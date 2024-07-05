@@ -961,7 +961,6 @@ const ReportPage = () => {
         }
         dispatch(getExpense(body))
     }, [dispatch, beginDay, endDay])
-
     useEffect(() => {
         if (id === 'debts') {
             let date = new Date()

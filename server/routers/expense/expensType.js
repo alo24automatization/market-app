@@ -4,7 +4,6 @@ const { Market } = require("../../models/MarketAndBranch/Market");
 module.exports.getTypes = async (req, res) => {
     try {
         const { market } = req.body;
-        console.log(req.body);
         const marke = await Market.findById(market);
         if (!marke) {
             return res
