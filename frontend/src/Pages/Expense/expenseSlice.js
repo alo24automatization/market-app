@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { universalToast } from '../../Components/ToastMessages/ToastMessages'
 import Api from '../../Config/Api'
 
-export const    getExpense = createAsyncThunk(
+export const  getExpense = createAsyncThunk(
     'expense/getExpense',
     async (body, { rejectWithValue }) => {
         try {

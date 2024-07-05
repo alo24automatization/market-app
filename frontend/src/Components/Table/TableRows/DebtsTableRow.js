@@ -37,7 +37,6 @@ export const DebtsTableRow = ({
         const daysUntilPayment = debtEndDate.diff(now, 'days');
         return daysUntilPayment <= 3;
     }
-    console.log(data);
     return (
         <>
             {map(data, (debt, index) =>
@@ -217,7 +216,7 @@ export const DebtsTableRow = ({
             <tr className='tr bg-transparent'>
                 <td
                     className='text-left td border-none bg-none'
-                    colSpan={7}
+                    colSpan={8}
                 ></td>
                 <td
                     className='text-left td py-[0.625rem] font-medium border-none bg-none'

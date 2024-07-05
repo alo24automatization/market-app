@@ -3,7 +3,6 @@ const router = Router();
 const auth = require('../../middleware/auth.middleware');
 
 router.post('/', auth, (req, res) => {
-  console.log(req.body);
   require('./expensType').getTypes(req, res);
 });
 
