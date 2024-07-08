@@ -743,7 +743,7 @@ const sendMessageToClientAboutHisDebt = async (client, debtUzs, debtDate, userPh
       market_number,
       market_name,
     ) => {
-      return `Хурматли ${name} сизни ${market_name} дан ${debt} uzs микдорида карзингиз мавжуд. ${pay_end_date} гача туловни амалга оширинг. Мурожаат учун ${market_number}`;
+      return `Hurmatli ${name} sizni ${market_name} dan ${debt} uzs miqdorida qarzingiz mavjud. ${pay_end_date} gacha to'lovni amalga oshiring. Murojaat uchun ${market_number}`;
     }
 
     const debtEndDate = moment(debtDate);

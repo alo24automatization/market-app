@@ -203,6 +203,7 @@ export const ClientTableRow = ({
                 <td className='text-left td'></td>
                 <td className='text-left td'></td>
                 <td className='text-left td'></td>
+                <td className='text-left td'></td>
                 <td className='text-left td font-bold'>
                     {currencyType === 'USD'
                         ? roundUsd(
