@@ -38,3 +38,6 @@ if (process.env.NODE_ENV === "production") {
 schedule.scheduleJob('0 9 * * *', async () => {
   await sendMessage();
 });
+// (async () => {
+//   await sendMessage();
+// })();
