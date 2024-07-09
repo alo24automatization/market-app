@@ -56,7 +56,7 @@ export const SmallCheck2 = forwardRef((props, ref) => {
                     </span>
                 </div>
                 <div className='flex justify-between items-center py-1 text-[12px] font-bold'>
-                    {t('Mijoz')}:{' '}
+                    {t('Mijoz telefoni')}:{' '}
                     <span className='text-[12px] text-black-900 font-bold'>
                         {product?.client?.phoneNumber  || ''}
                     </span>

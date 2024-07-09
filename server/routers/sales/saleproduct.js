@@ -366,7 +366,7 @@ module.exports.register = async (req, res) => {
       .populate("payment", "payment paymentuzs totalprice totalpriceuzs")
       .populate("discount", "discount discountuzs")
       .populate("debt", "debt debtuzs pay_end_date")
-      .populate("client", "name")
+      .populate("client", "name phoneNumber")
       .populate("packman", "name")
       .populate("user", "firstname lastname")
       .populate("saleconnector", "id");
@@ -722,7 +722,7 @@ module.exports.addproducts = async (req, res) => {
       .populate("payment", "payment paymentuzs totalprice totalpriceuzs")
       .populate("discount", "discount discountuzs")
       .populate("debt", "debt debtuzs")
-      .populate("client", "name")
+      .populate("client", "name phoneNumber")
       .populate("packman", "name")
       .populate("user", "firstname lastname")
       .populate("saleconnector", "id");

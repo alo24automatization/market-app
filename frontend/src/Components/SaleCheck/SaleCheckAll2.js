@@ -98,7 +98,7 @@ export const SaleCheckAll2 = forwardRef((props, ref) => {
                         </span>
                     </li>
                     <li className='check-ul-li font-bold'>
-                        {t('Telefon')}:{' '}
+                        {t('Mijoz telefoni')}:{' '}
                         <span className='check-ul-li-span font-bold'>
                             {product?.client?.phoneNumber || ""}
                         </span>
