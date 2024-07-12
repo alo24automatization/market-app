@@ -2187,6 +2187,7 @@ const RegisterSelling = () => {
                 </form>
             </Modal>
             <CustomerPayment
+                hasDiscountBtn={true}
                 clickdelay={clickdelay}
                 returned={!!returnProducts.length}
                 type={paymentType}
