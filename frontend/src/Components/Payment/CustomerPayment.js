@@ -223,7 +223,7 @@ function CustomerPayment({
                             />
                         )}
                     </div>
-                    {!returned || hasDiscount && (
+                    {hasDiscount && (
                         <DiscountBtn
                             text={t(`Chegirma`)}    
                             onClick={handleClickDiscountBtn}
