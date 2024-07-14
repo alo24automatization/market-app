@@ -138,7 +138,6 @@ const RegisterSelling = () => {
         label: market?.name,
         value: market?._id, 
     })
-    console.log(tableProducts);
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
     useEffect(() => {
         const handleResize = () => {
