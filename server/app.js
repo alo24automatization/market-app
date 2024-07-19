@@ -18,6 +18,7 @@ const io = new Server(server, {
     },
 });
 
+// a
 app.use(cors());
 
 socketIO(io);
