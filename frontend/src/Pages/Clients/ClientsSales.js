@@ -149,7 +149,6 @@ const ClientsSales = () => {
             setModalVisible(!modalVisible)
         }
     }
-
     const filterData = (filterKey) => {
         if (filterKey === sorItem.filter) {
             switch (sorItem.count) {
