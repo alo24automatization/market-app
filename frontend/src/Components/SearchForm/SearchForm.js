@@ -66,6 +66,8 @@ function SearchForm({
     const {t} = useTranslation(['common'])
     const chooseComponent = (key) => {
         switch (key) {
+            case "page_changer":
+                return 
             case 'category':
                 return (
                     <FilterButtons

@@ -18,13 +18,13 @@ const io = new Server(server, {
     },
 });
 
+// a
 app.use(cors());
 
 socketIO(io);
 
 start(server).then(() => {
 });
-
 routers(app);
 
 if (process.env.NODE_ENV === "production") {
@@ -37,7 +37,7 @@ if (process.env.NODE_ENV === "production") {
     });
 }
 schedule.scheduleJob('0 9 * * *', async () => {
-  await sendMessage();
+    await sendMessage();
 });
 // (async () => {
 //     await sendMessage();

@@ -18,7 +18,15 @@ const { Debt } = require("../../models/Sales/Debt");
 
 module.exports.register = async (req, res) => {
   try {
-    const { name, phoneNumber, market, packman, search, currentPage, countPage } = req.body;
+    const {
+      name,
+      phoneNumber,
+      market,
+      packman,
+      search,
+      currentPage,
+      countPage,
+    } = req.body;
     const { error } = validateClient({ name, phoneNumber, market });
     if (error) {
       return res.status(400).json({
@@ -46,7 +54,7 @@ module.exports.register = async (req, res) => {
     const newClient = new Client({
       name,
       market,
-      phoneNumber
+      phoneNumber,
     });
     await newClient.save();
 
@@ -133,8 +141,16 @@ module.exports.getAll = async (req, res) => {
 
 module.exports.updateClient = async (req, res) => {
   try {
-    const { _id, market, name, phoneNumber, packman, search, currentPage, countPage } =
-      req.body;
+    const {
+      _id,
+      market,
+      name,
+      phoneNumber,
+      packman,
+      search,
+      currentPage,
+      countPage,
+    } = req.body;
     const marke = await Market.findById(market);
     if (!marke) {
       return res
@@ -283,18 +299,19 @@ module.exports.deleteClient = async (req, res) => {
 
 module.exports.paymentDebt = async (req, res) => {
   try {
-    const { payment, user, saleconnectorid, products, debt_id, market } = req.body;
+    const { payment, user, saleconnectorid, products, debt_id, market } =
+      req.body;
 
     const debt = await Debt.findById(debt_id);
     if (!debt) {
-      return res.status(404).json({ message: 'Debt not found' });
+      return res.status(404).json({ message: "Debt not found" });
     }
     debt.debt -= payment.card + payment.cash + payment.transfer;
     debt.debtuzs -= payment.carduzs + payment.cashuzs + payment.transferuzs;
     await debt.save();
     const saleConnector = await SaleConnector.findById(saleconnectorid);
     if (!saleConnector) {
-      return res.status(404).json({ message: 'SaleConnector not found' });
+      return res.status(404).json({ message: "SaleConnector not found" });
     }
     const newPayment = await Payment({
       comment: payment.comment,
@@ -311,7 +328,7 @@ module.exports.paymentDebt = async (req, res) => {
       market,
       user,
       saleconnector: saleconnectorid,
-    })
+    });
     await newPayment.save();
     saleConnector.payments.push(newPayment._id);
     await saleConnector.save();
@@ -324,14 +341,16 @@ module.exports.paymentDebt = async (req, res) => {
     res.status(200).json(returnpayment);
   } catch (error) {
     // Handle any errors that occur
-    console.error('Error processing payment:', error);
-    res.status(500).json({ message: 'An error occurred while processing the payment', error });
+    console.error("Error processing payment:", error);
+    res.status(500).json({
+      message: "An error occurred while processing the payment",
+      error,
+    });
   }
 };
 module.exports.getClients = async (req, res) => {
   try {
-    const { market, search } =
-      req.body;
+    const { market, search } = req.body;
     const marke = await Market.findById(market);
     if (!marke) {
       return res
@@ -358,7 +377,7 @@ module.exports.getClients = async (req, res) => {
       })
         .sort({ _id: -1 })
         .select("name market packman phoneNumber")
-        .populate("packman", "name")
+        .populate("packman", "name");
     } else {
       clientsCount = await Client.find({
         market,
@@ -371,7 +390,7 @@ module.exports.getClients = async (req, res) => {
       })
         .sort({ _id: -1 })
         .select("name market phoneNumber packman")
-        .populate("packman", "name")
+        .populate("packman", "name");
     }
 
     const reduceForSales = (arr, key) => {
@@ -485,7 +504,7 @@ module.exports.getClients = async (req, res) => {
         market: client.market,
         packman: client.packman,
         saleconnector: s,
-        phoneNumber: client.phoneNumber
+        phoneNumber: client.phoneNumber,
       };
       newClients.push(newClient);
     }
@@ -499,8 +518,7 @@ module.exports.getClients = async (req, res) => {
 
 module.exports.getClientsSales = async (req, res) => {
   try {
-    const { market, clientId } =
-      req.body;
+    const { market, clientId } = req.body;
 
     const marke = await Market.findById(market);
     if (!marke) {
@@ -508,7 +526,6 @@ module.exports.getClientsSales = async (req, res) => {
         .status(401)
         .json({ message: `Diqqat! Do'kon haqida malumotlar topilmadi!` });
     }
-
 
     const allpayments = await DailySaleConnector.find({
       market,
@@ -542,17 +559,14 @@ module.exports.getClientsSales = async (req, res) => {
         path: "saleconnector",
         populate: {
           path: "payments",
-          match: { totalprice: { $exists: false } }
+          match: { totalprice: { $exists: false } },
         },
       })
       .lean()
-      .then(connectors => connectors.filter(connector => connector.client))
+      .then((connectors) => connectors.filter((connector) => connector.client));
+    const response = allpayments.filter((product) => product.client !== null);
 
-    const response = allpayments.filter(
-      (product) => product.client !== null
-    );
     const count = response.length;
-    console.log(allpayments);
     res.status(201).json({ data: response, count });
   } catch (error) {
     console.log(error);

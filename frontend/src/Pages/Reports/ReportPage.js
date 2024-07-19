@@ -780,7 +780,23 @@ const ReportPage = () => {
             client: target,
         })
     }
-
+    const [clientPhoneNumber,setClinetPhoneNumber]=useState("")
+const handleChangeClientPhoneNumber=(e)=>{
+    let target = e.target.value.toLowerCase();
+    setClinetPhoneNumber(target)
+    setCurrentData([
+        ...filter(
+            [...storageData],
+            (item) =>
+                item.client &&
+                item.client.phoneNumber.toLowerCase().includes(target)
+        ),
+    ])
+    setLocalSearch({
+        ...localSearch,
+        client: target,
+    })
+}
     const onKeySearch = (e) => {
         if (e.key === 'Enter') {
             setSendingSearch(localSearch)
@@ -862,6 +878,7 @@ const ReportPage = () => {
         setModalVisible(!modalVisible)
     }
 
+    
     useEffect(() => {
         const check = (page) => id === page
         let body = {
@@ -986,7 +1003,7 @@ const ReportPage = () => {
             }
         }
     }, [id, startDate, endDate])
-
+  
     return (
         <div className='relative overflow-auto '>
             {customLoading && (
@@ -1048,7 +1065,7 @@ const ReportPage = () => {
                         <SearchForm
                             filterBy={
                                 id === 'debts'
-                                    ? ['id', 'clientName']
+                                    ? ['id', 'clientName',"clientPhoneNumber"]
                                     : id === 'income'
                                         ? ['total', 'id', 'startDate', 'endDate']
                                         : id === 'expenses'
@@ -1075,7 +1092,8 @@ const ReportPage = () => {
                                                     ]
                             }
                             filterById={searchId}
-                            filterByClientName={searchClientName}
+                            filterByClientPhoneNumber={handleChangeClientPhoneNumber}
+phoneNumber={clientPhoneNumber}                            filterByClientName={searchClientName}
                             filterByIdWhenPressEnter={onKeySearch}
                             filterByClientNameWhenPressEnter={onKeySearch}
                             startDate={beginDay}
@@ -1134,6 +1152,7 @@ const ReportPage = () => {
                                             'endDate',
                                             'id',
                                             'clientName',
+                                            
                                         ]
                                         : id === 'income'
                                             ? [

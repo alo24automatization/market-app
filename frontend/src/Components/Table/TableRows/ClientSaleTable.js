@@ -94,10 +94,27 @@ export const ClientSaleTable = ({
             return Number(parseFloat(value).toFixed(2));
         }
     }
+    // const cacl=({saleconnector})=>{
+    //  return  data.map((el) => {
+    //      a=  el.saleconnector?.payments?.reduce((sum, payment) => {
+    //              return (
+    //                  sum +
+    //                  Number(
+    //                      payment[
+    //                      currency === 'USD' ? 'payment' : 'paymentuzs'
+    //                      ]
+    //                  )
+    //              )
+    //         }, 0)
+    //     })[data.length - 1]
+    //     console.log(a);
+    //     return 0
+    // }
     return (
         <>
             {map(data, (saleconnector, index) => {
-                let totalSum = 0
+                let totalSum = 0;
+                const uniqueProductIds = new Set();
                 return !isMobile ? (
                     <tr className='tr' key={uniqueId('sales')}>
                         <td className='text-left td'>
@@ -151,15 +168,15 @@ export const ClientSaleTable = ({
                         </td>
                         <td className='text-success-500 text-left td'>
                             <ul>
+                                {/* {cacl(saleconnector)} */}
                                 {saleconnector?.saleconnector?.payments?.flatMap(
                                     (payment) =>
                                         payment.products.map((productId) => {
                                             let product =
                                                 saleconnector.products.find(
                                                     (p) => p._id === productId
-                                                )?._id
-
-                                            if (productId === product) {
+                                                )?._id;
+                                                if (productId === product) {
                                                 totalSum +=
                                                     payment[
                                                     currency === 'USD'

@@ -89,12 +89,14 @@ const Sellings = ({id}) => {
     const [storeData, setStoreData] = useState(sellings)
     const [filteredDataTotal, setFilteredDataTotal] = useState(total)
     const [searchedData, setSearchedData] = useState(searchedSellings)
-    const [showByTotal, setShowByTotal] = useState('10')
+    const [showByTotal, setShowByTotal] = useState('50')
     const [currentPage, setCurrentPage] = useState(0)
+    const [searchingStatus,setSearchingStatus]=useState(false)
     const [search, setSearch] = useState({
         id: '',
         client: '',
         product: '',
+        phoneNumber:''
     })
     const [sorItem, setSorItem] = useState({
         filter: '',
@@ -319,13 +321,16 @@ const Sellings = ({id}) => {
         }
     }
     const handleChangeClient = (e) => {
-        const val = e.target.value
+        const val = e.target.value;
+        setSearchingStatus(true)
         const valForSearch = val.toLowerCase().replace(/\s+/g, ' ').trim()
         setSearch({...search, client: val})
         ;(searchedData.length > 0 || totalSearched > 0) &&
             dispatch(clearSearchedSellings())
         if (valForSearch === '') {
             setData(sellings)
+            setSearchedData([])
+            setSearchingStatus(false)
             setFilteredDataTotal(total)
         } else {
             const filteredProducts = filter(sellings, (selling) => {
@@ -336,7 +341,31 @@ const Sellings = ({id}) => {
                     selling?.packman?.name.toLowerCase().includes(valForSearch)
                 )
             })
-            setData(filteredProducts)
+            setSearchedData(filteredProducts);
+            setFilteredDataTotal(filteredProducts.length)
+        }
+    }
+    const handleChangeClientPhoneNumber = (e) => {
+        const val = e.target.value;
+        setSearchingStatus(true)
+        const valForSearch = val.toLowerCase().replace(/\s+/g, ' ').trim()
+        setSearch({...search, phoneNumber: val})
+        ;(searchedData.length > 0 || totalSearched > 0) &&
+            dispatch(clearSearchedSellings())
+        if (valForSearch === '') {
+            setData(sellings)
+            setSearchedData([])
+            setSearchingStatus(false)
+            setFilteredDataTotal(total)
+        } else {
+            const filteredProducts = filter(sellings, (selling) => {
+                return (
+                    selling?.client?.phoneNumber
+                        .toLowerCase()
+                        .includes(valForSearch) 
+                )
+            })
+            setSearchedData(filteredProducts);
             setFilteredDataTotal(filteredProducts.length)
         }
     }
@@ -463,9 +492,9 @@ const Sellings = ({id}) => {
         setData(sellings)
         setStoreData(sellings)
     }, [sellings])
-    useEffect(() => {
-        setSearchedData(searchedSellings)
-    }, [searchedSellings])
+    // useEffect(() => {
+    //     setSearchedData(searchedSellings)
+    // }, [searchedSellings])
     useEffect(() => {
         setFilteredDataTotal(total)
     }, [total])
@@ -631,7 +660,12 @@ const Sellings = ({id}) => {
         }
         dispatch(getSellingsByFilter(body))
     }
-
+    const options = [
+        {value: 50, label: 50},
+        {value: 100, label: 100},
+        {value: 150, label: 150},
+        {value: 100000, label: t('Barchasi')}
+    ]
     return (
         <motion.section
             key='content'
@@ -676,19 +710,31 @@ const Sellings = ({id}) => {
                 </div>
             </div>
             {!isMobile ? (
-                <div className='mt-2'>
+                <div className='mt-2 flex items-center'>
+                     <div className={'mt-6'}>
+                            <SelectForm
+                            otherOptions={options}
+                                key={'total_1'}
+                                onSelect={filterByTotal}
+                            />
+                        </div>
                     <SearchForm
                         filterBy={[
+                            'page_changer' ,
                             'total',
                             'startDate',
                             'endDate',
                             'id',
                             'clientName',
+                            'clientPhoneNumber',
                             'product_name',
+
                         ]}
                         filterByTotal={filterByTotal}
+                        filterByClientPhoneNumber={handleChangeClientPhoneNumber}
                         startDate={startDate}
                         setStartDate={setStartDate}
+                        phoneNumber={search.phoneNumber}
                         endDate={endDate}
                         setEndDate={setEndDate}
                         searchById={search.id}
@@ -729,9 +775,11 @@ const Sellings = ({id}) => {
                                 startDate={startDate}
                                 setStartDate={setStartDate}
                                 endDate={endDate}
+                                filterByClientPhoneNumber={handleChangeClientPhoneNumber}
                                 setEndDate={setEndDate}
                                 searchById={search.id}
                                 searchByClientName={search.client}
+                                phoneNumber={search.phoneNumber}
                                 filterByClientName={handleChangeClient}
                                 filterById={handleChangeId}
                                 filterByClientNameWhenPressEnter={
@@ -758,7 +806,6 @@ const Sellings = ({id}) => {
                     </div>
                 )
             )}
-
             <div className='lg:tableContainerPadding'>
                 {getSellingsLoading ? (
                     <Spinner />
@@ -766,7 +813,7 @@ const Sellings = ({id}) => {
                     <NotFind text={`${t("Ro'yxat mavjud emas")}`} />
                 ) : !isMobile ? (
                     <Table
-                        data={searchedData.length > 0 ? searchedData : data}
+                        data={searchingStatus?searchedData:data}
                         currentPage={currentPage}
                         currency={currencyType}
                         countPage={showByTotal}
@@ -796,7 +843,7 @@ const Sellings = ({id}) => {
                         editComment={editComment}
                     />
                 )}
-                {/* <div className='m-4  flex justify-center'>
+                <div className='m-4 flex justify-center'>
                     {(filteredDataTotal !== 0 || totalSearched !== 0) && (
                         <Pagination
                             countPage={Number(showByTotal)}
@@ -805,7 +852,7 @@ const Sellings = ({id}) => {
                             setCurrentPage={setCurrentPage}
                         />
                     )}
-                </div> */}
+                </div>
                 <UniversalModal
                     body='approve'
                     toggleModal={toggleDeleteModal}

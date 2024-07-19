@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import '../../Pages/Category/Category.scss'
 import {t} from 'i18next'
 
-const SelectForm = ({onSelect, isDisabled}) => {
+const SelectForm = ({onSelect, isDisabled,otherOptions}) => {
     const {t} = useTranslation(['common'])
     const options = [
         {value: 10, label: 10},
@@ -25,12 +25,11 @@ const SelectForm = ({onSelect, isDisabled}) => {
                 {t(``)}
             </label>
             <Select
-            
                 onChange={onSelect}
                 styles={CustomStyle}
                 isSearchable={false}
-                defaultValue={options[0]}
-                options={options}
+                defaultValue={otherOptions?otherOptions[0]:options[0]}
+                options={otherOptions?otherOptions:options}
                 isDisabled={isDisabled}
                 id={'select'}
                 components={{

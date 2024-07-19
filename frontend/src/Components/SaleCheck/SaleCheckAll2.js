@@ -17,6 +17,16 @@ export const SaleCheckAll2 = forwardRef((props, ref) => {
     const { market } = useSelector((state) => state.login)
     const { currencyType } = useSelector((state) => state.currency)
     const calculateAllSum = (data) => {
+        console.log(data.reduce((acc, pr) => {
+            return (
+                acc +
+                pr[
+                currencyType === 'USD'
+                    ? 'totalprice'
+                    : 'totalpriceuzs'
+                ]
+            )
+        }, 0));
         return data
             ? data.reduce((acc, pr) => {
                 return (
@@ -495,7 +505,7 @@ export const SaleCheckAll2 = forwardRef((props, ref) => {
                     {t('Jami')}:{' '}
                     <span className='text-black-900 font-bold'>
                         {(
-                            calculateAllSum(selled) + calculateAllSum(returned)
+                            calculateAllSum(selled) 
                         ).toLocaleString('ru-Ru')}{' '}
                         {currencyType}
                     </span>
@@ -525,7 +535,7 @@ export const SaleCheckAll2 = forwardRef((props, ref) => {
                 <li className='text-black-900 check-ul-li-foot'>
                     {' '}
                     {t('Qarz')}:{' '}
-                    <span className=' text-black-900 font-bold'>
+                    <span className='text-black-900 font-bold'>
                         {(
                             calculateAllSum(selled) +
                             calculateAllSum(returned) -
@@ -542,6 +552,9 @@ export const SaleCheckAll2 = forwardRef((props, ref) => {
                     {t('Umumiy qarz')}:{' '}
                     <span className=' text-black-900 font-bold'>
                         {currencyType === 'USD' ? product?.totaldebtusd || 0 : product?.totaldebtuzs || 0}
+                        {
+                            " "
+                        }
                         {currencyType}
                     </span>
                 </li>
