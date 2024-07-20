@@ -8,6 +8,7 @@ import Table from '../../Components/Table/Table'
 import {warningMoreDiscount, warningMorePayment} from '../../Components/ToastMessages/ToastMessages'
 import {getDebts, payDebt} from '../Reports/reportsSlice'
 import {filter} from 'lodash'
+import {t} from "i18next";
 
 const PayDebts = () => {
     const dispatch = useDispatch()
@@ -513,22 +514,30 @@ const PayDebts = () => {
             title: '№',
         },
         {
-            title: 'Sana',
+            title: t('Sana'),
+            filter: 'createdAt',
         },
         {
-            title: 'ID',
+            title: t('ID'),
         },
         {
-            title: 'Mijoz',
+            title: t('Mijoz'),
+            filter: 'client',
         },
         {
-            title: 'Izoh',
+            title: t('Telefon'),
         },
         {
-            title: 'Jami',
+            title: t('Qarz izoh'),
         },
         {
-            title: 'Qarz',
+            title: t(`To'lov sanasi`),
+        },
+        {
+            title: t('Jami'),
+        },
+        {
+            title: t('Qarz'),
         },
         {
             title: '',
@@ -538,8 +547,9 @@ const PayDebts = () => {
     return (
         <div className='relative overflow-auto h-full pt-[10px]'>
             <div className='flex items-center justify-between'>
+
                 <SearchForm
-                    filterBy={['startDate', 'endDate', 'id', 'clientName']}
+                    filterBy={['startDate', 'endDate', 'id', 'clientName','clientPhoneNumber']}
                     filterById={searchId}
                     filterByClientName={searchClientName}
                     startDate={startDate}
@@ -551,6 +561,7 @@ const PayDebts = () => {
             <div className='tableContainerPadding'>
                 {currentData.length > 0 && (
                     <Table
+                        salerDebts={true}
                         page={'debts'}
                         headers={debtHeader}
                         data={currentData}
@@ -562,6 +573,7 @@ const PayDebts = () => {
             </div>
             <div>
                 <CustomerPayment
+                    disableInputsCashCard={true}
                     returned={true}
                     type={paymentType}
                     active={paymentModalVisible}

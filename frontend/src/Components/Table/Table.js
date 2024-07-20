@@ -52,6 +52,7 @@ function Table({
     countPage,
     Sort,
     Edit,
+                   salerDebts,
     Delete,
     currency,
     changeHandler,
@@ -413,6 +414,7 @@ function Table({
             case 'debts':
                 return (
                     <DebtsTableRow
+                        salerDebts={salerDebts}
                         data={data}
                         currency={currency}
                         Pay={Pay}

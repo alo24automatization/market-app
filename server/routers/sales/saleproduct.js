@@ -1085,7 +1085,6 @@ module.exports.registeredit = async (req, res) => {
     );
 
     let all = [];
-
     // Create SaleProducts
     for (const saleproduct of saleproducts) {
       if (saleproduct.pieces > 0) {
@@ -1127,6 +1126,9 @@ module.exports.registeredit = async (req, res) => {
           $push: {
             saleproducts: newSaleProduct._id,
           },
+          $set: {
+            backed: true,
+          },
         });
 
         const saleproductprice = await SaleProduct.findById(
@@ -1135,7 +1137,6 @@ module.exports.registeredit = async (req, res) => {
 
         newSaleProduct.price = saleproductprice.price;
         newSaleProduct.save();
-
         all.push(newSaleProduct);
       }
     }
@@ -1160,7 +1161,6 @@ module.exports.registeredit = async (req, res) => {
       saleprod.dailysaleconnector = dailysaleconnector._id;
       await saleprod.save();
       products.push(saleprod._id);
-
       const updateproduct = await Product.findById(saleproduct.product);
       updateproduct.total -= saleproduct.pieces;
       await updateproduct.save();

@@ -12,6 +12,7 @@ import {SaleCheckAll2} from '../../SaleCheck/SaleCheckAll2.js'
 import {SmallCheck2} from './SmallCheck2.js'
 
 function AllCheck({product, allDetails}) {
+    console.log("salled")
     // detect mobile
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
     const [loadContent, setLoadContent] = useState(false)

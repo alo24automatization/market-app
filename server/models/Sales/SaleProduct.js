@@ -47,7 +47,8 @@ const saleproductSchema = new Schema(
     isArchive: { type: Boolean, default: false },
     sizePrice: {type:Number,default:0},
     lengthAmout: {type:Number,default:0},
-    priceFromLengthAmout: {type:Number,default:0}
+    priceFromLengthAmout: {type:Number,default:0},
+      backed:{type:Boolean,default:false}
   }, 
   {
     timestamps: true,
@@ -64,6 +65,7 @@ function validateSaleProduct(saleproduct) {
     unitpriceuzs: Joi.number().required(),
     pieces: Joi.number().required(),
     product: Joi.string().required(),
+      backed:Joi.boolean().default(false),
     market: Joi.string(),
     sizePrice:Joi.number().optional().default(0),
     lengthAmout:Joi.number().optional().default(0),
