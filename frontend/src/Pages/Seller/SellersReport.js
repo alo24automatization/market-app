@@ -36,10 +36,7 @@ const SellersReport = () => {
             title: t('Sana'),
             filter: 'createdAt'
         },
-        {
-            title: t('ID'),
-            filter: 'id'
-        },
+
         {
             title: t('Mijoz')
         },
@@ -51,6 +48,10 @@ const SellersReport = () => {
         },
         {
             title: t('Qarz')
+        },
+        {
+            title: t("Qarzdan to'lov"),
+            styles: 'w-[7rem]'
         },
         {
             title: '',

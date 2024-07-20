@@ -17,16 +17,16 @@ export const SaleCheckAll2 = forwardRef((props, ref) => {
     const { market } = useSelector((state) => state.login)
     const { currencyType } = useSelector((state) => state.currency)
     const calculateAllSum = (data) => {
-        console.log(data.reduce((acc, pr) => {
-            return (
-                acc +
-                pr[
-                currencyType === 'USD'
-                    ? 'totalprice'
-                    : 'totalpriceuzs'
-                ]
-            )
-        }, 0));
+        // console.log(data.reduce((acc, pr) => {
+        //     return (
+        //         acc +
+        //         pr[
+        //         currencyType === 'USD'
+        //             ? 'totalprice'
+        //             : 'totalpriceuzs'
+        //         ]
+        //     )
+        // }, 0));
         return data
             ? data.reduce((acc, pr) => {
                 return (
@@ -306,9 +306,9 @@ export const SaleCheckAll2 = forwardRef((props, ref) => {
                         })
                     }
                     {
-                        selled.some((item) => item.more_parameters1.length == 0 &&
-                            item.more_parameters1.size == 0 &&
-                            item.more_parameters1.piece == 0 &&
+                        selled.some((item) => item.more_parameters1.length === 0 &&
+                            item.more_parameters1.size === 0 &&
+                            item.more_parameters1.piece === 0 &&
                             item.more_parameters2.length === 0) &&
                         <table className='border-collapse border border-slate-400 w-full mt-2'>
                             <thead>

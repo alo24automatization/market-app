@@ -10,6 +10,7 @@ export const DebtsTableRow = ({
     Pay,
     Print,
     Edit,
+                                  salerDebts,
     totalDebt,
 }) => {
     const [isEditComment, setIsEditComment] = useState(null)
@@ -47,9 +48,12 @@ export const DebtsTableRow = ({
                             {new Date(debt.createdAt).toLocaleDateString()}
                         </td>
                         <td className='text-left td'>{debt.id}</td>
-                        <td className='text-left td'>
-                            {debt.packman && debt.packman}
-                        </td>
+                        {salerDebts ? null :
+                            <td className='text-left td'>
+                                {debt.packman && debt.packman}
+                            </td>
+                        }
+
                         <td className='text-left td'>
                             {debt.client && debt.client.name}
                         </td>

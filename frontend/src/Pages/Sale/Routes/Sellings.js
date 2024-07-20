@@ -360,8 +360,7 @@ const Sellings = ({id}) => {
         } else {
             const filteredProducts = filter(sellings, (selling) => {
                 return (
-                    selling?.client?.phoneNumber
-                        .toLowerCase()
+                    selling?.client?.phoneNumber?.toLowerCase()
                         .includes(valForSearch) 
                 )
             })

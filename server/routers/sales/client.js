@@ -16,6 +16,9 @@ const { regExpression } = require("../globalFunctions.js");
 const { DailySaleConnector } = require("../../models/Sales/DailySaleConnector");
 const { Debt } = require("../../models/Sales/Debt");
 
+ const reduce = (arr, el) =>
+    arr.reduce((prev, item) => prev + (item[el] || 0), 0);
+
 module.exports.register = async (req, res) => {
   try {
     const {
@@ -527,6 +530,7 @@ module.exports.getClientsSales = async (req, res) => {
         .json({ message: `Diqqat! Do'kon haqida malumotlar topilmadi!` });
     }
 
+
     const allpayments = await DailySaleConnector.find({
       market,
     })
@@ -534,10 +538,10 @@ module.exports.getClientsSales = async (req, res) => {
       .populate({
         path: "products",
         select:
-          "totalprice unitprice totalpriceuzs unitpriceuzs pieces fromFilial",
+          "totalprice backed unitprice totalpriceuzs unitpriceuzs pieces fromFilial",
         populate: {
           path: "product",
-          select: "productdata total",
+          select: "productdata  total",
           populate: {
             path: "productdata",
             select: "code name",
@@ -564,8 +568,8 @@ module.exports.getClientsSales = async (req, res) => {
       })
       .lean()
       .then((connectors) => connectors.filter((connector) => connector.client));
-    const response = allpayments.filter((product) => product.client !== null);
-
+    const response = allpayments.filter((payment) => payment.client !== null&&payment.products.some(product=>!product.backed));
+     // const filteredResponse=response.filter((item=>  !filter.some((res)=> Math.abs(res?.totalpriceuzs)===item?.debt?.debtuzs)))
     const count = response.length;
     res.status(201).json({ data: response, count });
   } catch (error) {

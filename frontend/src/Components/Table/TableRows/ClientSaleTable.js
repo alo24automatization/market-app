@@ -94,22 +94,7 @@ export const ClientSaleTable = ({
             return Number(parseFloat(value).toFixed(2));
         }
     }
-    // const cacl=({saleconnector})=>{
-    //  return  data.map((el) => {
-    //      a=  el.saleconnector?.payments?.reduce((sum, payment) => {
-    //              return (
-    //                  sum +
-    //                  Number(
-    //                      payment[
-    //                      currency === 'USD' ? 'payment' : 'paymentuzs'
-    //                      ]
-    //                  )
-    //              )
-    //         }, 0)
-    //     })[data.length - 1]
-    //     console.log(a);
-    //     return 0
-    // }
+
     return (
         <>
             {map(data, (saleconnector, index) => {
@@ -168,7 +153,6 @@ export const ClientSaleTable = ({
                         </td>
                         <td className='text-success-500 text-left td'>
                             <ul>
-                                {/* {cacl(saleconnector)} */}
                                 {saleconnector?.saleconnector?.payments?.flatMap(
                                     (payment) =>
                                         payment.products.map((productId) => {
