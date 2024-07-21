@@ -37,7 +37,6 @@ export const ClientTableRow = ({
             state: name,
         })
     }
-    console.log(data);
     return (
         <>
             {map(data, (client, index) =>

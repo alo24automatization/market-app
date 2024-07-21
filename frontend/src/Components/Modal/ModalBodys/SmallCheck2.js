@@ -1,22 +1,23 @@
-import React, { forwardRef } from 'react'
-import { map } from 'lodash'
-import { useSelector } from 'react-redux'
-import { t } from 'i18next'
+import React, {forwardRef} from 'react'
+import {map} from 'lodash'
+import {useSelector} from 'react-redux'
+import {t} from 'i18next'
 
 export const SmallCheck2 = forwardRef((props, ref) => {
-    const {  selled,
+    const {
+        selled,
         returned,
         selledDiscounts,
         returnedDiscounts,
         selledPayments,
         returnedPayments,
         product,
-        userInfo, } = props;
+        userInfo,
+    } = props;
 
-    const { market } = useSelector((state) => state.login)
-    const { currencyType } = useSelector((state) => state.currency)
-    const calculateDebt = (total=0, payment=0, discount = 0) => {
-        console.log(total,payment,discount)
+    const {market} = useSelector((state) => state.login)
+    const {currencyType} = useSelector((state) => state.currency)
+    const calculateDebt = (total = 0, payment = 0, discount = 0) => {
         return (total - payment - discount).toLocaleString('ru-Ru')
     }
     const calculateAllPayments = (data) => {
@@ -47,7 +48,7 @@ export const SmallCheck2 = forwardRef((props, ref) => {
         <div ref={ref} className={'px-2'}>
             <div className='flex pb-2 flex-col text-center justify-center border-b-[0.8px] border-black-700'>
                 <div className='w-[200px] h-[200px] object-contain'>
-                    <img src={market?.image} alt='logo' className='w-full h-full' />
+                    <img src={market?.image} alt='logo' className='w-full h-full'/>
                 </div>
                 <div className='flex justify-between items-center py-1 text-[12px] font-bold'>
                     {t('Telefon')}:
@@ -76,7 +77,7 @@ export const SmallCheck2 = forwardRef((props, ref) => {
                 <div className='flex justify-between items-center py-1 text-[12px] font-bold'>
                     {t('Mijoz telefoni')}:{' '}
                     <span className='text-[12px] text-black-900 font-bold'>
-                        {product?.client?.phoneNumber  || ''}
+                        {product?.client?.phoneNumber || ''}
                     </span>
                 </div>
                 <div
@@ -108,9 +109,10 @@ export const SmallCheck2 = forwardRef((props, ref) => {
                     <div>
                         {map(product?.products, (item, index) => {
                             if (
-                                item?.more_parameters1?.length != 0 &&
-                                item?.more_parameters1?.size != 0 &&
-                                item?.more_parameters1?.piece != 0
+                                item['more_parameters1'] &&
+                                item?.more_parameters1?.length !== 0 &&
+                                item?.more_parameters1?.size !== 0 &&
+                                item?.more_parameters1?.piece !== 0
                             ) {
                                 return (
                                     <div>
@@ -119,11 +121,13 @@ export const SmallCheck2 = forwardRef((props, ref) => {
                                             {item?.product?.productdata?.name}
                                         </div>
                                         {item?.forWhat !== "" || item.forWhat ?
-                                            <div className='text-start text-[12px] border  border-b-0 !text-black-900 p-1 pr-3 border-slate-400'>
+                                            <div
+                                                className='text-start text-[12px] border  border-b-0 !text-black-900 p-1 pr-3 border-slate-400'>
                                                 <b>{item?.forWhat}</b>{" "}
                                             </div> : null
                                         }
-                                        <table className='border-collapse border border-slate-400 w-full break-inside-auto'>
+                                        <table
+                                            className='border-collapse border border-slate-400 w-full break-inside-auto'>
                                             <thead>
                                             <tr
                                                 className={
@@ -171,8 +175,9 @@ export const SmallCheck2 = forwardRef((props, ref) => {
                                             </tr>
                                             </tbody>
                                         </table>
-                                        <div className='text-end text-[12px] border font-bold border-t-0 !text-black-900 p-1 pr-3 border-slate-400'>
-                                            Umumiy: {item?.more_parameters1?.length}  *{' '}
+                                        <div
+                                            className='text-end text-[12px] border font-bold border-t-0 !text-black-900 p-1 pr-3 border-slate-400'>
+                                            Umumiy: {item?.more_parameters1?.length} *{' '}
                                             {currencyType === 'USD'
                                                 ? item?.[item?.sizePrice === "" || item?.sizePrice === undefined ? "unitprice" : "sizePrice"]?.toLocaleString(
                                                     'ru-Ru'
@@ -190,7 +195,7 @@ export const SmallCheck2 = forwardRef((props, ref) => {
                                                 )}{' '}
                                             {currencyType}
                                         </div>
-                                        <br />
+                                        <br/>
                                     </div>
                                 )
                             } else if (item?.more_parameters2?.length > 0) {
@@ -219,7 +224,7 @@ export const SmallCheck2 = forwardRef((props, ref) => {
                                         </thead>
                                         <tbody>
                                         {
-                                            item?.more_parameters2?.map((column) => <tr>
+                                            item['more_parameters2'] && item?.more_parameters2?.map((column) => <tr>
                                                 <td className='check-table-body text-center'>
                                                     {
                                                         column.col1
@@ -239,7 +244,8 @@ export const SmallCheck2 = forwardRef((props, ref) => {
                                         }
                                         </tbody>
                                     </table>
-                                    <div className='text-end text-[12px] border border-t-0 !text-black-900 p-1 pr-3 font-bold border-slate-400'>
+                                    <div
+                                        className='text-end text-[12px] border border-t-0 !text-black-900 p-1 pr-3 font-bold border-slate-400'>
                                         {t("Umumiy")}: {item?.more_parameters2?.reduce((el, prev) => {
                                         return el + prev.result
                                     }, 0)}
@@ -267,7 +273,7 @@ export const SmallCheck2 = forwardRef((props, ref) => {
                                             {currencyType}
                                         </h1>
                                     </div>
-                                    <br />
+                                    <br/>
                                 </div>
                             } else {
                                 return (
@@ -295,7 +301,7 @@ export const SmallCheck2 = forwardRef((props, ref) => {
                                                 )}{' '}
                                             {currencyType}
                                         </div>
-                                        <br />
+                                        <br/>
                                     </div>
                                 )
                             }
@@ -305,23 +311,23 @@ export const SmallCheck2 = forwardRef((props, ref) => {
             )}
             <div className='border-t-[0.8px] border-black-700 w-full mt-4 mb-4 text-left'>
                 <h3
-                    style={{ fontWeight: 'bolder' }}
+                    style={{fontWeight: 'bolder'}}
                     className='text-black-900 text-[12px] font-bold pt-4'
                 >
                     {t('Jami')} :{' '}
-                    <span style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold'>
+                    <span style={{fontWeight: "bolder"}} className='text-black-900 text-[12px] font-bold'>
                         {calculateAllSum(product).toLocaleString('ru-Ru')}{' '}
                         {currencyType}
                     </span>
                 </h3>
                 <h3
-                    style={{ fontWeight: 'bolder' }}
+                    style={{fontWeight: 'bolder'}}
                     className='text-black-900 text-[12px] font-bold pt-4'
                 >
                     {' '}
                     {t('Chegirma')}:{' '}
                     <span
-                        style={{ fontWeight: 'bolder' }}
+                        style={{fontWeight: 'bolder'}}
                         className='text-black-900 text-[12px] font-bold'
                     >
                         {product?.hasOwnProperty('discount')
@@ -333,13 +339,13 @@ export const SmallCheck2 = forwardRef((props, ref) => {
                     </span>
                 </h3>
                 <h3
-                    style={{ fontWeight: 'bolder' }}
+                    style={{fontWeight: 'bolder'}}
                     className='text-black-900 text-[12px] font-bold pt-4'
                 >
                     {' '}
                     {t("To'langan")}:{' '}
                     <span
-                        style={{ fontWeight: 'bolder' }}
+                        style={{fontWeight: 'bolder'}}
                         className='text-black-900 text-[12px] font-bold'
                     >
                         {(
@@ -350,17 +356,17 @@ export const SmallCheck2 = forwardRef((props, ref) => {
                     </span>
                 </h3>
                 <h3
-                    style={{ fontWeight: 'bolder' }}
+                    style={{fontWeight: 'bolder'}}
                     className='text-black-900 text-[12px] font-bold pt-4'
                 >
                     {' '}
                     {t('Qarz')}:{' '}
                     <span
-                        style={{ fontWeight: 'bolder' }}
+                        style={{fontWeight: 'bolder'}}
                         className='text-black-900 text-[12px] font-bold'
                     >
                         {currencyType === 'USD'
-                            ?  calculateDebt(
+                            ? calculateDebt(
                                 product?.payment?.totalprice,
                                 product?.payment?.payment,
                                 product?.discount?.discount
@@ -376,7 +382,7 @@ export const SmallCheck2 = forwardRef((props, ref) => {
             </div>
             {market.qrcode && (
                 <div className='w-[120px] h-[120px] mx-auto'>
-                    <img src={market.qrcode} alt='qrcode' />
+                    <img src={market.qrcode} alt='qrcode'/>
                 </div>
             )}
         </div>

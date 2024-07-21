@@ -1612,7 +1612,6 @@ const RegisterSelling = () => {
             })
         market &&
             socket.on('getProductsOfCount', ({ id, products }) => {
-                console.log(products);
                 if (id === market._id) {
                     productsForSearch = [
                         ...productsForSearch,
@@ -1813,8 +1812,10 @@ const RegisterSelling = () => {
     }
     const handlePieceInputsChange = (value, key) => {
         const validNumberRegex = /^[0-9]+(\.[0-9]*)?$/;
+
         if (validNumberRegex.test(value) || value === "") {
             const updatedProduct = { ...isClickedProduct, [key]: value }
+            console.log(key)
             if (key === 'size') {
                 const sizeValue = value
                 updatedProduct.size = sizeValue
@@ -1836,12 +1837,12 @@ const RegisterSelling = () => {
                 updatedProduct.lengthAmout = lengthValue
                 updatedProduct.length = lengthValue;
                 if (value !== "") {
-                    let pieces = lengthValue / updatedProduct.piece
+                    let pieces = lengthValue / updatedProduct.piece;
                     updatedProduct.pieces = parseFloat(pieces.toFixed(2));
                 }
             } else if (key === "sizePrice") {
                 const totalPieces =
-                    Number(updatedProduct.lengthAmout) || 0 + Number(updatedProduct.fromFilial) || 0
+                    Number(updatedProduct.lengthAmout) || Number(updatedProduct.fromFilial) || 0
                 updatedProduct.priceFromLengthAmout = value
                 // const totalprice = convertToUsd(totalPieces * value)
                 const totalpriceuzs = convertToUzs(totalPieces * value)
@@ -1874,7 +1875,7 @@ const RegisterSelling = () => {
                 )
             )
 
-            if (updatedProduct.pieces !== 1) {
+            if (updatedProduct.pieces !== -1) {
                 setTotalFromPieceProduct(parseFloat((updatedProduct.pieces)))
             }
         } else if (key === "forWhat") {

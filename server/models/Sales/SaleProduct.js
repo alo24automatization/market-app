@@ -58,10 +58,10 @@ const saleproductSchema = new Schema(
 // Define the Joi validation schema
 function validateSaleProduct(saleproduct) {
   const schema = Joi.object({
-    totalprice: Joi.number().required(),
+    totalprice: Joi.number().required().allow(null),
     totalpriceuzs: Joi.number().required(),
     forWhat: Joi.string().optional().default("").allow(""),
-    unitprice: Joi.number().required(),
+    unitprice: Joi.number().required().allow(null),
     unitpriceuzs: Joi.number().required(),
     pieces: Joi.number().required(),
     product: Joi.string().required(),

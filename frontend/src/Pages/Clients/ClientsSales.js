@@ -135,6 +135,7 @@ const ClientsSales = () => {
     }
 
     const handleClickPrint = (saleconnector, key) => {
+        console.log(key)
         if (key === 'firstPay') {
             setModalBody('checkSell')
             setModalData(saleconnector)

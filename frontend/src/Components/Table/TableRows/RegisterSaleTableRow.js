@@ -42,7 +42,6 @@ export const RegisterSaleTableRow = ({
     useEffect(() => {
         setShowIncomingPrice(map(data, () => false))
     }, [data])
-    console.log(data);
     return (
         <>
             {map(data, (product, index) =>
