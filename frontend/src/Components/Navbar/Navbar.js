@@ -184,12 +184,12 @@ function Navbar() {
                 >
                     <div className='w-full flex justify-around items-center'>
                         <Language />
-                        {user.type !== 'Admin' && (
-                            <Currency
-                                currency={currencyType}
-                                onClick={changeCurrency}
-                            />
-                        )}{' '}
+                        {/*{user.type !== 'Admin' && (*/}
+                        {/*    <Currency*/}
+                        {/*        currency={currencyType}*/}
+                        {/*        onClick={changeCurrency}*/}
+                        {/*    />*/}
+                        {/*)}{' '}*/}
                     </div>
 
                     {/* <div className='footer-logo flex items-center justify-center'>
