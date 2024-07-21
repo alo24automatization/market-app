@@ -1120,6 +1120,7 @@ module.exports.registeredit = async (req, res) => {
           saleproduct: saleproduct._id,
           previous: produc.total,
           next: produc.total + Number(pieces),
+          backed: true
         });
 
         await SaleProduct.findByIdAndUpdate(saleproduct._id, {

@@ -471,6 +471,16 @@ const PayDebts = () => {
         ])
     }
 
+    const searchClientPhoneNumber = (e) => {
+        setCurrentData([
+            ...filter(
+                [...storageData],
+                (debt) =>
+                    debt.client &&
+                    debt.client.phoneNumber.includes(e.target.value.toLowerCase())
+            ),
+        ])
+    }
     const handleClickPrint = (selling) => {
         setModalBody('allChecks')
         setPrintedSelling(selling)
@@ -552,6 +562,7 @@ const PayDebts = () => {
                     filterBy={['startDate', 'endDate', 'id', 'clientName','clientPhoneNumber']}
                     filterById={searchId}
                     filterByClientName={searchClientName}
+                    filterByClientPhoneNumber={searchClientPhoneNumber}
                     startDate={startDate}
                     endDate={endDate}
                     setStartDate={handleBeginDay}

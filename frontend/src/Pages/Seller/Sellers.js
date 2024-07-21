@@ -43,7 +43,6 @@ function Sellers() {
 
     const { user } = useSelector((state) => state.login)
 
-    console.log(user);
 
     const headers = [
         { title: '№', styles: 'w-[8%] text-left' },

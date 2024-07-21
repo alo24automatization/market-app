@@ -15,6 +15,7 @@ const { filter } = require("lodash/collection.js");
 const { regExpression } = require("../globalFunctions.js");
 const { DailySaleConnector } = require("../../models/Sales/DailySaleConnector");
 const { Debt } = require("../../models/Sales/Debt");
+const {all} = require("axios");
 
  const reduce = (arr, el) =>
     arr.reduce((prev, item) => prev + (item[el] || 0), 0);
@@ -568,10 +569,14 @@ module.exports.getClientsSales = async (req, res) => {
       })
       .lean()
       .then((connectors) => connectors.filter((connector) => connector.client));
-    const response = allpayments.filter((payment) => payment.client !== null&&payment.products.some(product=>!product.backed));
-     // const filteredResponse=response.filter((item=>  !filter.some((res)=> Math.abs(res?.totalpriceuzs)===item?.debt?.debtuzs)))
-    const count = response.length;
-    res.status(201).json({ data: response, count });
+    const filteredPayments = allpayments.map(payment => {
+      return {
+        ...payment,
+        products: payment.products.filter(product => !product.backed)
+      };
+    }).filter(payment => payment.products.length > 0);
+    const count = filteredPayments.length;
+    res.status(201).json({ data: filteredPayments, count });
   } catch (error) {
     console.log(error);
     res.status(501).json({ error: "Serverda xatolik yuz berdi..." });
