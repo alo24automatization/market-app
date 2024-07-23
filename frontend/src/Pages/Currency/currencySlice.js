@@ -115,7 +115,7 @@ export const updateProductPrices = createAsyncThunk(
 const initialState = {
     currency: 'USZ',
     currencies: [],
-    currencyType: '',
+    currencyType: 'USZ',
     getCurrenciesLoading: true,
     getCurrencyLoading: true,
     currencyLoading: true,

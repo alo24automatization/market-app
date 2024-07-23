@@ -17,16 +17,6 @@ export const SaleCheckAll2 = forwardRef((props, ref) => {
     const { market } = useSelector((state) => state.login)
     const { currencyType } = useSelector((state) => state.currency)
     const calculateAllSum = (data) => {
-        // console.log(data.reduce((acc, pr) => {
-        //     return (
-        //         acc +
-        //         pr[
-        //         currencyType === 'USD'
-        //             ? 'totalprice'
-        //             : 'totalpriceuzs'
-        //         ]
-        //     )
-        // }, 0));
         return data
             ? data.reduce((acc, pr) => {
                 return (
