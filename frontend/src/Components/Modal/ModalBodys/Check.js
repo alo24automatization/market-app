@@ -105,9 +105,10 @@ function Check({ product, returned, isPayment, payment, isOrder, order, noXPrint
 
                 {returned ? (
                     <div className='hidden'>
-                        <SaleCheckPosReturn
+                        <SmallCheck2
+                            isReturned={true}
                             product={product}
-                            ref={saleCheckRefPosPrinter}
+                            ref={saleSmallCheckRef}
                         />
                     </div>
                 ) : isPayment ? (

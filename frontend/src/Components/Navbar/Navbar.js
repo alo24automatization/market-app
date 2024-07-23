@@ -56,7 +56,9 @@ function Navbar() {
 
     const { currency, currencyType, currencyError, getCurrencyLoading } =
         useSelector((state) => state.currency)
-
+useEffect(()=>{
+    dispatch(changeCurrencyType({ currency: "UZS" }))
+},[])
     const changeCurrency = () => {
         const prevCurrencyType = currencyType === 'USD' ? 'UZS' : 'USD'
         dispatch(changeCurrencyType({ currency: prevCurrencyType }))
