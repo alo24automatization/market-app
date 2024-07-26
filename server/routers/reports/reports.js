@@ -773,7 +773,7 @@ module.exports.getDebtsReport = async (req, res) => {
 
 // Step 1: Sum the totaldebtuzs for each client
         debtsreport.forEach(sale => {
-            if (sale?.client?._id) {
+            if (sale && sale.client?._id) {
                 const clientId = sale.client._id;
                 const existingDebt = clientDebtMap.get(clientId) || 0;
                 clientDebtMap.set(clientId, existingDebt + sale.totaldebtuzs);
@@ -782,7 +782,7 @@ module.exports.getDebtsReport = async (req, res) => {
 
 // Step 2: Update each sale connector with the total debt for its client
         debtsreport.forEach(sale => {
-            if (sale?.client?._id) {
+            if (sale && sale.client?._id) {
                 const clientId = sale.client._id;
                 sale.totaldebtuzs = clientDebtMap.get(clientId);
             }
