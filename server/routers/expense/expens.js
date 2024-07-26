@@ -96,8 +96,8 @@ module.exports.registerExpense = async (req, res) => {
 
         await expense.save();
         const findExpenseTypes = await ExpenseCommentType.findById(comment);
-        if(findExpenseTypes){
-            findExpenseTypes.expenses?.push(expense);
+        if (findExpenseTypes) {
+            findExpenseTypes.expenses.push(expense);
         }
         await findExpenseTypes.save()
         const responseExpense = await Expense.find({market}).select(

@@ -469,8 +469,10 @@ module.exports.getClients = async (req, res) => {
                 );
                 let totaldebtuzs = 0
                 for (let debt of debts) {
-                    const foundedDebt = await Debt.findById(debt)
-                    totaldebtuzs+= foundedDebt?.debtuzs || 0
+                    const foundedDebt = await Debt.findById(debt);
+                    if (foundedDebt) {
+                        totaldebtuzs += foundedDebt.debtuzs || 0
+                    }
                 }
 
                 const totalsales = [...products].reduce(
