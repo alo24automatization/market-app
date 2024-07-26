@@ -348,9 +348,10 @@ module.exports.register = async (req, res) => {
             let debts = await Debt.find({saleconnector: item._id});
             allDebts = allDebts.concat(debts);
         }
+      let totaldebtuzs=  allDebts.reduce((prev, debt) => prev + debt.debtuzs, 0)
         res.status(201).send({
             ...connector,
-            totaldebtuzs: allDebts?.reduce((prev, debt) => prev + debt.debtuzs, 0)
+            totaldebtuzs
         });
     } catch
         (error) {
@@ -855,7 +856,7 @@ module.exports.getsaleconnectors = async (req, res) => {
 
 // Step 1: Sum the totaldebtuzs for each client
         filteredProductsSale.forEach(sale => {
-            if (sale?.client?._id) {
+            if (sale && sale.client && sale.client._id) {
                 const clientId = sale.client._id;
                 const existingDebt = clientDebtMap.get(clientId) || 0;
                 clientDebtMap.set(clientId, existingDebt + sale.totaldebtuzs);
@@ -864,7 +865,7 @@ module.exports.getsaleconnectors = async (req, res) => {
 
 // Step 2: Update each sale connector with the total debt for its client
         filteredProductsSale.forEach(sale => {
-            if (sale?.client?._id) {
+            if (sale && sale.client && sale.client._id) {
                 const clientId = sale.client._id;
                 sale.totaldebtuzs = clientDebtMap.get(clientId);
             }
