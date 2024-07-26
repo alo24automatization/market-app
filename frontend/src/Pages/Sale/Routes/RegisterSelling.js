@@ -1,16 +1,16 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import Checkbox from '../../../Components/Checkbox/Checkbox.js'
 import FieldContainer from '../../../Components/FieldContainer/FieldContainer.js'
 import Table from '../../../Components/Table/Table.js'
-import { useDispatch, useSelector } from 'react-redux'
-import { IoAttach } from 'react-icons/io5'
+import {useDispatch, useSelector} from 'react-redux'
+import {IoAttach} from 'react-icons/io5'
 import CategoryCard from '../../../Components/CategoryCard/CategoryCard.js'
 import NotFind from '../../../Components/NotFind/NotFind.js'
 import Spinner from '../../../Components/Spinner/SmallLoader.js'
 import Modal from 'react-modal'
 import SmallLoader from '../../../Components/Spinner/SmallLoader.js'
-import { RegisteredSaleModal } from '../../../Components/Modal/RegisteredSaleModal.js'
-import { v4 as uuidv4 } from 'uuid';
+import {RegisteredSaleModal} from '../../../Components/Modal/RegisteredSaleModal.js'
+import {v4 as uuidv4} from 'uuid';
 import {
     addPayment,
     getClients,
@@ -20,11 +20,11 @@ import {
     savePayment,
     setAllProductsBySocket,
 } from '../Slices/registerSellingSlice.js'
-import { deleteSavedPayment } from '../Slices/savedSellingsSlice.js'
-import { getAllPackmans } from '../../Clients/clientsSlice.js'
+import {deleteSavedPayment} from '../Slices/savedSellingsSlice.js'
+import {getAllPackmans} from '../../Clients/clientsSlice.js'
 import SearchInput from '../../../Components/Inputs/SearchInput.js'
 import UniversalModal from '../../../Components/Modal/UniversalModal.js'
-import { UsdToUzs, UzsToUsd } from '../../../App/globalFunctions.js'
+import {UsdToUzs, UzsToUsd} from '../../../App/globalFunctions.js'
 import {
     universalToast,
     warningCountSellPayment,
@@ -39,12 +39,12 @@ import {
     warningSaleProductsEmpty,
 } from '../../../Components/ToastMessages/ToastMessages.js'
 import CustomerPayment from '../../../Components/Payment/CustomerPayment.js'
-import { useLocation, useNavigate } from 'react-router-dom'
+import {useLocation, useNavigate} from 'react-router-dom'
 import BarcodeReader from 'react-barcode-reader'
-import { useTranslation } from 'react-i18next'
-import { filter, map, update } from 'lodash'
+import {useTranslation} from 'react-i18next'
+import {filter, map, update} from 'lodash'
 import socket from '../../../Config/socket.js'
-import { setAllCategories } from '../../Category/categorySlice.js'
+import {setAllCategories} from '../../Category/categorySlice.js'
 import Api from '../../../Config/Api.js'
 import TableMobile from '../../../Components/Table/TableMobile.js'
 import {
@@ -54,30 +54,30 @@ import {
     FaRegUser,
     FaTrash,
 } from 'react-icons/fa'
-import { MdCategory } from 'react-icons/md'
-import { VscChromeClose } from 'react-icons/vsc'
-import { SmallCheck2 } from '../../../Components/Modal/ModalBodys/SmallCheck2.js'
-import { useReactToPrint } from 'react-to-print'
+import {MdCategory} from 'react-icons/md'
+import {VscChromeClose} from 'react-icons/vsc'
+import {SmallCheck2} from '../../../Components/Modal/ModalBodys/SmallCheck2.js'
+import {useReactToPrint} from 'react-to-print'
 
 const RegisterSelling = () => {
     const [productAddModal, setProductAddModal] = useState(false)
-    const { t } = useTranslation(['common'])
+    const {t} = useTranslation(['common'])
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const location = useLocation()
-    const { user, market } = useSelector((state) => state.login)
+    const {user, market} = useSelector((state) => state.login)
     const [modalOpen, setModalOpen] = useState(false)
     const [modalProduct, setModalProduct] = useState({
         visible: false,
         mode: '1',
     })
     const [categoryModal, setCategoryModal] = useState(false)
-    const { currencyType, currency } = useSelector((state) => state.currency)
-    const { allcategories, loading } = useSelector((state) => state.category)
-    const { filials } = useSelector((state) => state.registerSelling)
-    const { allProducts, clients, loadingMakePayment, lastPayments } =
+    const {currencyType, currency} = useSelector((state) => state.currency)
+    const {allcategories, loading} = useSelector((state) => state.category)
+    const {filials} = useSelector((state) => state.registerSelling)
+    const {allProducts, clients, loadingMakePayment, lastPayments} =
         useSelector((state) => state.registerSelling)
-    const { packmans } = useSelector((state) => state.clients)
+    const {packmans} = useSelector((state) => state.clients)
     const [filteredProducts, setFilteredProducts] = useState([])
     const [selectedProduct, setSelectedProduct] = useState('')
     const [checked, setChecked] = useState(false)
@@ -113,6 +113,7 @@ const RegisterSelling = () => {
     const [paymentDebt, setPaymentDebt] = useState(0)
     const [paymentDebtUzs, setPaymentDebtUzs] = useState(0)
     const [allPayment, setAllPayment] = useState(0)
+    const [totalOfBackAndDebt, setTotalOfBackAndDebt] = useState(0)
     const [allPaymentUzs, setAllPaymentUzs] = useState(0)
     const [paid, setPaid] = useState(0)
     const [paidUzs, setPaidUzs] = useState(0)
@@ -136,7 +137,7 @@ const RegisterSelling = () => {
     const [showPayEndDate, setShowPayEndDate] = useState(false)
     const [selectedFilial, setSelectedFilial] = useState({
         label: market?.name,
-        value: market?._id, 
+        value: market?._id,
     })
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
     useEffect(() => {
@@ -171,38 +172,38 @@ const RegisterSelling = () => {
     // })
 
     const headers = [
-        { title: '№' },
-        { title: t('Filial') },
-        { title: t('Qoldiq') },
-        { title: t('Nomi') },
-        { title: t('Soni') },
-        { title: t('Ombordan') },
-        { title: t('Narxi') },
-        { title: t('Jami'), styles: 'w-[8rem]' },
-        { title: '' },
-        { title: '' },
+        {title: '№'},
+        {title: t('Filial')},
+        {title: t('Qoldiq')},
+        {title: t('Nomi')},
+        {title: t('Soni')},
+        {title: t('Ombordan')},
+        {title: t('Narxi')},
+        {title: t('Jami'), styles: 'w-[8rem]'},
+        {title: ''},
+        {title: ''},
     ]
     const headers2 = [
-        { title: '№' },
+        {title: '№'},
         // {title: t('Filial')},
-        { title: t('Qoldiq') },
-        { title: t('Nomi') },
-        { title: t('Soni') },
+        {title: t('Qoldiq')},
+        {title: t('Nomi')},
+        {title: t('Soni')},
         // {title: 'Ombordan'},
-        { title: t('Narxi') },
-        { title: t('Jami'), styles: 'w-[8rem]' },
-        { title: '' },
-        { title: '' },
+        {title: t('Narxi')},
+        {title: t('Jami'), styles: 'w-[8rem]'},
+        {title: ''},
+        {title: ''},
     ]
 
     const headerReturn = [
-        { title: '№' },
-        { title: t('Kodi') },
-        { title: t('Nomi') },
-        { title: t('Soni') },
-        { title: t('Jami') },
-        { title: t('Soni') },
-        { title: t('Jami') },
+        {title: '№'},
+        {title: t('Kodi')},
+        {title: t('Nomi')},
+        {title: t('Soni')},
+        {title: t('Jami')},
+        {title: t('Soni')},
+        {title: t('Jami')},
     ]
 
     // payment
@@ -218,7 +219,7 @@ const RegisterSelling = () => {
         setPaymentDebt(0)
         setShowPayEndDate(false)
         setPaymentDebtUzs(0)
-        setDiscountSelectOption({ label: '%', value: '%' })
+        setDiscountSelectOption({label: '%', value: '%'})
     }
 
     const toggleCheckModal = () => {
@@ -760,7 +761,6 @@ const RegisterSelling = () => {
     }
 
     const [clickdelay, setClickDelay] = useState(false)
-
     const handleApprovePay = () => {
         handleClosePay()
         const body = {
@@ -839,12 +839,13 @@ const RegisterSelling = () => {
             return warningProductPiecesEmpty()
         }
         dispatch(saleConnectorId ? addPayment(body) : makePayment(body)).then(
-            ({ payload, error }) => {
+            ({payload, error}) => {
                 setClickDelay(true)
                 if (!error) {
                     setModalData(payload)
                     setWholesale(false)
-                    setPayEndDate("")
+                    setPayEndDate("");
+                    setSaleConnectorId(null)
                     setTimeout(() => {
                         if (!isMobile) {
                             // setModalBody('checkSell')
@@ -854,7 +855,7 @@ const RegisterSelling = () => {
                         clearAll()
                     }, 500)
                     if (temporary) {
-                        dispatch(deleteSavedPayment({ _id: temporary._id }))
+                        dispatch(deleteSavedPayment({_id: temporary._id}))
                         setTemporary(null)
                     }
                     setTimeout(() => {
@@ -870,6 +871,7 @@ const RegisterSelling = () => {
         setClickDelay(true)
         handleClosePay()
         const body = {
+            totalOfBackAndDebt,
             saleproducts: filter(
                 returnProducts,
                 (product) => Number(product.pieces) > 0
@@ -907,7 +909,7 @@ const RegisterSelling = () => {
             comment: saleComment,
         }
 
-        dispatch(returnSaleProducts(body)).then(({ payload, error }) => {
+        dispatch(returnSaleProducts(body)).then(({payload, error}) => {
             if (!error) {
                 setModalData(payload)
                 setTimeout(() => {
@@ -945,14 +947,14 @@ const RegisterSelling = () => {
                 },
                 user: user._id,
             }
-            dispatch(savePayment(body)).then(({ error }) => {
+            dispatch(savePayment(body)).then(({error}) => {
                 if (!error) {
                     clearAll(false)
                     navigate('/saqlanganlar')
                 }
             })
             if (temporary) {
-                dispatch(deleteSavedPayment({ _id: temporary._id }))
+                dispatch(deleteSavedPayment({_id: temporary._id}))
                 setTemporary(null)
             }
         }
@@ -1022,11 +1024,11 @@ const RegisterSelling = () => {
     const handleChangeSelectedProduct = (option) => {
         const hasProduct = option.barcode
             ? filter(
-                tableProducts,
-                (obj) => obj.product.barcode === option.barcode
-            ).length > 0
+            tableProducts,
+            (obj) => obj.product.barcode === option.barcode
+        ).length > 0
             : filter(tableProducts, (obj) => obj.product._id === option.value)
-                .length > 0
+            .length > 0
         // if (!hasProduct) {
         !option.barcode && setSelectedProduct(option)
         const product = option.barcode
@@ -1044,7 +1046,7 @@ const RegisterSelling = () => {
                 barcode: product.productdata.barcode,
             },
             newID,
-            minimumcount:product.minimumcount,
+            minimumcount: product.minimumcount,
             totalprice: product.price.sellingprice,
             totalpriceuzs: product.price.sellingpriceuzs,
             tradeprice: product.price.tradeprice || 0,
@@ -1082,7 +1084,7 @@ const RegisterSelling = () => {
         // }
         if (hasProduct) {
             const newID = uuidv4();
-            currentProduct = { ...currentProduct, newID }
+            currentProduct = {...currentProduct, newID}
         }
         setTableProducts([...tableProducts, currentProduct])
         setSelectedProduct('')
@@ -1117,11 +1119,13 @@ const RegisterSelling = () => {
         setUserValue('')
     }
 
-    const handleClickPrint = () => { }
+    const handleClickPrint = () => {
+    }
 
     const handleChangeClientValue = (option) => {
         setClientValue(option)
-        setSaleConnectorId(option?.saleconnectorid || null)
+        // setSaleConnectorId(option?.saleconnectorid || null)
+
         const client = filter(
             clients,
             (client) => client._id === option.value
@@ -1139,7 +1143,7 @@ const RegisterSelling = () => {
     const handleChangeUserValue = (e) => {
         setUserValue(e.target.value)
     }
-    const handleChangePhoneNumberValue = ({ target }) =>
+    const handleChangePhoneNumberValue = ({target}) =>
         setPhoneNumber(target.value)
 
     const handleChangeProductUnitPrice = (value) => {
@@ -1390,7 +1394,7 @@ const RegisterSelling = () => {
     }
 
     const handleScan = (data) => {
-        handleChangeSelectedProduct({ barcode: data })
+        handleChangeSelectedProduct({barcode: data})
     }
 
     const handleChangeReturnProduct = (value, id, index) => {
@@ -1427,7 +1431,7 @@ const RegisterSelling = () => {
                 0
             )
             const newRelease = discounts.map((discount) => {
-                let newDiscount = { ...discount }
+                let newDiscount = {...discount}
                 map(returnProducts, (product) => {
                     if (discount._id === product.product?.discount) {
                         newDiscount = {
@@ -1459,7 +1463,7 @@ const RegisterSelling = () => {
                     }
                     return ''
                 })
-                return { ...newDiscount }
+                return {...newDiscount}
             })
             const totalDiscountsUsd = newRelease.reduce(
                 (summ, discount) => summ + discount.discount,
@@ -1476,7 +1480,6 @@ const RegisterSelling = () => {
             const paymentUzs = convertToUzs(
                 totalPaymentsUzs - totalPaysUzs - totalDiscountsUzs - allUzs
             )
-
             setReturnDiscounts(newRelease)
             if (payment <= 0) {
                 setAllPayment(payment)
@@ -1485,6 +1488,9 @@ const RegisterSelling = () => {
                 setPaymentCashUzs(Math.abs(paymentUzs))
                 setPaid(Math.abs(payment))
                 setPaidUzs(Math.abs(paymentUzs))
+                // QARZ CHIQSIN
+                console.log(allUzs - Math.abs(paymentUzs)===0?paymentUzs:allUzs - Math.abs(paymentUzs))
+                setTotalOfBackAndDebt(allUzs - Math.abs(paymentUzs)===0?paymentUzs:allUzs - Math.abs(paymentUzs))
             } else {
                 setPaymentCash(0)
                 setPaymentCashUzs(UsdToUzs(0, exchangerate))
@@ -1494,7 +1500,11 @@ const RegisterSelling = () => {
                 setAllPaymentUzs(allUzs)
                 setPaid(all)
                 setPaidUzs(allUzs)
+                // QAYTGAN SUMMA CHIQSIN
+                setTotalOfBackAndDebt(allUzs)
+                console.log(allUzs)
             }
+            // paidUzs qaytarilyotgan summa
             setPaymentModalVisible(true)
             currentEchangerate(allUzs, all)
         } else {
@@ -1549,7 +1559,7 @@ const RegisterSelling = () => {
     }
 
     const handleClickProduct = (product) => {
-        setModalProduct({ visible: true, mode: "1" })
+        setModalProduct({visible: true, mode: "1"})
         setIsClickedProduct({
             ...product,
             columns: product?.columns || [],
@@ -1595,7 +1605,7 @@ const RegisterSelling = () => {
     }
 
     const getFilialProducts = async (value) => {
-        const { data } = await Api.post('/filials/products/get', value)
+        const {data} = await Api.post('/filials/products/get', value)
         return data
     }
 
@@ -1603,41 +1613,41 @@ const RegisterSelling = () => {
         let allProductsReducer = []
         let productsForSearch = []
         market &&
-            socket.emit('getProductsOfCount', {
-                market: market._id,
-            })
+        socket.emit('getProductsOfCount', {
+            market: market._id,
+        })
         market &&
-            socket.on('categories', ({ id, categories }) => {
-                id === market._id && dispatch(setAllCategories(categories))
-            })
+        socket.on('categories', ({id, categories}) => {
+            id === market._id && dispatch(setAllCategories(categories))
+        })
         market &&
-            socket.on('getProductsOfCount', ({ id, products }) => {
-                if (id === market._id) {
-                    productsForSearch = [
-                        ...productsForSearch,
-                        ...map(products, (product) => ({
-                            value: product._id,
-                            label: `(${product.total}) ${product.category.code
-                                }${product.productdata.code} - ${product.productdata.name
-                                } -------- (${currencyType === 'USD'
-                                    ? (product?.price?.sellingprice).toLocaleString(
-                                        'ru-RU'
-                                    )
-                                    : (product?.price?.sellingpriceuzs).toLocaleString(
-                                        'ru-RU'
-                                    )
-                                } ${currencyType})`,
-                        })),
-                    ]
-                    setFilteredProducts(productsForSearch)
-                    allProductsReducer.push(...products)
-                    dispatch(setAllProductsBySocket(allProductsReducer))
-                }
-            })
+        socket.on('getProductsOfCount', ({id, products}) => {
+            if (id === market._id) {
+                productsForSearch = [
+                    ...productsForSearch,
+                    ...map(products, (product) => ({
+                        value: product._id,
+                        label: `(${product.total}) ${product.category.code
+                        }${product.productdata.code} - ${product.productdata.name
+                        } -------- (${currencyType === 'USD'
+                            ? (product?.price?.sellingprice).toLocaleString(
+                                'ru-RU'
+                            )
+                            : (product?.price?.sellingpriceuzs).toLocaleString(
+                                'ru-RU'
+                            )
+                        } ${currencyType})`,
+                    })),
+                ]
+                setFilteredProducts(productsForSearch)
+                allProductsReducer.push(...products)
+                dispatch(setAllProductsBySocket(allProductsReducer))
+            }
+        })
         market &&
-            socket.on('error', ({ id, message }) => {
-                id === market._id && universalToast(message, 'error')
-            })
+        socket.on('error', ({id, message}) => {
+            id === market._id && universalToast(message, 'error')
+        })
         //    eslint-disable-next-line react-hooks/exhaustive-deps
     }, [market, dispatch, lastPayments])
 
@@ -1666,7 +1676,7 @@ const RegisterSelling = () => {
     useEffect(() => {
         dispatch(getAllPackmans())
         dispatch(getClients())
-        dispatch(getFilials({ marketData: market }))
+        dispatch(getFilials({marketData: market}))
     }, [dispatch, market])
 
     useEffect(() => {
@@ -1704,15 +1714,15 @@ const RegisterSelling = () => {
         const data = location.state
         const setClientData = () => {
             data.saleconnector.client &&
-                setClientValue({
-                    label: data.saleconnector.client.name,
-                    value: data.saleconnector.client._id,
-                })
+            setClientValue({
+                label: data.saleconnector.client.name,
+                value: data.saleconnector.client._id,
+            })
             data.saleconnector.packman &&
-                setPackmanValue({
-                    label: data.saleconnector.packman.name,
-                    value: data.saleconnector.packman._id,
-                })
+            setPackmanValue({
+                label: data.saleconnector.packman.name,
+                value: data.saleconnector.packman._id,
+            })
             setSaleConnectorId(data.saleconnector._id)
         }
         if (data && data.temporary) {
@@ -1745,16 +1755,16 @@ const RegisterSelling = () => {
                     return ''
                 })
                 saleProduct.pieces > 0 &&
-                    returned.push({
-                        pieces: '',
-                        totalpriceuzs: 0,
-                        totalprice: 0,
-                        unitprice: saleProduct.unitprice,
-                        unitpriceuzs: saleProduct.unitpriceuzs,
-                        product: { ...sale },
-                        productdata: { ...saleProduct.product.productdata },
-                        _id: saleProduct._id,
-                    })
+                returned.push({
+                    pieces: '',
+                    totalpriceuzs: 0,
+                    totalprice: 0,
+                    unitprice: saleProduct.unitprice,
+                    unitpriceuzs: saleProduct.unitpriceuzs,
+                    product: {...sale},
+                    productdata: {...saleProduct.product.productdata},
+                    _id: saleProduct._id,
+                })
                 return ''
             })
 
@@ -1791,7 +1801,7 @@ const RegisterSelling = () => {
     const handleParameters1InputChange = (value, index, key) => {
         const updatedColumns = isClickedProduct.columns.map(
             (column, colIndex) =>
-                colIndex === index ? { ...column, [key]: value } : column
+                colIndex === index ? {...column, [key]: value} : column
         )
 
         if (key === 'col1' || key === 'col2') {
@@ -1800,7 +1810,7 @@ const RegisterSelling = () => {
             ))
         }
 
-        const updatedProduct = { ...isClickedProduct, columns: updatedColumns }
+        const updatedProduct = {...isClickedProduct, columns: updatedColumns}
         setIsClickedProduct(updatedProduct)
         setTableProducts((prev) =>
             prev.map((item) =>
@@ -1814,8 +1824,7 @@ const RegisterSelling = () => {
         const validNumberRegex = /^[0-9]+(\.[0-9]*)?$/;
 
         if (validNumberRegex.test(value) || value === "") {
-            const updatedProduct = { ...isClickedProduct, [key]: value }
-            console.log(key)
+            const updatedProduct = {...isClickedProduct, [key]: value}
             if (key === 'size') {
                 const sizeValue = value
                 updatedProduct.size = sizeValue
@@ -1870,7 +1879,7 @@ const RegisterSelling = () => {
             setTableProducts((prev) =>
                 prev.map((item) =>
                     item.newID === updatedProduct.newID
-                        ? { ...updatedProduct }
+                        ? {...updatedProduct}
                         : item
                 )
             )
@@ -1879,12 +1888,12 @@ const RegisterSelling = () => {
                 setTotalFromPieceProduct(parseFloat((updatedProduct.pieces)))
             }
         } else if (key === "forWhat") {
-            const updatedProduct = { ...isClickedProduct, [key]: value }
+            const updatedProduct = {...isClickedProduct, [key]: value}
             setIsClickedProduct(updatedProduct)
             setTableProducts((prev) =>
                 prev.map((item) =>
                     item.newID === updatedProduct.newID
-                        ? { ...updatedProduct }
+                        ? {...updatedProduct}
                         : item
                 )
             )
@@ -1896,7 +1905,7 @@ const RegisterSelling = () => {
             ...isClickedProduct,
             columns: [
                 ...isClickedProduct.columns,
-                { col1: 0, col2: 0, result: 0 },
+                {col1: 0, col2: 0, result: 0},
             ],
         }
         setIsClickedProduct(updatedProduct)
@@ -1914,7 +1923,7 @@ const RegisterSelling = () => {
             (_, colIndex) => colIndex !== index
         )
 
-        const updatedProduct = { ...isClickedProduct, columns: updatedColumns }
+        const updatedProduct = {...isClickedProduct, columns: updatedColumns}
         setIsClickedProduct(updatedProduct)
         setTableProducts((prev) =>
             prev.map((item) =>
@@ -1926,10 +1935,10 @@ const RegisterSelling = () => {
     }
 
     const handleParamtersModalClose = (modalMode) => {
-        setModalProduct({ visible: false, mode: modalMode })
+        setModalProduct({visible: false, mode: modalMode})
     }
     const handleClickReset = (modalMode) => {
-        setModalProduct({ visible: false, mode: modalMode })
+        setModalProduct({visible: false, mode: modalMode})
         tableProducts.forEach((item) => {
             if (item?.newID === isClickedProduct?.newID) {
                 delete item.columns
@@ -1988,20 +1997,23 @@ const RegisterSelling = () => {
     return (
         <div className={'flex grow relative overflow-auto'}>
             {loadingMakePayment && (
-                <div className='fixed backdrop-blur-[2px] z-[100] left-0 top-0 right-0 bottom-0 bg-white-700 flex flex-col items-center justify-center w-full h-full'>
-                    <SmallLoader />
+                <div
+                    className='fixed backdrop-blur-[2px] z-[100] left-0 top-0 right-0 bottom-0 bg-white-700 flex flex-col items-center justify-center w-full h-full'>
+                    <SmallLoader/>
                 </div>
             )}
             <Modal
-                style={{ content: { width: '700px' } }}
+                style={{content: {width: '700px'}}}
                 isOpen={modalProduct.visible}
                 onRequestClose={() => handleParamtersModalClose('1')}
             >
                 <form onSubmit={handleParametersInputSubmit}>
-                    <span className='absolute top-3 font-medium text-lg left-[45%] transform -translate-x-1/2     w-full text-center'>
+                    <span
+                        className='absolute top-3 font-medium text-lg left-[45%] transform -translate-x-1/2     w-full text-center'>
                         {isClickedProduct?.product.name}
                     </span>
-                    <input type='checkbox' label={`Bo'lib sotish turi - ${modalProduct.mode}`} onChange={(e) => setModalProduct(prev => ({ ...prev, mode: e.target.checked ? "1" : "2" }))} />
+                    <input type='checkbox' label={`Bo'lib sotish turi - ${modalProduct.mode}`}
+                           onChange={(e) => setModalProduct(prev => ({...prev, mode: e.target.checked ? "1" : "2"}))}/>
                     <button
                         type='button'
                         onClick={() => handleClickReset('1')}
@@ -2020,7 +2032,7 @@ const RegisterSelling = () => {
                                             label={index === 0 && "O'lcham"}
                                             value={value.col1}
                                             placeholder={"O'lcham"}
-                                            onChange={({ target }) =>
+                                            onChange={({target}) =>
                                                 handleParameters1InputChange(
                                                     target.value,
                                                     index,
@@ -2034,7 +2046,7 @@ const RegisterSelling = () => {
                                             value={value.col2}
                                             placeholder={'Soni'}
                                             step={'0.11'}
-                                            onChange={({ target }) =>
+                                            onChange={({target}) =>
                                                 handleParameters1InputChange(
                                                     target.value,
                                                     index,
@@ -2048,7 +2060,7 @@ const RegisterSelling = () => {
                                             value={value.result}
                                             placeholder={'Umumiy'}
                                             label={index === 0 && 'Umumiy'}
-                                            onChange={({ target }) =>
+                                            onChange={({target}) =>
                                                 handleParameters1InputChange(
                                                     target.value,
                                                     index,
@@ -2063,9 +2075,9 @@ const RegisterSelling = () => {
                                         }
                                         type='button'
                                         className={`${index == 0 ? "mt-6" : ""
-                                            }  text-error-500 border w-9 h-9 rounded-full flex justify-center items-center`}
+                                        }  text-error-500 border w-9 h-9 rounded-full flex justify-center items-center`}
                                     >
-                                        <FaTrash />
+                                        <FaTrash/>
                                     </button>
                                 </div>
                             ))}
@@ -2083,7 +2095,7 @@ const RegisterSelling = () => {
                                     placeholder={"O'lchami"}
                                     type={'text'}
                                     label={"O'lchami"}
-                                    onChange={({ target }) =>
+                                    onChange={({target}) =>
                                         handlePieceInputsChange(
                                             target.value,
                                             'size'
@@ -2097,7 +2109,7 @@ const RegisterSelling = () => {
                                     placeholder={t('Uzunligi')}
                                     type={'text'}
                                     label={t('Uzunligi')}
-                                    onChange={({ target }) =>
+                                    onChange={({target}) =>
                                         handlePieceInputsChange(
                                             target.value,
                                             'length'
@@ -2109,7 +2121,7 @@ const RegisterSelling = () => {
                                     placeholder={t('Bo`lak')}
                                     type={'text'}
                                     label={t('Bo`lak')}
-                                    onChange={({ target }) =>
+                                    onChange={({target}) =>
                                         handlePieceInputsChange(
                                             target.value,
                                             'piece'
@@ -2129,7 +2141,7 @@ const RegisterSelling = () => {
                                     placeholder={t('Maxsulot')}
                                     label={t('Maxsulot')}
                                     type={'text'}
-                                    onChange={({ target }) =>
+                                    onChange={({target}) =>
                                         handlePieceInputsChange(
                                             target.value,
                                             'forWhat'
@@ -2143,7 +2155,7 @@ const RegisterSelling = () => {
                                     placeholder={t("Narxi")}
                                     label={t("Narxi")}
                                     type={'text'}
-                                    onChange={({ target }) =>
+                                    onChange={({target}) =>
                                         handlePieceInputsChange(
                                             target.value,
                                             'sizePrice'
@@ -2161,7 +2173,7 @@ const RegisterSelling = () => {
                             type='button'
                             className='text-success-500 mt-2 border w-9 h-9 rounded-full flex justify-center items-center'
                         >
-                            <FaPlus className='text-white' />
+                            <FaPlus className='text-white'/>
                         </button>
                     )}
                     <div className='flex justify-between items-center absolute bottom-2 w-[86%]'>
@@ -2393,7 +2405,7 @@ const RegisterSelling = () => {
                                 onClick={() => setModalOpen(true)}
                                 className=' hover:bg-blue-200  bg-blue-400 focus-visible:outline-none w-[150px] lg:h-[33px] h=[40px] createElement '
                             >
-                                <FaRegUser />
+                                <FaRegUser/>
                                 {t('Mijoz')}
                             </button>
                         ) : null}
@@ -2403,7 +2415,7 @@ const RegisterSelling = () => {
                                 onClick={() => setCategoryModal(true)}
                                 className=' hover:bg-green-200  bg-green-400 focus-visible:outline-none w-[150px] lg:h-[33px] h=[40px] createElement '
                             >
-                                <MdCategory /> {t('Kategoriya')}
+                                <MdCategory/> {t('Kategoriya')}
                             </button>
                         ) : null}
                     </div>
@@ -2505,7 +2517,7 @@ const RegisterSelling = () => {
                                         onClick={() => setModalOpen(false)}
                                         className=' hover:bg-blue-200  bg-blue-400 focus-visible:outline-none w-[150px] lg:h-[33px] h=[40px] createElement '
                                     >
-                                        <FaFilter /> {t('izlash')}
+                                        <FaFilter/> {t('izlash')}
                                     </button>
                                 </div>
                             </div>
@@ -2595,7 +2607,7 @@ const RegisterSelling = () => {
                                         'lg:w-[50px] flex justify-center w-[20vw] register-selling-right-deny-btn'
                                     }
                                 >
-                                    <IoAttach size={'1.5rem'} />
+                                    <IoAttach size={'1.5rem'}/>
                                 </button>
                             )}
                         </div>
@@ -2603,7 +2615,8 @@ const RegisterSelling = () => {
                 </div>
             ) : null}
             {categoryModal ? (
-                <div className='fixed w-[100%] h-[100vh] bg-[white] top-0 right-0 z-50 register-selling-right min-w-[20.25rem] bg-white-400 backdrop-blur-[3.125rem] rounded-[0.25rem] flex flex-col gap-[1.25rem]'>
+                <div
+                    className='fixed w-[100%] h-[100vh] bg-[white] top-0 right-0 z-50 register-selling-right min-w-[20.25rem] bg-white-400 backdrop-blur-[3.125rem] rounded-[0.25rem] flex flex-col gap-[1.25rem]'>
                     <VscChromeClose
                         onClick={() => setCategoryModal(false)}
                         className=' absolute right-[20px]  top-[20px]  text-4xl cursor-pointer'
@@ -2613,13 +2626,14 @@ const RegisterSelling = () => {
                             placeholder={t('kategoriyani qidirish...')}
                             value={searchCategory}
                             onChange={handleSearchCategory}
-                            onKeyUp={() => { }}
+                            onKeyUp={() => {
+                            }}
                         />
                         <div className='grow relative overflow-auto'>
                             <div className='cards-container absolute left-0 right-[0.125rem] top-0 bottom-0'>
                                 {loading ? (
                                     <div className='tableContainerPadding'>
-                                        <Spinner />
+                                        <Spinner/>
                                     </div>
                                 ) : filteredCategories.length > 0 ? (
                                     map(filteredCategories, (category) => (
@@ -2656,19 +2670,21 @@ const RegisterSelling = () => {
             ) : null}
 
             {!isMobile ? (
-                <div className='register-selling-right min-w-[20.25rem] bg-white-400 backdrop-blur-[3.125rem] rounded-[0.25rem] flex flex-col gap-[1.25rem]'>
+                <div
+                    className='register-selling-right min-w-[20.25rem] bg-white-400 backdrop-blur-[3.125rem] rounded-[0.25rem] flex flex-col gap-[1.25rem]'>
                     <div className='flex flex-col grow gap-[1.25rem]'>
                         <SearchInput
                             placeholder={t('kategoriyani qidirish...')}
                             value={searchCategory}
                             onChange={handleSearchCategory}
-                            onKeyUp={() => { }}
+                            onKeyUp={() => {
+                            }}
                         />
                         <div className='grow relative overflow-auto'>
                             <div className='cards-container absolute left-0 right-[0.125rem] top-0 bottom-0'>
                                 {loading ? (
                                     <div className='tableContainerPadding'>
-                                        <Spinner />
+                                        <Spinner/>
                                     </div>
                                 ) : filteredCategories.length > 0 ? (
                                     map(filteredCategories, (category) => (
@@ -2710,15 +2726,15 @@ const RegisterSelling = () => {
                                 onClick={handleClickSave}
                                 className={'register-selling-right-deny-btn'}
                             >
-                                <IoAttach size={'1.5rem'} />
+                                <IoAttach size={'1.5rem'}/>
                             </button>
                         )}
                     </div>
                 </div>
             ) : null}
-            <BarcodeReader onError={handleError} onScan={handleScan} />
+            <BarcodeReader onError={handleError} onScan={handleScan}/>
             <div className='hidden'>
-                <SmallCheck2 ref={saleSmallCheckRef} product={modalData} />
+                <SmallCheck2 ref={saleSmallCheckRef} product={modalData}/>
             </div>
         </div>
     )

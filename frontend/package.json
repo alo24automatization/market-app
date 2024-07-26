@@ -40,7 +40,7 @@
         "uuid": "^10.0.0",
         "xlsx": "^0.18.5"
     },
-    "proxy": "http://localhost:8801",
+    "proxya": "http://localhost:8801",
     "scripts": {
         "start": "react-scripts start",
         "build": "react-scripts build",

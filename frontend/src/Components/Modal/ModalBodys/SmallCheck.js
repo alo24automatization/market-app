@@ -49,7 +49,7 @@ export const SmallCheck =   forwardRef((props, ref) => {
     }
     const calculateAllPayments = (data) => {
         return data
-            ? data.reduce((acc, pr) => {
+            ? data.filter((item)=>item.totalprice).reduce((acc, pr) => {
                 return (
                     acc +
                     pr[currencyType === 'USD' ? 'payment' : 'paymentuzs']
@@ -211,7 +211,7 @@ export const SmallCheck =   forwardRef((props, ref) => {
                 {' '}
                 {t('Umumiy qarz')}:{' '}
                 <span className='text-black-900 text-[12px] font-bold'>
-                    {currencyType === 'USD' ? product?.totaldebtusd || 0 : product?.totaldebtuzs || 0}{' '}
+                    {(currencyType === 'USD' ? product?.totaldebtusd || 0 : product?.totaldebtuzs || 0)?.toLocaleString('ru-Ru')}{' '}
                     {currencyType}
                 </span>
             </div>

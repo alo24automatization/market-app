@@ -1,20 +1,21 @@
-import React, { useEffect, useState } from 'react'
+import React, {useEffect, useState} from 'react'
 import TableBtn from '../../Buttons/TableBtn'
-import { map, uniqueId } from 'lodash'
-import { t } from 'i18next'
+import {map, uniqueId} from 'lodash'
+import {t} from 'i18next'
 
 export const ClientSaleTable = ({
-    data,
-    currentPage,
-    countPage,
-    currency,
-    Print,
-    handlePayDebt,
-}) => {
+                                    data,
+                                    currentPage,
+                                    countPage,
+                                    currency,
+                                    Print,
+                                    handlePayDebt,
+                                }) => {
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
     const [totalDebtPayment, setTotalDebtPayment] = useState(0)
     const [totalDiscount, setTotalDiscount] = useState(0)
-    const [totalDebt, setTotalDebt] = useState(0)
+    const [totalDebt, setTotalDebt] = useState(0);
+    const [totalBacks, setTotalBacks] = useState(0)
     useEffect(() => {
         const handleResize = () => {
             setIsMobile(window.innerWidth <= 768)
@@ -47,8 +48,8 @@ export const ClientSaleTable = ({
                         sum +
                         Number(
                             payment[
-                            currency === 'USD' ? 'payment' : 'paymentuzs'
-                            ]
+                                currency === 'USD' ? 'payment' : 'paymentuzs'
+                                ]
                         )
                     )
                 }, 0)
@@ -61,8 +62,8 @@ export const ClientSaleTable = ({
                     Number(
                         (el?.discount &&
                             el?.discount[
-                            currency === 'USD' ? 'discount' : 'discountuzs'
-                            ]) ||
+                                currency === 'USD' ? 'discount' : 'discountuzs'
+                                ]) ||
                         0
                     )
                 )
@@ -75,19 +76,27 @@ export const ClientSaleTable = ({
                     Number(
                         (el?.debt &&
                             el?.debt[
-                            currency === 'USD' ? 'debt' : 'debtuzs'
-                            ]) ||
+                                currency === 'USD' ? 'debt' : 'debtuzs'
+                                ]) ||
                         0
                     )
                 )
             }, 0)
         )
+        setTotalBacks(data?.reduce((sum, el) => {
+            return (
+                sum +
+                Number(
+                    el?.saleconnector.totalOfBackAndDebt ||
+                    0)
+            )
+        }, 0))
     }
     useEffect(() => {
         calcTotalPayments()
     }, [data, currency])
     const parseToIntOrFloat = (value) => {
-        if (!value || value === 0)  return null
+        if (!value || value === 0) return 0
         else if (value % 1 === 0) {
             return parseInt(value)
         } else {
@@ -99,7 +108,6 @@ export const ClientSaleTable = ({
         <>
             {map(data, (saleconnector, index) => {
                 let totalSum = 0;
-                const uniqueProductIds = new Set();
                 return !isMobile ? (
                     <tr className='tr' key={uniqueId('sales')}>
                         <td className='text-left td'>
@@ -134,45 +142,42 @@ export const ClientSaleTable = ({
                         </td>
                         <td className='text-warning-500 text-left td'>
                             {currency === 'UZS'
-                                ? parseToIntOrFloat(saleconnector?.discount?.discountuzs)
-                                : parseToIntOrFloat(saleconnector?.discount?.discount)}{' '}
+                                ? parseToIntOrFloat(saleconnector?.discount?.discountuzs)?.toLocaleString("ru-Ru")
+                                : parseToIntOrFloat(saleconnector?.discount?.discount)?.toLocaleString("ru-Ru")}{' '}
                             {currency}
                         </td>
                         <td className='text-error-500 text-left td'>
                             {(currency === 'UZS' &&
                                 saleconnector?.debt?.debtuzs !== 0) ||
-                                (currency !== 'UZS' &&
-                                    saleconnector?.debt?.debt !== 0) ? (
+                            (currency !== 'UZS' &&
+                                saleconnector?.debt?.debt !== 0) ? (
                                 <>
                                     {currency === 'UZS'
-                                        ? parseToIntOrFloat(saleconnector?.debt?.debtuzs)
-                                        : parseToIntOrFloat(saleconnector?.debt?.debt)}{' '}
+                                        ? parseToIntOrFloat(saleconnector?.debt?.debtuzs)?.toLocaleString("ru-Ru")
+                                        : parseToIntOrFloat(saleconnector?.debt?.debt).toLocaleString("ru-Ru")}{' '}
                                 </>
                             ) : null}
+                            {currency}
+                        </td>
+                        <td className='text-error-500 text-left td'>
+                            {saleconnector?.saleconnector?.totalOfBackAndDebt?.toLocaleString("ru-Ru")}{" "}
                             {currency}
                         </td>
                         <td className='text-success-500 text-left td'>
                             <ul>
                                 {saleconnector?.saleconnector?.payments?.flatMap(
-                                    (payment) =>
-                                        payment.products.map((productId) => {
-                                            let product =
-                                                saleconnector.products.find(
-                                                    (p) => p._id === productId
-                                                )?._id;
-                                                if (productId === product) {
-                                                totalSum +=
-                                                    payment[
-                                                    currency === 'USD'
-                                                        ? 'payment'
-                                                        : 'paymentuzs'
-                                                    ]
-                                            }
-                                        })
+                                    (payment) => {
+                                        totalSum +=
+                                            payment[
+                                                currency === 'USD'
+                                                    ? 'payment'
+                                                    : 'paymentuzs'
+                                                ]
+                                    }
                                 )}
                                 <li className='flex justify-between'>
                                     <span>
-                                        {totalSum > 0 ? '+ ' + parseToIntOrFloat(totalSum) : null}{' '}
+                                        {totalSum > 0 ? '+ ' + parseToIntOrFloat(totalSum).toLocaleString("ru-Ru") : null}{' '}
                                         {currency}
                                     </span>
                                     {totalSum > 0 ? (
@@ -199,16 +204,16 @@ export const ClientSaleTable = ({
                                         Print(saleconnector, 'firstPay')
                                     }
                                 />
-                                {saleconnector?.debt?.debtuzs ||
-                                    saleconnector?.debt?.debt ? (
-                                    <TableBtn
-                                        type={'pay'}
-                                        bgcolor={'bg-success-500'}
-                                        onClick={() =>
-                                            handlePayDebt(saleconnector)
-                                        }
-                                    />
-                                ) : null}
+                                {saleconnector?.debt?.debtuzs
+                                    ? (
+                                        <TableBtn
+                                            type={'pay'}
+                                            bgcolor={'bg-success-500'}
+                                            onClick={() =>
+                                                handlePayDebt(saleconnector)
+                                            }
+                                        />
+                                    ) : null}
                             </div>
                         </td>
                     </tr>
@@ -272,14 +277,17 @@ export const ClientSaleTable = ({
                 <td className='text-left'></td>
                 <td className='text-left'></td>
                 <td className='text-left td border text-warning-500 border-left'>
-                    {totalDiscount > 0 ? parseToIntOrFloat(totalDiscount) : null} {currency}
+                    {totalDiscount > 0 ? parseToIntOrFloat(totalDiscount).toLocaleString("ru-Ru") : null} {currency}
                 </td>
                 <td className='text-left td text-[red]'>
-                    {totalDebt > 0 ? parseToIntOrFloat(totalDebt) : null} {currency}
+                    {totalDebt > 0 ? parseToIntOrFloat(totalDebt).toLocaleString("ru-Ru") : null} {currency}
+                </td>
+                <td className='text-left td text-[red]'>
+                    {totalBacks ? parseToIntOrFloat(totalBacks).toLocaleString("ru-Ru") : null} {currency}
                 </td>
                 <td className='text-left td text-success-500'>
                     <p className='py-2 pl-0 flex justify-between items-center'>
-                        {totalDebtPayment > 0 ? '+ ' + parseToIntOrFloat(totalDebtPayment) : null}{' '}
+                        {totalDebtPayment > 0 ? '+ ' + parseToIntOrFloat(totalDebtPayment).toLocaleString("ru-Ru") : null}{' '}
                         {currency}
                         {totalDebtPayment > 0 && <TableBtn
                             type={'print'}

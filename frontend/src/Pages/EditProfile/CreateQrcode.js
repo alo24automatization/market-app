@@ -37,7 +37,7 @@ function CreateQrcode() {
     const handleSubmit = () => {
             const body = {
                 market: currentUser._id,
-                qrcode: currentUser.qrcode.replace(/\s+/g, ' ').trim(),
+                qrcode: currentUser?.qrcode?.replace(/\s+/g, ' ').trim(),
             }  
             dispatch(createQrcode(body))
         

@@ -1,18 +1,19 @@
-import { map, uniqueId } from 'lodash'
-import React, { useEffect, useState } from 'react'
+import {map, uniqueId} from 'lodash'
+import React, {useEffect, useState} from 'react'
 import TableBtn from '../../Buttons/TableBtn'
-import { t } from 'i18next'
-import { useNavigate } from 'react-router-dom'
+import {t} from 'i18next'
+import {useNavigate} from 'react-router-dom'
 import moment from 'moment'
+
 export const DebtsTableRow = ({
-    data,
-    currency,
-    Pay,
-    Print,
-    Edit,
+                                  data,
+                                  currency,
+                                  Pay,
+                                  Print,
+                                  Edit,
                                   salerDebts,
-    totalDebt,
-}) => {
+                                  totalDebt,
+                              }) => {
     const [isEditComment, setIsEditComment] = useState(null)
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
     useEffect(() => {
@@ -42,7 +43,8 @@ export const DebtsTableRow = ({
         <>
             {map(data, (debt, index) =>
                 !isMobile ? (
-                    <tr className={`${showRedLinePayDateComing(debt.pay_end_date) ? "bg-error-300" : ""} tr`} key={uniqueId('debt')}>
+                    <tr className={`${showRedLinePayDateComing(debt.pay_end_date) ? "bg-error-300" : ""} tr`}
+                        key={uniqueId('debt')}>
                         <td className='text-left td '>{1 + index}</td>
                         <td className='text-left td'>
                             {new Date(debt.createdAt).toLocaleDateString()}
@@ -85,8 +87,8 @@ export const DebtsTableRow = ({
                         </td>
                         <td className='text-left td font-medium'>
                             {(currency === 'USD'
-                                ? debt.totalprice
-                                : debt.totalpriceuzs
+                                    ? debt.totalprice
+                                    : debt.totalpriceuzs
                             ).toLocaleString('ru-RU')}{' '}
                             <span className='text-warning-500'>{currency}</span>
                         </td>
@@ -105,7 +107,9 @@ export const DebtsTableRow = ({
                                 <TableBtn
                                     type={'print'}
                                     bgcolor={'bg-blue-600'}
-                                    onClick={() => Print(debt.saleconnector)}
+                                    onClick={() => {
+                                        Print({...debt.saleconnector, totaldebtuzs: debt.totaldebtuzs})
+                                    }}
                                 />
                                 <TableBtn
                                     type={'info'}
@@ -151,7 +155,8 @@ export const DebtsTableRow = ({
                                 >
                                     {t('Qarz izoh')}:{debt.comment}
                                     {isEditComment === debt._id && (
-                                        <span className='absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]'>
+                                        <span
+                                            className='absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]'>
                                             <TableBtn
                                                 type={'edit'}
                                                 bgcolor={
@@ -174,8 +179,8 @@ export const DebtsTableRow = ({
                             <p>
                                 <span>{t('Jami')}: </span>
                                 {(currency === 'USD'
-                                    ? debt.totalprice
-                                    : debt.totalpriceuzs
+                                        ? debt.totalprice
+                                        : debt.totalpriceuzs
                                 ).toLocaleString('ru-RU')}{' '}
                                 <span className='text-warning-500'>
                                     {currency}
@@ -220,7 +225,7 @@ export const DebtsTableRow = ({
             <tr className='tr bg-transparent'>
                 <td
                     className='text-left td border-none bg-none'
-                    colSpan={8}
+                    colSpan={9}
                 ></td>
                 <td
                     className='text-left td py-[0.625rem] font-medium border-none bg-none'

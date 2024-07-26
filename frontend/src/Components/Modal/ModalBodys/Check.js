@@ -13,7 +13,8 @@ import { OrderCheckPos } from '../../OrdersCheck/OrderCheckPos.js'
 import { SmallCheck2 } from './SmallCheck2'
 import { IoPrint } from 'react-icons/io5'
 
-function Check({ product, returned, isPayment, payment, isOrder, order, noXPrint }) {
+function    Check(props) {
+    const { product, returned, isPayment, payment, isOrder, order, noXPrint }=props;
     const [loadContent, setLoadContent] = useState(false)
     const saleCheckRef = useRef(null)
     const saleCheckRefPosPrinter = useRef(null)
@@ -97,7 +98,7 @@ function Check({ product, returned, isPayment, payment, isOrder, order, noXPrint
                         <div className='hidden'>
                             <SmallCheck2
                                 ref={saleSmallCheckRef}
-                                product={product}
+                                {...props}
                             />
                         </div>
                     </>

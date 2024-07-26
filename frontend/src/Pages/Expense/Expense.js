@@ -1,29 +1,38 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import React, {useCallback, useEffect, useRef, useState} from 'react'
+import {useDispatch, useSelector} from 'react-redux'
 import FieldContainer from '../../Components/FieldContainer/FieldContainer'
 import Button from '../../Components/Buttons/BtnAddRemove'
-import { clearSuccessRegister, createExpenseTypes, deleteExpense, getExpense, getExpenseByType, getExpenseTypes, registerExpense } from './expenseSlice'
+import {
+    clearSuccessRegister,
+    createExpenseTypes,
+    deleteExpense,
+    getExpense,
+    getExpenseByType,
+    getExpenseTypes,
+    registerExpense
+} from './expenseSlice'
 import SearchForm from '../../Components/SearchForm/SearchForm'
 import Pagination from '../../Components/Pagination/Pagination'
 import Table from '../../Components/Table/Table'
 import TableMobile from '../../Components/Table/TableMobile'
-import { universalToast } from '../../Components/ToastMessages/ToastMessages'
-import { useTranslation } from 'react-i18next'
-import { universalSort } from './../../App/globalFunctions'
-import { VscChromeClose } from 'react-icons/vsc'
+import {universalToast} from '../../Components/ToastMessages/ToastMessages'
+import {useTranslation} from 'react-i18next'
+import {universalSort} from './../../App/globalFunctions'
+import {VscChromeClose} from 'react-icons/vsc'
 import CreatableSelect from 'react-select/creatable'
 import Select from 'react-select'
-import CustomStyle, { DropdownIcon } from '../../Components/SelectInput/CustomStyle'
+import CustomStyle, {DropdownIcon} from '../../Components/SelectInput/CustomStyle'
+
 const Expense = () => {
-    const { t } = useTranslation(['common'])
+    const {t} = useTranslation(['common'])
     const dispatch = useDispatch()
     const selectRef = useRef(null);
     const {
-        market: { _id },
+        market: {_id},
         user
     } = useSelector((state) => state.login)
-    const { currencyType, currency } = useSelector((state) => state.currency)
-    const { expenses, count, successRegister } = useSelector(
+    const {currencyType, currency} = useSelector((state) => state.currency)
+    const {expenses, count, successRegister} = useSelector(
         (state) => state.expense
     )
     const [data, setData] = useState(expenses)
@@ -70,7 +79,7 @@ const Expense = () => {
         }
     ]
     const handleChangeInput = (e, key) => {
-        let target = e.target.value
+        let target = e.target.value;
         if (key === 'comment') {
             setExpense({
                 ...expense,
@@ -132,7 +141,7 @@ const Expense = () => {
             user: user._id
         }
         if (!checkExpense(expense)) {
-            dispatch(registerExpense(body)).then(({ error }) => {
+            dispatch(registerExpense(body)).then(({error}) => {
                 if (!error) {
                     let body = {
                         currentPage,
@@ -180,7 +189,7 @@ const Expense = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const expenseTypesResponse = await dispatch(getExpenseTypes({ market: _id }));
+                const expenseTypesResponse = await dispatch(getExpenseTypes({market: _id}));
                 setExpenseTypes(expenseTypesResponse.payload);
                 let body = {
                     currentPage,
@@ -288,15 +297,15 @@ const Expense = () => {
     ]
 
     const createExpenseType = (value) => {
-        dispatch(createExpenseTypes({ market: _id, comment: value })).then(({ payload }) => {
+        dispatch(createExpenseTypes({market: _id, comment: value, expense})).then(({payload}) => {
             setExpenseTypes(prev => [...prev, payload])
         })
     }
-    const [filteredExpenses, setFilteredExpenses] = useState({ data: [], stated: false });
+    const [filteredExpenses, setFilteredExpenses] = useState({data: [], stated: false});
 
-    const filterExpenses = ({ value }) => {
+    const filterExpenses = ({value}) => {
         if (value === "all") {
-            setFilteredExpenses({ data: [], stated: false })
+            setFilteredExpenses({data: [], stated: false})
         } else {
             let body = {
                 currentPage,
@@ -305,9 +314,9 @@ const Expense = () => {
                 endDate,
                 comment: value
             };
-            dispatch(getExpenseByType(body)).then(({ error, payload }) => {
+            dispatch(getExpenseByType(body)).then(({error, payload}) => {
                 if (!error) {
-                    setFilteredExpenses({ data: payload.expenses, stated: true })
+                    setFilteredExpenses({data: payload.expenses, stated: true})
                 }
             })
         }
@@ -337,14 +346,17 @@ const Expense = () => {
                                     }
                                 >Xarajat turi</label>
                                 <CreatableSelect
-                                    onChange={(value) => handleChangeInput({ target: value }, "comment")}
+                                    onChange={(value) => handleChangeInput({target: value}, "comment")}
                                     components={{
                                         IndicatorSeparator: () => null,
                                         DropdownIndicator: DropdownIcon,
                                     }}
                                     placeholder="Xarajat turi"
-                                    value={({ value: expenseTypes.find((item) => item._id == expense.comment)?._id || "", label: expenseTypes.find((item) => item._id == expense.comment)?.comment || "Xarajat turi" })}
-                                    options={expenseTypes?.map((item => ({ value: item._id, label: item?.comment })))}
+                                    value={({
+                                        value: expenseTypes.find((item) => item._id == expense.comment)?._id || "",
+                                        label: expenseTypes.find((item) => item._id == expense.comment)?.comment || "Xarajat turi"
+                                    })}
+                                    options={expenseTypes?.map((item => ({value: item._id, label: item?.comment})))}
                                     formatCreateLabel={(value) => `Yaratish "${value}"`}
                                     styles={CustomStyle}
                                     onCreateOption={createExpenseType}
@@ -378,7 +390,7 @@ const Expense = () => {
                                     add={createExpense}
                                     text={t('Yangi xarajat yaratish')}
                                 />
-                                <Button onClick={clearForm} text={t('Tozalash')} />
+                                <Button onClick={clearForm} text={t('Tozalash')}/>
                             </div>
                         </div>
                     </div> : null
@@ -395,7 +407,7 @@ const Expense = () => {
                 isMobile && modalOpen ?
                     <div className='absolute h-[100vh]  w-[100%] bg-[white] z-50 top-0 left-0'>
                         <VscChromeClose onClick={() => setModalOpen(false)}
-                            className='absolute cursor-pointer text-3xl end-5 top-5' />
+                                        className='absolute cursor-pointer text-3xl end-5 top-5'/>
                         <div className='flex items-center ps-[20px] gap-[1.25rem] flex-wrap mt-[50px]'>
                             <FieldContainer
                                 value={
@@ -417,14 +429,17 @@ const Expense = () => {
                                 >Xarajat turi</label>
                                 <CreatableSelect
 
-                                    onChange={(value) => handleChangeInput({ target: value }, "comment")}
+                                    onChange={(value) => handleChangeInput({target: value}, "comment")}
                                     components={{
                                         IndicatorSeparator: () => null,
                                         DropdownIndicator: DropdownIcon,
                                     }}
-                                    value={({ value: expenseTypes.find((item) => item._id == expense.comment)?._id || "", label: expenseTypes.find((item) => item._id == expense.comment)?.comment || "Xarajat turi" })}
+                                    value={({
+                                        value: expenseTypes.find((item) => item._id == expense.comment)?._id || "",
+                                        label: expenseTypes.find((item) => item._id == expense.comment)?.comment || "Xarajat turi"
+                                    })}
                                     placeholder="Xarajat turi"
-                                    options={expenseTypes?.map((item => ({ value: item._id, label: item?.comment })))}
+                                    options={expenseTypes?.map((item => ({value: item._id, label: item?.comment})))}
                                     formatCreateLabel={(value) => `Yaratish "${value}"`}
                                     styles={CustomStyle}
                                     onCreateOption={createExpenseType}
@@ -448,7 +463,7 @@ const Expense = () => {
                                     add={createExpense}
                                     text={t('Yangi xarajat yaratish')}
                                 />
-                                <Button onClick={clearForm} text={t('Tozalash')} />
+                                <Button onClick={clearForm} text={t('Tozalash')}/>
                             </div>
                         </div>
                     </div> : null
@@ -472,11 +487,11 @@ const Expense = () => {
                             }
                         >Xarajat turi</label>
                         <Select onChange={(value) => filterExpenses(value)}
-                            options={[
-                                { label: "Hammasi", value: "all" }, // Add this item first
-                                ...expenseTypes.map((item) => ({ label: item.comment, value: item._id })),
-                            ]}
-                            placeholder="Xarajat turini tanlang" />
+                                options={[
+                                    {label: "Hammasi", value: "all"}, // Add this item first
+                                    ...expenseTypes.map((item) => ({label: item.comment, value: item._id})),
+                                ]}
+                                placeholder="Xarajat turini tanlang"/>
                     </div>
                 </div>
             </div>

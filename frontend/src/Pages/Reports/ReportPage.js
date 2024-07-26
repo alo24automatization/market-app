@@ -717,6 +717,9 @@ const ReportPage = () => {
 
     const handleClickPrint = (saleconnector) => {
         if (id === 'debts') {
+            console.log("----")
+            console.log(saleconnector)
+            console.log('-----')
             setModalData(saleconnector)
             setModalBody('allChecks')
             setModalVisible(true)

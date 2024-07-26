@@ -100,6 +100,9 @@ const ClientsSales = () => {
             title: t('Qarz'),
         },
         {
+            title: t('Qayratilganlar'),
+        },
+        {
             title: t(`Qarzdan to'lov`),
         },
         {
@@ -527,25 +530,24 @@ const ClientsSales = () => {
                 changePaymentType={handleChangePaymentType}
                 onChange={handleChangePaymentInput}
                 client={null}
-                allPayment={currencyType === 'USD' ? allPayment : allPaymentUzs}
-                card={currencyType === 'USD' ? paymentCard : paymentCardUzs}
-                cash={currencyType === 'USD' ? paymentCash : paymentCashUzs}
-                debt={currencyType === 'USD' ? paymentDebt : paymentDebtUzs}
+                allPayment={allPaymentUzs}
+                card={ paymentCardUzs}
+                cash={ paymentCashUzs}
+                debt={paymentDebtUzs}
                 discount={null}
                 handleChangeDiscount={handleChangeDiscount}
                 hasDiscount={false}
                 changeComment={() => setComment('')}
                 transfer={
-                    currencyType === 'USD'
-                        ? paymentTransfer
-                        : paymentTransferUzs
+
+                         paymentTransferUzs
                 }
                 handleClickDiscountBtn={handleClickDiscountBtn}
                 discountSelectOption={discountSelectOption}
                 handleChangeDiscountSelectOption={
                     handleChangeDiscountSelectOption
                 }
-                paid={currencyType === 'USD' ? paid : paidUzs}
+                paid={paidUzs}
                 disablePayButton={clickdelay}
                 handleClickPay={handleClickPay}
                 clickdelay={clickdelay}

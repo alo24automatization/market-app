@@ -13,7 +13,8 @@ export const SmallCheck2 = forwardRef((props, ref) => {
         returnedPayments,
         product,
         userInfo,
-        isReturned
+        isReturned,
+        totalOfBackAndDebt
     } = props;
     const {market} = useSelector((state) => state.login)
     const {currencyType} = useSelector((state) => state.currency)
@@ -135,7 +136,7 @@ export const SmallCheck2 = forwardRef((props, ref) => {
                         {isReturned ? t('Qaytarilgan') : t('Sotilganlar')} :
                     </h3>
                     <div>
-                        {map(product?.products.filter(product=>product.pieces>0), (item, index) => {
+                        {map(product?.products.filter(product => product.pieces > 0), (item, index) => {
                             if (
                                 item['more_parameters1'] &&
                                 item?.more_parameters1?.length !== 0 &&
@@ -337,7 +338,7 @@ export const SmallCheck2 = forwardRef((props, ref) => {
                     </div>
                 </div>
             )}
-            {returned.length > 0 && (
+            {returned?.length > 0 && (
                 <div className='mt-5'>
                     <h3 className='text-[14px] text-black-900 mb-5 font-bold'>
                         {t('Qaytarilgan')} :
@@ -594,6 +595,21 @@ export const SmallCheck2 = forwardRef((props, ref) => {
                         {currencyType}
                     </span>
                 </h3>
+
+                <h3
+                    style={{fontWeight: 'bolder', display: returned?.length>0 ? "none" : "block"}}
+                    className='text-black-900 text-[12px] font-bold pt-4'
+                >
+                    {' '}
+                    {t('Qarzdan qaytarilganlar')}:{' '}
+                    <span
+                        style={{fontWeight: 'bolder'}}
+                        className='text-black-900 text-[12px] font-bold'
+                    >
+                          {totalOfBackAndDebt?.toLocaleString('ru-Ru')}{' '}
+                        {currencyType}
+                    </span>
+                </h3>
                 <h3
                     style={{fontWeight: 'bolder', display: isReturned ? "none" : "block"}}
                     className='text-black-900 text-[12px] font-bold pt-4'
@@ -625,7 +641,19 @@ export const SmallCheck2 = forwardRef((props, ref) => {
                         {currencyType}
                     </span>
                 </h3>
+                <h3
+                    style={{fontWeight: 'bolder', display: isReturned ? "none" : "block"}}
+                    className='text-black-900 text-[12px] font-bold pt-4'
+                >
+                    {' '}
+                    {t('Umumiy qarz')}:{' '}
+                    <span className='text-black-900 text-[12px] font-bold'>
+                    {(currencyType === 'USD' ? product?.totaldebtusd || 0 : product?.totaldebtuzs || 0).toLocaleString("ru-Ru")}{' '}
+                        {currencyType}
+                </span>
+                </h3>
             </div>
+
             {market.qrcode && (
                 <div className='w-[120px] h-[120px] mx-auto'>
                     <img src={market.qrcode} alt='qrcode'/>
