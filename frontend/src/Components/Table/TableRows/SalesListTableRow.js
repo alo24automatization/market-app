@@ -36,7 +36,7 @@ export const SalesListTableRow = ({
     }
     const reduceEl = (arr, usd, uzs) => {
         return (
-            (arr.length > 0 &&
+            (arr?.length > 0 &&
                 arr.reduce((prev, item) => {
                     return result(prev, item[usd], item[uzs])
                 }, 0)) ||

@@ -12,8 +12,9 @@ export const SaleCheckAll2 = forwardRef((props, ref) => {
         selledPayments,
         returnedPayments,
         product,
-        userInfo
-    } = props
+        userInfo,
+        totalOfBackAndDebt
+    } = props;
     const { market } = useSelector((state) => state.login)
     const { currencyType } = useSelector((state) => state.currency)
     const calculateAllSum = (data) => {
@@ -495,7 +496,7 @@ export const SaleCheckAll2 = forwardRef((props, ref) => {
                     {t('Jami')}:{' '}
                     <span className='text-black-900 font-bold'>
                         {(
-                            calculateAllSum(selled) 
+                            calculateAllSum(selled)
                         ).toLocaleString('ru-Ru')}{' '}
                         {currencyType}
                     </span>
@@ -516,9 +517,19 @@ export const SaleCheckAll2 = forwardRef((props, ref) => {
                     {t('To\'langan')}:{' '}
                     <span className='text-black-900 font-bold'>
                         {(
-                            calculateAllPayments(selledPayments) +
-                            calculateAllPayments(returnedPayments)
+                            calculateAllPayments(selledPayments?.filter(item => item.totalpriceuzs)) +
+                            calculateAllPayments(returnedPayments?.filter(item => item.totalpriceuzs))
                         ).toLocaleString('ru-Ru')}{' '}
+                        {currencyType}
+                    </span>
+                </li>
+                <li className='text-black-900 check-ul-li-foot'
+                style={{display:returned?.length>0?"flex":"none"}}
+                >
+                    {' '}
+                    {t("Qarzdan qaytarilganlar")}:{' '}
+                    <span className='text-black-900 font-bold'>
+                         {totalOfBackAndDebt?.toLocaleString('ru-Ru')}{' '}
                         {currencyType}
                     </span>
                 </li>
@@ -541,7 +552,7 @@ export const SaleCheckAll2 = forwardRef((props, ref) => {
                     {' '}
                     {t('Umumiy qarz')}:{' '}
                     <span className=' text-black-900 font-bold'>
-                        {currencyType === 'USD' ? product?.totaldebtusd || 0 : product?.totaldebtuzs || 0}
+                        {(currencyType === 'USD' ? product?.totaldebtusd || 0 : product?.totaldebtuzs || 0).toLocaleString('ru-Ru')}
                         {
                             " "
                         }

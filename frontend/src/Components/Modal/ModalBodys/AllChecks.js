@@ -12,7 +12,6 @@ import {SaleCheckAll2} from '../../SaleCheck/SaleCheckAll2.js'
 import {SmallCheck2} from './SmallCheck2.js'
 
 function AllCheck({product, allDetails}) {
-    console.log("salled")
     // detect mobile
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
     const [loadContent, setLoadContent] = useState(false)
@@ -27,7 +26,7 @@ function AllCheck({product, allDetails}) {
     const saleSmallCheckRef1 = useRef()
     const saleSmallCheckRef2 = useRef()
     const onBeforeGetContentResolve = useRef(null)
-   
+   const [totalOfBackAndDebt,setTotalOfBackAndDebt]=useState(0)
     const handleOnBeforeGetContent = React.useCallback(
         (e) => {
             setLoadContent(true)
@@ -134,6 +133,7 @@ function AllCheck({product, allDetails}) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [onBeforeGetContentResolve.current, loadContent])
     useEffect(() => {
+        setTotalOfBackAndDebt(product?.saleconnector?.totalOfBackAndDebt)
         setSelled(filter(product?.products, (item) => item.pieces > 0))
         setReturned(filter(product?.products, (item) => item.pieces < 0))
         setSelledDiscounts(
@@ -170,6 +170,7 @@ function AllCheck({product, allDetails}) {
             <div className='hidden md:block'>
                 {allDetails ? (
                     <SaleCheckAll2
+                        totalOfBackAndDebt={totalOfBackAndDebt}
                         ref={saleCheckRef}
                         returned={returned}
                         selled={selled}
@@ -182,6 +183,7 @@ function AllCheck({product, allDetails}) {
                     />
                 ) : (
                     <SaleCheckAll
+                        totalOfBackAndDebt={totalOfBackAndDebt}
                         ref={saleCheckRef}
                         returned={returned}
                         selled={selled}
@@ -196,6 +198,7 @@ function AllCheck({product, allDetails}) {
             </div>
             <div className='hidden'>
                 <SmallCheck2
+                    totalOfBackAndDebt={totalOfBackAndDebt}
                     ref={saleSmallCheckRef2}
                     returned={returned}
                     selled={selled}
@@ -207,6 +210,8 @@ function AllCheck({product, allDetails}) {
                     userInfo={userInfo}
                 />
                 <SmallCheck
+                    totalOfBackAndDebt={totalOfBackAndDebt}
+
                     ref={saleSmallCheckRef1}
                     returned={returned}
                     selled={selled}

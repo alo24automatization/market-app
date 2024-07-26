@@ -1,19 +1,19 @@
-import { t } from 'i18next'
-import { map } from 'lodash'
-import React, { useEffect, useState, useRef, useMemo, useCallback } from 'react'
-import { useSelector } from 'react-redux'
-import { useReactToPrint } from 'react-to-print'
+import {t} from 'i18next'
+import {map} from 'lodash'
+import React, {useEffect, useState, useRef, useMemo, useCallback} from 'react'
+import {useSelector} from 'react-redux'
+import {useReactToPrint} from 'react-to-print'
 import TableBtn from '../../Buttons/TableBtn'
 import SmallLoader from '../../Spinner/SmallLoader'
-import { IoPrint } from 'react-icons/io5'
+import {IoPrint} from 'react-icons/io5'
 import PrintBtn from '../../Buttons/PrintBtn'
 
-const MiniSaleDebtPaymentCheck = ({ data, type }) => {
+const MiniSaleDebtPaymentCheck = ({data, type}) => {
     const [totalCard, setTotalCard] = useState(0)
     const [totalCash, setTotalCash] = useState(0)
     const [totalTransfer, setTotalTransfer] = useState(0)
-    const { user, market } = useSelector((state) => state.login)
-    const { currencyType } = useSelector((state) => state.currency)
+    const {user, market} = useSelector((state) => state.login)
+    const {currencyType} = useSelector((state) => state.currency)
     const componentRef = useRef()
     const [loadContent, setLoadContent] = useState(false)
     const onBeforeGetContentResolve = useRef(null)
@@ -64,17 +64,10 @@ const MiniSaleDebtPaymentCheck = ({ data, type }) => {
                 return data[currencyType === 'USD' ? key : `${key}uzs`]
             } else {
                 return (data?.saleconnector || data)?.payments?.reduce((prev, payment) => {
-                    return prev + payment.products?.reduce((sum, productId) => {
-                        const product = data.products.find((p) => p._id === productId)
-                        if (product) {
-                            return sum + payment[currencyType === 'USD' ? key : `${key}uzs`]
-                        }
-                        return sum
-                    }, 0)
+                    return prev + payment[currencyType === 'USD' ? key : `${key}uzs`]
                 }, 0)
             }
         }
-
         setTotalCard(calculate('card'))
         setTotalCash(calculate('cash'))
         setTotalTransfer(calculate('transfer'))
@@ -84,33 +77,28 @@ const MiniSaleDebtPaymentCheck = ({ data, type }) => {
         return products.find((p) => p._id === productId)
     }, [])
 
-    const generatePaymentItem = useCallback((payment, productId, currencyType) => {
-        let product = findProductById(data.products, productId)?._id
-        if (productId === product) {
-            return (
-                <li className='border-b mt-3' key={`${payment._id}-${productId}`}>
+    const generatePaymentItem = useCallback((payment) => {
+        return (
+            <li className='border-b mt-3' key={`${payment._id}`}>
                     <span className='check-ul-li'>
                         <span>{new Date(payment?.createdAt).toLocaleDateString()}</span>
                         <span>
-                            {payment[currencyType === 'USD' ? 'payment' : 'paymentuzs'].toLocaleString('ru-RU')} {currencyType}
+                            {payment['paymentuzs']?.toLocaleString('ru-RU')} {currencyType}
                         </span>
                     </span>
-                </li>
-            )
-        }
-        return null
+            </li>
+        )
     }, [data.products, findProductById])
 
     const paymentItems = useMemo(() => {
-        return (data?.saleconnector || data)?.payments?.flatMap((payment) => {
-            return payment.products.map((productId) => {
-                return generatePaymentItem(payment, productId, currencyType)
-            }).filter(item => item !== null)
-        })
+        return data?.saleconnector?.payments?.flatMap(
+            (payment) =>
+                generatePaymentItem(payment)
+        )
     }, [data, currencyType, generatePaymentItem])
 
     const parseToIntOrFloat = (value) => {
-        if (!value || value === 0) return null
+        if (!value || value === 0) return 0
         else if (value % 1 === 0) {
             return parseInt(value)
         } else {
@@ -121,8 +109,9 @@ const MiniSaleDebtPaymentCheck = ({ data, type }) => {
     return (
         <div>
             {loadContent && (
-                <div className='fixed backdrop-blur-[2px] left-0 top-0 bg-white-700 flex flex-col items-center justify-center w-full h-full'>
-                    <SmallLoader />
+                <div
+                    className='fixed backdrop-blur-[2px] left-0 top-0 bg-white-700 flex flex-col items-center justify-center w-full h-full'>
+                    <SmallLoader/>
                 </div>
             )}
             <div className='w-full grid'>
@@ -158,7 +147,7 @@ const MiniSaleDebtPaymentCheck = ({ data, type }) => {
                                 </span>
                             </li>
                         </ul>
-                        <hr />
+                        <hr/>
                         <h2 className='text-center text-lg mt-2 font-medium'>
                             {t("Qarzdan to'lov")}
                         </h2>
@@ -191,28 +180,28 @@ const MiniSaleDebtPaymentCheck = ({ data, type }) => {
                             <div className='font-semibold flex justify-between items-center'>
                                 <span>{t('Naqt')}:</span>
                                 <span>
-                                    {parseToIntOrFloat(totalCash)} {currencyType}
+                                    {parseToIntOrFloat(totalCash)?.toLocaleString("ru-Ru")} {currencyType}
                                 </span>
                             </div>
                             <div className='font-semibold flex justify-between items-center'>
                                 <span>{t('Plastik')}:</span>
                                 <span>
-                                    {parseToIntOrFloat(totalCard)} {currencyType}
+                                    {parseToIntOrFloat(totalCard)?.toLocaleString("ru-Ru")} {currencyType}
                                 </span>
                             </div>
                             <div className='font-semibold flex justify-between items-center pb-4'>
                                 <span>{t("O'tkazma")}:</span>
                                 <span>
-                                    {parseToIntOrFloat(totalTransfer)} {currencyType}
+                                    {parseToIntOrFloat(totalTransfer)?.toLocaleString("ru-Ru")} {currencyType}
                                 </span>
                             </div>
                         </div>
                     </div>
-                    <hr className="w-full h-[5px] print:h-[10px] mt-[5cm] bg-[#000]" />
+                    <hr className="w-full h-[5px] print:h-[10px] mt-[5cm] bg-[#000]"/>
                 </div>
             </div>
             <div className='w-full flex justify-end'>
-                <PrintBtn onClick={print} />
+                <PrintBtn onClick={print}/>
             </div>
         </div>
     )

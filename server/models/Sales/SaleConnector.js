@@ -1,41 +1,45 @@
-const { Schema, model, Types } = require('mongoose');
+const {Schema, model, Types} = require('mongoose');
 const Joi = require('joi');
 
 const saleconnector = new Schema(
-  {
-    id: { type: String },
-    payments: [{ type: Schema.Types.ObjectId, ref: 'Payment' }],
-    dailyconnectors: [
-      { type: Schema.Types.ObjectId, ref: 'DailySaleConnector' },
-    ],
-    products: [{ type: Schema.Types.ObjectId, ref: 'SaleProduct' }],
-    discounts: [{ type: Schema.Types.ObjectId, ref: 'Discount' }],
-    debts: [{ type: Schema.Types.ObjectId, ref: 'Debt' }],
-    packman: { type: Schema.Types.ObjectId, ref: 'Packman' },
-    client: { type: Schema.Types.ObjectId, ref: 'Client' },
-    market: { type: Schema.Types.ObjectId, ref: 'Market', required: true },
-    user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    isArchive: { type: Boolean, default: false },
-  },
-  {
-    timestamps: true,
-  }
+    {
+        id: {type: String},
+        payments: [{type: Schema.Types.ObjectId, ref: 'Payment'}],
+        dailyconnectors: [
+            {type: Schema.Types.ObjectId, ref: 'DailySaleConnector'},
+        ],
+        products: [{type: Schema.Types.ObjectId, ref: 'SaleProduct'}],
+        discounts: [{type: Schema.Types.ObjectId, ref: 'Discount'}],
+        debts: [{type: Schema.Types.ObjectId, ref: 'Debt'}],
+        packman: {type: Schema.Types.ObjectId, ref: 'Packman'},
+        client: {type: Schema.Types.ObjectId, ref: 'Client'},
+        market: {type: Schema.Types.ObjectId, ref: 'Market', required: true},
+        user: {type: Schema.Types.ObjectId, ref: 'User', required: true},
+        isArchive: {type: Boolean, default: false},
+        totalOfBackAndDebt: {type: Number, default: 0, required: false}
+
+    },
+    {
+        timestamps: true,
+    }
 );
 
 function validateSaleConnector(saleconnector) {
-  const schema = Joi.object({
-    id: Joi.string(),
-    payments: Joi.array(),
-    discounts: Joi.array(),
-    debts: Joi.string(),
-    packman: Joi.string(),
-    client: Joi.string(),
-    user: Joi.string(),
-    products: Joi.array(),
-    market: Joi.string(),
-  });
+    const schema = Joi.object({
+        id: Joi.string(),
+        payments: Joi.array(),
+        discounts: Joi.array(),
+        debts: Joi.string(),
+        packman: Joi.string(),
+        client: Joi.string(),
+        totalOfBackAndDebt: Joi.number().default(0),
 
-  return schema.validate(saleconnector);
+        user: Joi.string(),
+        products: Joi.array(),
+        market: Joi.string(),
+    });
+
+    return schema.validate(saleconnector);
 }
 
 module.exports.validateSaleConnector = validateSaleConnector;

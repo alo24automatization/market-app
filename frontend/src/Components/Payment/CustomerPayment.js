@@ -131,7 +131,7 @@ function CustomerPayment({
                         </div>
                     )}
                     <div className='mb-[1.25rem] font-medium text-[1.25rem] text-center leading-[23.44px]'>
-                        {allPayment.toLocaleString('ru-Ru')} {currencyType}
+                        {allPayment?.toLocaleString('ru-Ru')} {currencyType}
                     </div>
                     <ul className='w-full pb-[1.25rem]'>
                         {!returned && defineLabel()}
@@ -182,7 +182,7 @@ function CustomerPayment({
                                 :{' '}
                             </span>
                             <h3 className='text-[1rem] text-loginButton'>
-                                {paid.toLocaleString('ru-Ru')} {currencyType}
+                                {paid?.toLocaleString('ru-Ru')} {currencyType}
                             </h3>
                         </li>
                     </ul>

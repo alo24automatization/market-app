@@ -13,7 +13,10 @@ export const SaleCheckAll = forwardRef((props, ref) => {
         returnedPayments,
         product,
         userInfo
-    } = props
+    } = props;
+
+    console.log(product)
+
     const { market } = useSelector((state) => state.login)
     const { currencyType } = useSelector((state) => state.currency)
     const calculateAllSum = (data) => {
@@ -56,7 +59,9 @@ export const SaleCheckAll = forwardRef((props, ref) => {
                 )
             }, 0)
             : 0
+
     }
+
 
     return (
         <div ref={ref} className={'bg-white-900 p-4 rounded-md'}>
@@ -177,7 +182,7 @@ export const SaleCheckAll = forwardRef((props, ref) => {
                                                     'ru-Ru'
                                                 )
                                                 : item?.unitpriceuzs.toLocaleString(
-                                                    'ru-Ru'
+                                                     'ru-Ru'
                                                 )}{' '}
                                             {currencyType}
                                         </td>
@@ -363,7 +368,7 @@ export const SaleCheckAll = forwardRef((props, ref) => {
                     {' '}
                     {t('Umumiy qarz')}:{' '}
                     <span className=' text-black-900 font-bold'>
-                        {currencyType === 'USD' ? product?.totaldebtusd || 0 : product?.totaldebtuzs || 0}
+                        {(currencyType === 'USD' ? product?.totaldebtusd || 0 : product?.totaldebtuzs || 0).toLocaleString("ru-Ru")}{" "}
                         {currencyType}
                     </span>
                 </li>
