@@ -44,21 +44,22 @@ const ClientsPage = () => {
     const headers =
         user.type === 'Director'
             ? [
-                  {title: '№', styles: 'w-[8%] text-left'},
-                  {title: t('Agent'), styles: 'w-[41%] text-left'},
-                  {title: t('Mijoz'), styles: 'w-[41%] text-left'},
-                  {title: t('Telefon'), styles: 'w-[41%] text-left'},
-                  {title: t('Savdo'), styles: 'w-[41%] text-left'},
-                  {title: t('Sof foyda'), styles: 'w-[41%] text-left'},
-                  {title: '', styles: 'w-[8%] text-left'},
-              ]
+                {title: '№', styles: 'w-[8%] text-left'},
+                {title: t('Agent'), styles: 'w-[41%] text-left'},
+                {title: t('Mijoz'), styles: 'w-[41%] text-left'},
+                {title: t('Telefon'), styles: 'w-[41%] text-left'},
+                {title: t('Savdo'), styles: 'w-[41%] text-left'},
+                {title: t('Sof foyda'), styles: 'w-[41%] text-left'},
+                {title: '', styles: 'w-[8%] text-left'},
+            ]
             : [
-                  {title: '№', styles: 'w-[8%] text-left'},
-                  {title: t('Agent'), styles: 'w-[41%] text-left'},
-                  {title: t('Mijoz'), styles: 'w-[41%] text-left'},
-                  {title: t('Savdo'), styles: 'w-[41%] text-left'},
-                  {title: '', styles: 'w-[8%] text-left'},
-              ]
+                {title: '№', styles: 'w-[8%] text-left'},
+                {title: t('Agent'), styles: 'w-[41%] text-left'},
+                {title: t('Mijoz'), styles: 'w-[41%] text-left'},
+                {title: t('Telefon'), styles: 'w-[41%] text-left'},
+                {title: t('Savdo'), styles: 'w-[41%] text-left'},
+                {title: '', styles: 'w-[8%] text-left'},
+            ]
 
     const [startDate, setStartDate] = useState(
         new Date(
@@ -394,7 +395,7 @@ const ClientsPage = () => {
                             }
                             onClick={stickyForm ? handleEdit : addNewClients}
                         />
-                        <Button onClick={clearForm} text={t('Tozalash')} />
+                        <Button onClick={clearForm} text={t('Tozalash')}/>
                     </div>
                 </div>
 
@@ -416,7 +417,7 @@ const ClientsPage = () => {
                         }}
                         className='d-block  hover:bg-blue-200  bg-blue-400   focus-visible:outline-none w-[150px] h-[40px] createElement '
                     >
-                        <FaFilter /> {t('izlash')}
+                        <FaFilter/> {t('izlash')}
                     </button>
                 </div>
             )}
@@ -458,7 +459,8 @@ const ClientsPage = () => {
                 </div>
             ) : (
                 modalOpen && (
-                    <div className='absolute lg:p-[50px] w-[100vw]  h-[100vh]  flex justify-evenly flex-wrap    top-0	left-0 z-50 bg-[white]	'>
+                    <div
+                        className='absolute lg:p-[50px] w-[100vw]  h-[100vh]  flex justify-evenly flex-wrap    top-0	left-0 z-50 bg-[white]	'>
                         <VscChromeClose
                             onClick={() => setModalOpen(false)}
                             className=' absolute right-[20px]  top-[20px]  text-4xl cursor-pointer'
@@ -501,7 +503,7 @@ const ClientsPage = () => {
                                 }}
                                 className='d-block  hover:bg-blue-200  bg-blue-400   focus-visible:outline-none w-[150px] h-[40px] createElement '
                             >
-                                <FaFilter /> {t('izlash')}
+                                <FaFilter/> {t('izlash')}
                             </button>
                         </div>
                     </div>
@@ -510,9 +512,9 @@ const ClientsPage = () => {
 
             <div className='lg:tableContainerPadding'>
                 {loading ? (
-                    <Spinner />
+                    <Spinner/>
                 ) : data.length === 0 && searchedData.length === 0 ? (
-                    <NotFind text={t('Mijozlar mavjud emas')} />
+                    <NotFind text={t('Mijozlar mavjud emas')}/>
                 ) : !isMobile ? (
                     <Table
                         data={searchedData.length > 0 ? searchedData : data}

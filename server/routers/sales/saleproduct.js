@@ -330,25 +330,72 @@ module.exports.register = async (req, res) => {
             .populate("user", "firstname lastname")
             .populate("saleconnector", "id").lean();
         // Step 1: Fetch all SaleConnector documents for the given client
-        const startOfToday = new Date();
-        startOfToday.setHours(0, 0, 0, 0);
 
-        const endOfToday = new Date();
-        endOfToday.setHours(23, 59, 59, 999);
-
-        const clientSales = await SaleConnector.find({
+        let filteredProductsSale = [];
+        let totaldebtuzs = 0;
+        const saleconnectors = await SaleConnector.find({
+            market: market,
             client: client._id,
-            createdAt: {$gte: startOfToday, $lte: endOfToday}
-        });
+        })
+            .select("-isArchive -market -__v")
+            .sort({updatedAt: -1}).populate("debts")
+            .populate({
+                path: "products", select: "user", populate: {
+                    path: "user", select: "firstname lastname",
+                },
+            })
+            .populate({
+                path: "products", select: "product", populate: {
+                    path: "product", select: "category", populate: {path: "category", select: "code"},
+                },
+            })
+            .populate({
+                path: "products",
+                select: "totalprice  unitprice totalpriceuzs unitpriceuzs pieces createdAt discount saleproducts product fromFilial",
+                options: {sort: {createdAt: -1}},
+                populate: {
+                    path: "product", select: "productdata", populate: {
+                        path: "productdata", select: "name code", // match: {name: product}
+                    },
+                },
+            })
+            .populate({
+                path: "products",
+                select: "totalprice  priceFromLengthAmout lengthAmout sizePrice forWhat more_parameters1 more_parameters2 unitprice totalpriceuzs unitpriceuzs pieces createdAt discount saleproducts product fromFilial",
+                options: {sort: {createdAt: -1}},
+                populate: {
+                    path: "saleproducts", select: "pieces totalprice totalpriceuzs",
+                },
+            })
+            .populate("payments", "payment paymentuzs comment totalprice totalpriceuzs createdAt cash cashuzs card carduzs transfer transferuzs")
+            .populate("discounts", "discount discountuzs createdAt procient products totalprice totalpriceuzs")
+            .populate({path: "client", select: "name phoneNumber"})
+            .populate("packman", "name")
+            .populate("user", "firstname lastname")
+            .populate("dailyconnectors", "comment ")
+            .lean()
+        for (const connector of saleconnectors) {
 
-// Step 2: Collect all Debt documents associated with each SaleConnector
-        let allDebts = [];
-        for (let item of clientSales) {
-            // Fetch debts
-            let debts = await Debt.find({saleconnector: item._id});
-            allDebts = allDebts.concat(debts);
+            const products = await SaleProduct.find({
+                saleconnector: connector._id,
+            }).lean();
+            const productstotaluzs = [...products].reduce((prev, el) => prev + el.totalpriceuzs, 0);
+            const payments = await Payment.find({
+                saleconnector: connector._id,
+            }).lean();
+            const paymentstotaluzs = [...payments].reduce((prev, el) => prev + el.paymentuzs, 0);
+
+            const discounts = await Discount.find({
+                saleconnector: connector._id,
+            }).lean();
+
+            const discountstotaluzs = [...discounts].reduce((prev, el) => prev + el.discountuzs, 0);
+            totaldebtuzs = productstotaluzs - paymentstotaluzs - discountstotaluzs;
+            filteredProductsSale.push({
+                totaldebtuzs: totaldebtuzs,
+            });
         }
-      let totaldebtuzs=  allDebts.reduce((prev, debt) => prev + debt.debtuzs, 0)
+        totaldebtuzs = filteredProductsSale.length > 0 ? filteredProductsSale.reduce((sum, item) => sum + item.totaldebtuzs, 0) : 0
         res.status(201).send({
             ...connector,
             totaldebtuzs
@@ -829,12 +876,12 @@ module.exports.getsaleconnectors = async (req, res) => {
             const discounts = await Discount.find({
                 saleconnector: connector._id,
             }).lean();
+
             const discountstotalusd = [...discounts].reduce((prev, el) => prev + el.discount, 0);
             const discountstotaluzs = [...discounts].reduce((prev, el) => prev + el.discountuzs, 0);
 
             totaldebtusd = productstotalusd - paymentstotalusd - discountstotalusd;
             totaldebtuzs = productstotaluzs - paymentstotaluzs - discountstotaluzs;
-
             filteredProductsSale.push({
                 _id: connector._id,
                 dailyconnectors: connector.dailyconnectors,
@@ -935,7 +982,7 @@ module.exports.registeredit = async (req, res) => {
         const {
             saleproducts, discounts, payment, debt, market, user, saleconnectorid, comment, totalOfBackAndDebt
         } = req.body;
-
+        console.log(req.body)
         const marke = await Market.findById(market);
         if (!marke) {
             return res.status(400).json({
@@ -1013,7 +1060,6 @@ module.exports.registeredit = async (req, res) => {
         const saleconnector = await SaleConnector.findById(saleconnectorid);
 
         saleconnector.dailyconnectors.push(dailysaleconnector._id);
-        console.log(totalOfBackAndDebt)
         saleconnector.totalOfBackAndDebt = saleconnector.totalOfBackAndDebt + totalOfBackAndDebt;
         let products = [];
         for (const saleproduct of all) {

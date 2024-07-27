@@ -33,7 +33,6 @@ function validateSaleConnector(saleconnector) {
         packman: Joi.string(),
         client: Joi.string(),
         totalOfBackAndDebt: Joi.number().default(0),
-
         user: Joi.string(),
         products: Joi.array(),
         market: Joi.string(),
