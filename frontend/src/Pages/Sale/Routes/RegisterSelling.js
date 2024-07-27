@@ -1489,8 +1489,7 @@ const RegisterSelling = () => {
                 setPaid(Math.abs(payment))
                 setPaidUzs(Math.abs(paymentUzs))
                 // QARZ CHIQSIN
-                console.log(allUzs - Math.abs(paymentUzs)===0?paymentUzs:allUzs - Math.abs(paymentUzs))
-                setTotalOfBackAndDebt(allUzs - Math.abs(paymentUzs)===0?paymentUzs:allUzs - Math.abs(paymentUzs))
+                setTotalOfBackAndDebt(allUzs - Math.abs(paymentUzs) <= 0 ? 0 : allUzs - Math.abs(paymentUzs))
             } else {
                 setPaymentCash(0)
                 setPaymentCashUzs(UsdToUzs(0, exchangerate))
@@ -1502,7 +1501,6 @@ const RegisterSelling = () => {
                 setPaidUzs(allUzs)
                 // QAYTGAN SUMMA CHIQSIN
                 setTotalOfBackAndDebt(allUzs)
-                console.log(allUzs)
             }
             // paidUzs qaytarilyotgan summa
             setPaymentModalVisible(true)

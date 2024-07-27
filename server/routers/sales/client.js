@@ -16,6 +16,7 @@ const {regExpression} = require("../globalFunctions.js");
 const {DailySaleConnector} = require("../../models/Sales/DailySaleConnector");
 const {Debt} = require("../../models/Sales/Debt");
 const {all} = require("axios");
+const {Discount} = require("../../models/Sales/Discount");
 
 const reduce = (arr, el) =>
     arr.reduce((prev, item) => prev + (item[el] || 0), 0);
@@ -458,6 +459,7 @@ module.exports.getClients = async (req, res) => {
                 .populate("dailyconnectors", "comment");
 
             let s = null;
+            let totaldebtuzs = 0
             if (saleconnectors.length > 0) {
                 const payments = reduceForSales(saleconnectors, "payments");
                 const products = reduceForSales(saleconnectors, "products");
@@ -467,13 +469,6 @@ module.exports.getClients = async (req, res) => {
                     saleconnectors,
                     "dailyconnectors"
                 );
-                let totaldebtuzs = 0
-                for (let debt of debts) {
-                    const foundedDebt = await Debt.findById(debt);
-                    if (foundedDebt) {
-                        totaldebtuzs += foundedDebt.debtuzs || 0
-                    }
-                }
 
                 const totalsales = [...products].reduce(
                     (prev, el) => prev + el.totalprice || 0,
@@ -494,7 +489,10 @@ module.exports.getClients = async (req, res) => {
                     0
                 );
 
-
+                const productstotaluzs = [...products].reduce((prev, el) => prev + el.totalpriceuzs, 0);
+                const paymentstotaluzs = [...payments].reduce((prev, el) => prev + el.paymentuzs, 0);
+                const discountstotaluzs = [...discounts].reduce((prev, el) => prev + el.discountuzs, 0);
+                totaldebtuzs = productstotaluzs - paymentstotaluzs - discountstotaluzs;
                 s = {
                     products: products,
                     payments: payments,
@@ -562,7 +560,7 @@ module.exports.getClientsSales = async (req, res) => {
             })
             .populate("payment", "payment paymentuzs totalprice totalpriceuzs")
             .populate("discount", "discount discountuzs")
-            .populate("debt", "debt debtuzs")
+            .populate("debt")
             .populate({
                 path: "client",
                 select: "name",
@@ -584,7 +582,9 @@ module.exports.getClientsSales = async (req, res) => {
             if (payment.saleconnector.totalOfBackAndDebt) {
                 sum = payment.debt.debtuzs - payment.saleconnector.totalOfBackAndDebt;
             } else {
-                sum = payment.debt.debtuzs
+                if (payment.debt) {
+                    sum = payment.debt.debtuzs || 0
+                }
             }
             return {
                 ...payment,

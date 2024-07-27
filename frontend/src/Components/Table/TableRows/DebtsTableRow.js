@@ -4,6 +4,7 @@ import TableBtn from '../../Buttons/TableBtn'
 import {t} from 'i18next'
 import {useNavigate} from 'react-router-dom'
 import moment from 'moment'
+import {useSelector} from "react-redux";
 
 export const DebtsTableRow = ({
                                   data,
@@ -16,6 +17,8 @@ export const DebtsTableRow = ({
                               }) => {
     const [isEditComment, setIsEditComment] = useState(null)
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
+    const {user} = useSelector((state) => state.login)
+
     useEffect(() => {
         const handleResize = () => {
             setIsMobile(window.innerWidth <= 768)
@@ -225,7 +228,7 @@ export const DebtsTableRow = ({
             <tr className='tr bg-transparent'>
                 <td
                     className='text-left td border-none bg-none'
-                    colSpan={9}
+                    colSpan={user.type==="Director"?9:8}
                 ></td>
                 <td
                     className='text-left td py-[0.625rem] font-medium border-none bg-none'
