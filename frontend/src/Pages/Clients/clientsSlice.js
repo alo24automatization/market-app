@@ -123,7 +123,6 @@ const clientsSlice = createSlice({
             state.loading = true
         },
         [getClients.fulfilled]: (state, {payload: {clients, count}}) => {
-            console.log(clients)
             state.loading = false
             if (state.totalSearched > 0) {
                 state.searchedClients = clients

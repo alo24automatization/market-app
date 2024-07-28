@@ -17,7 +17,6 @@ const MiniSaleDebtPaymentCheck = ({data, type}) => {
     const componentRef = useRef()
     const [loadContent, setLoadContent] = useState(false)
     const onBeforeGetContentResolve = useRef(null)
-
     useEffect(() => {
         calcTotalPayments()
     }, [data, type, currencyType])
@@ -63,7 +62,7 @@ const MiniSaleDebtPaymentCheck = ({data, type}) => {
             } else if (type === 'debtPayed') {
                 return data[currencyType === 'USD' ? key : `${key}uzs`]
             } else {
-                return (data?.saleconnector || data)?.payments?.reduce((prev, payment) => {
+                return (data?.saleconnector || data)?.payments?.filter((item) => item.totalpriceuzs === undefined).reduce((prev, payment) => {
                     return prev + payment[currencyType === 'USD' ? key : `${key}uzs`]
                 }, 0)
             }
@@ -76,7 +75,6 @@ const MiniSaleDebtPaymentCheck = ({data, type}) => {
     const findProductById = useCallback((products, productId) => {
         return products.find((p) => p._id === productId)
     }, [])
-
     const generatePaymentItem = useCallback((payment) => {
         return (
             <li className='border-b mt-3' key={`${payment._id}`}>
@@ -91,12 +89,11 @@ const MiniSaleDebtPaymentCheck = ({data, type}) => {
     }, [data.products, findProductById])
 
     const paymentItems = useMemo(() => {
-        return data?.saleconnector?.payments?.flatMap(
+        return data?.saleconnector?.payments?.filter((item) => item.totalpriceuzs === undefined)?.flatMap(
             (payment) =>
                 generatePaymentItem(payment)
         )
     }, [data, currencyType, generatePaymentItem])
-
     const parseToIntOrFloat = (value) => {
         if (!value || value === 0) return 0
         else if (value % 1 === 0) {
@@ -105,7 +102,6 @@ const MiniSaleDebtPaymentCheck = ({data, type}) => {
             return Number(parseFloat(value).toFixed(2))
         }
     }
-
     return (
         <div>
             {loadContent && (
@@ -143,7 +139,7 @@ const MiniSaleDebtPaymentCheck = ({data, type}) => {
                             <li className='check-ul-li'>
                                 {t('Sana')}:
                                 <span className='check-ul-li-span'>
-                                    {new Date(data?.createdAt).toLocaleDateString()}
+                                    {new Date(Array.isArray(data) ? data[data.length - 1]?.createdAt : data?.createdAt).toLocaleDateString()}
                                 </span>
                             </li>
                         </ul>
@@ -153,7 +149,7 @@ const MiniSaleDebtPaymentCheck = ({data, type}) => {
                         </h2>
                         <ul className='my-4'>
                             {type === 'all' ? (
-                                map((data?.saleconnector || data)?.payments, (payment, index) => (
+                                map(data?.payments, (payment, index) => (
                                     <li className='border-b mt-3' key={index}>
                                         <span className='check-ul-li'>
                                             <span>{new Date(payment?.createdAt).toLocaleDateString()}</span>

@@ -43,7 +43,7 @@ export const ClientSaleTable = ({
     const calcTotalPayments = () => {
         setTotalDebtPayment(
             data.map((el) => {
-                return el.saleconnector?.payments?.reduce((sum, payment) => {
+                return el.saleconnector?.payments?.filter((item) => item.totalpriceuzs === undefined).reduce((sum, payment) => {
                     return (
                         sum +
                         Number(
@@ -53,7 +53,7 @@ export const ClientSaleTable = ({
                         )
                     )
                 }, 0)
-            })[data.length - 1]
+            }).reduce((prev,item)=>prev+item,0)
         )
         setTotalDiscount(
             data?.reduce((sum, el) => {
@@ -74,10 +74,23 @@ export const ClientSaleTable = ({
                 return (
                     sum +
                     Number(
-                        (el?.debt &&
-                            el?.debt[
-                                currency === 'USD' ? 'debt' : 'debtuzs'
-                                ]) ||
+                        ((
+                            reduceEl(
+                                el.saleconnector.products,
+                                'totalprice',
+                                'totalpriceuzs'
+                            ) -
+                            reduceEl(
+                                el.saleconnector.payments,
+                                'payment',
+                                'paymentuzs'
+                            ) -
+                            reduceEl(
+                                el.saleconnector.discounts,
+                                'discount',
+                                'discountuzs'
+                            )
+                        )) ||
                         0
                     )
                 )
@@ -147,16 +160,33 @@ export const ClientSaleTable = ({
                             {currency}
                         </td>
                         <td className='text-error-500 text-left td'>
-                            {(currency === 'UZS' &&
-                                saleconnector?.debt?.debtuzs !== 0) ||
-                            (currency !== 'UZS' &&
-                                saleconnector?.debt?.debt !== 0) ? (
-                                <>
-                                    {currency === 'UZS'
-                                        ? parseToIntOrFloat(saleconnector?.debt?.debtuzs)?.toLocaleString("ru-Ru")
-                                        : parseToIntOrFloat(saleconnector?.debt?.debt).toLocaleString("ru-Ru")}{' '}
-                                </>
-                            ) : null}
+                            {/*{(currency === 'UZS' &&*/}
+                            {/*    saleconnector?.debt?.debtuzs !== 0) ||*/}
+                            {/*(currency !== 'UZS' &&*/}
+                            {/*    saleconnector?.debt?.debt !== 0) ? (*/}
+                            {/*    <>*/}
+                            {/*        {currency === 'UZS'*/}
+                            {/*            ? parseToIntOrFloat(saleconnector?.debt?.debtuzs)?.toLocaleString("ru-Ru")*/}
+                            {/*            : parseToIntOrFloat(saleconnector?.debt?.debt).toLocaleString("ru-Ru")}{' '}*/}
+                            {/*    </>*/}
+                            {/*) : null}*/}
+                            {(
+                                reduceEl(
+                                    saleconnector.saleconnector.products,
+                                    'totalprice',
+                                    'totalpriceuzs'
+                                ) -
+                                reduceEl(
+                                    saleconnector.saleconnector.payments,
+                                    'payment',
+                                    'paymentuzs'
+                                ) -
+                                reduceEl(
+                                    saleconnector.saleconnector.discounts,
+                                    'discount',
+                                    'discountuzs'
+                                )
+                            ).toLocaleString('ru-Ru')}{' '}
                             {currency}
                         </td>
                         <td className='text-error-500 text-left td'>
@@ -165,7 +195,7 @@ export const ClientSaleTable = ({
                         </td>
                         <td className='text-success-500 text-left td'>
                             <ul>
-                                {saleconnector?.saleconnector?.payments?.flatMap(
+                                {saleconnector?.saleconnector?.payments?.filter((item) => item.totalpriceuzs === undefined)?.flatMap(
                                     (payment) => {
                                         totalSum +=
                                             payment[
@@ -204,7 +234,23 @@ export const ClientSaleTable = ({
                                         Print(saleconnector, 'firstPay')
                                     }
                                 />
-                                {saleconnector?.debt?.debtuzs
+                                {(
+                                    reduceEl(
+                                        saleconnector.saleconnector.products,
+                                        'totalprice',
+                                        'totalpriceuzs'
+                                    ) -
+                                    reduceEl(
+                                        saleconnector.saleconnector.payments,
+                                        'payment',
+                                        'paymentuzs'
+                                    ) -
+                                    reduceEl(
+                                        saleconnector.saleconnector.discounts,
+                                        'discount',
+                                        'discountuzs'
+                                    )
+                                ) > 0
                                     ? (
                                         <TableBtn
                                             type={'pay'}
@@ -263,7 +309,8 @@ export const ClientSaleTable = ({
                                 {t('Qarz')}{' '}
                                 {parseToIntOrFloat(currency === 'UZS'
                                     ? saleconnector?.debt?.debtuzs
-                                    : saleconnector?.debt?.debt)}{' '}
+                                    : saleconnector?.debt?.debt)}
+                                {' '}
                                 {currency}
                             </p>
                             <p></p>

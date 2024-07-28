@@ -211,7 +211,6 @@ function AllCheck({product, allDetails}) {
                 />
                 <SmallCheck
                     totalOfBackAndDebt={totalOfBackAndDebt}
-
                     ref={saleSmallCheckRef1}
                     returned={returned}
                     selled={selled}

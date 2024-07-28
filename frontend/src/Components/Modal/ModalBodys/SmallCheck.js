@@ -13,6 +13,8 @@ export const SmallCheck =   forwardRef((props, ref) => {
         returnedPayments,
         product,
         userInfo,
+        totalOfBackAndDebt
+
     } = props
     const { market } = useSelector((state) => state.login)
     const { currencyType } = useSelector((state) => state.currency)
@@ -204,6 +206,14 @@ export const SmallCheck =   forwardRef((props, ref) => {
                         (calculateAllDiscounts(selledDiscounts) +
                             calculateAllDiscounts(returnedDiscounts))
                     ).toLocaleString('ru-Ru')}{' '}
+                    {currencyType}
+                </span>
+            </div>
+            <div className='text-black-900 border-none check-ul-li-foot'>
+                {' '}
+                {t('Qarzdan qaytarilganlar')}:{' '}
+                <span className='text-black-900 text-[12px] font-bold'>
+                {totalOfBackAndDebt?.toLocaleString('ru-Ru')}{' '}
                     {currencyType}
                 </span>
             </div>

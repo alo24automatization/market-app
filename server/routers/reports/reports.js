@@ -693,7 +693,6 @@ module.exports.getPayment = async (req, res) => {
         res.status(400).json({error: "Serverda xatolik yuz berdi..."});
     }
 };
-
 module.exports.getDebtsReport = async (req, res) => {
     try {
         const {market, startDate, endDate} = req.body;
@@ -702,44 +701,30 @@ module.exports.getDebtsReport = async (req, res) => {
             return res.status(400).json({message: `Diqqat! Do'kon haqida malumotlar topilmadi!`});
         }
 
-        const saleconnector = await SaleConnector.find({
+        const saleconnectors = await SaleConnector.find({
             market,
-            createdAt: {$gte: startDate, $lte: endDate},
+            createdAt: {$gte: startDate, $lte: endDate}
         })
-            .select("-isArchive -updatedAt -__v ")
+            .select("-isArchive -updatedAt -__v")
             .populate("payments", "cash cashuzs card carduzs transfer transferuzs payment paymentuzs totalprice totalpriceuzs")
             .populate({
                 path: "products",
                 select: "totalprice unitprice totalpriceuzs unitpriceuzs pieces createdAt discount saleproducts product",
                 options: {sort: {createdAt: -1}},
-                populate: {
-                    path: "product",
-                    select: "productdata",
-                    populate: {path: "productdata", select: "name code"},
-                },
+                populate: [
+                    {path: "product", select: "productdata", populate: {path: "productdata", select: "name code"}},
+                    {path: "user", select: "firstname lastname"}
+                ]
             })
-            .populate({
-                path: "products",
-                select: "totalprice unitprice totalpriceuzs unitpriceuzs pieces createdAt discount saleproducts product",
-                options: {sort: {createdAt: -1}},
-                populate: {
-                    path: "user",
-                    select: "firstname lastname",
-                },
-            })
-            .populate({
-                path: "client",
-                select: "name phoneNumber",
-            })
-            .populate("payments", "payment paymentuzs comment totalprice totalpriceuzs ")
+            .populate("client", "name phoneNumber")
             .populate("debts", "comment pay_end_date")
             .populate("discounts", "discount discountuzs procient products totalprice totalpriceuzs")
             .populate("user", "firstname lastname")
             .populate("dailyconnectors", "comment debt")
-            .populate("packman", "name") // Populate packman field
+            .populate("packman", "name")
             .lean();
 
-        const debtsreport = saleconnector.map((sale) => {
+        const debtsreport = saleconnectors.map( (sale) => {
             const reduce = (arr, el) => arr.reduce((prev, item) => prev + (item[el] || 0), 0);
             const discount = reduce(sale.discounts, "discount");
             const discountuzs = reduce(sale.discounts, "discountuzs");
@@ -751,48 +736,180 @@ module.exports.getDebtsReport = async (req, res) => {
             const debtComment = sale.debts.length > 0 ? sale.debts[sale.debts.length - 1].comment : "";
             const debtId = sale.debts.length > 0 ? sale.debts[sale.debts.length - 1]._id : "";
             const payEndDate = sale.debts.length > 0 ? sale.debts[sale.debts.length - 1].pay_end_date : "";
-
-            return {
+            const returnObj={
                 _id: sale._id,
                 id: sale.id,
                 createdAt: sale.createdAt,
-                client: sale.client && sale.client,
+                client: sale.client,
                 totalprice,
                 totalpriceuzs,
                 debt: Math.round((totalprice - payment - discount) * 1000) / 1000,
-                debtuzs: Math.round((totalpriceuzs - paymentuzs - discountuzs) * 1) / 1,
-                debtid: debtId,
-                pay_end_date: payEndDate, // Adding pay_end_date to the response
+                debtuzs:Math.round((totalpriceuzs - paymentuzs - discountuzs) * 1) / 1,
+                pay_end_date: payEndDate,
                 comment: debtComment,
-                packman: sale.packman && sale.packman.name, // Add packman to the response
+                packman: sale.packman ? sale.packman.name : "",
                 saleconnector: {...sale},
-                totaldebtuzs: Math.round((totalpriceuzs - paymentuzs - discountuzs) * 1) / 1
+                totaldebtuzs: Math.round((totalpriceuzs - paymentuzs - discountuzs)),
+                debts: [debtId],
+                debtid:debtId,
+                saleconnectors: []
             };
-        }).filter((sales) => sales.debtuzs > 0);
+            return {...returnObj,saleconnectors:[returnObj]}
+        }).filter(sale=>sale.debtuzs>0)
+
         let clientDebtMap = new Map();
 
-// Step 1: Sum the totaldebtuzs for each client
         debtsreport.forEach(sale => {
-            if (sale && sale.client && sale.client._id) {
+            if (sale.client && sale.client._id) {
                 const clientId = sale.client._id;
-                const existingDebt = clientDebtMap.get(clientId) || 0;
-                clientDebtMap.set(clientId, existingDebt + sale.totaldebtuzs);
+                const existingData = clientDebtMap.get(clientId) || {
+                    totaldebtuzs: 0, debtuzs: 0, pay_end_date: null, totalpriceuzs: 0, debts: [],
+                    saleconnectors: []
+                };
+                clientDebtMap.set(clientId, {
+                    totaldebtuzs: existingData.totaldebtuzs + sale.totaldebtuzs,
+                    debtuzs: existingData.debtuzs + sale.debtuzs,
+                    totalpriceuzs: existingData.totalpriceuzs + sale.totalpriceuzs,
+                    pay_end_date: sale.pay_end_date || existingData.pay_end_date,
+                    debts: [...existingData.debts, ...sale.debts],
+                    saleconnectors: [...existingData.saleconnectors, ...sale.saleconnectors]
+                });
             }
         });
 
-// Step 2: Update each sale connector with the total debt for its client
+        // Update each sale connector with the total debt for its client
         debtsreport.forEach(sale => {
-            if (sale && sale.client && sale.client._id) {
+            if (sale.client && sale.client._id) {
                 const clientId = sale.client._id;
-                sale.totaldebtuzs = clientDebtMap.get(clientId);
+                const clientData = clientDebtMap.get(clientId);
+                sale.totaldebtuzs = clientData.totaldebtuzs;
+                sale.debtuzs = clientData.debtuzs;
+                sale.pay_end_date = clientData.pay_end_date;
+                sale.totalpriceuzs = clientData.totalpriceuzs;
+                sale.debts = clientData.debts;
+                sale.saleconnectors = clientData.saleconnectors;
             }
         });
-        res.status(201).json({data: debtsreport});
+
+        // Filter out duplicate client reports
+        const uniqueClientDebts = new Set();
+        const filteredDebtsReport = debtsreport.filter(sale => {
+            if (uniqueClientDebts.has(sale.client._id)) {
+                return false;
+            } else {
+                uniqueClientDebts.add(sale.client._id);
+                return true;
+            }
+        });
+
+        res.status(201).json({data: filteredDebtsReport.filter(sale=>sale.debtuzs>0)});
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(400).json({error: "Serverda xatolik yuz berdi..."});
     }
 };
+
+//
+// module.exports.getDebtsReport = async (req, res) => {
+//     try {
+//         const {market, startDate, endDate} = req.body;
+//         const marketData = await Market.findById(market);
+//         if (!marketData) {
+//             return res.status(400).json({message: `Diqqat! Do'kon haqida malumotlar topilmadi!`});
+//         }
+//
+//         const saleconnector = await SaleConnector.find({
+//             market,
+//             createdAt: {$gte: startDate, $lte: endDate},
+//         })
+//             .select("-isArchive -updatedAt -__v ")
+//             .populate("payments", "cash cashuzs card carduzs transfer transferuzs payment paymentuzs totalprice totalpriceuzs")
+//             .populate({
+//                 path: "products",
+//                 select: "totalprice unitprice totalpriceuzs unitpriceuzs pieces createdAt discount saleproducts product",
+//                 options: {sort: {createdAt: -1}},
+//                 populate: {
+//                     path: "product",
+//                     select: "productdata",
+//                     populate: {path: "productdata", select: "name code"},
+//                 },
+//             })
+//             .populate({
+//                 path: "products",
+//                 select: "totalprice unitprice totalpriceuzs unitpriceuzs pieces createdAt discount saleproducts product",
+//                 options: {sort: {createdAt: -1}},
+//                 populate: {
+//                     path: "user",
+//                     select: "firstname lastname",
+//                 },
+//             })
+//             .populate({
+//                 path: "client",
+//                 select: "name phoneNumber",
+//             })
+//             .populate("payments", "payment paymentuzs comment totalprice totalpriceuzs ")
+//             .populate("debts", "comment pay_end_date")
+//             .populate("discounts", "discount discountuzs procient products totalprice totalpriceuzs")
+//             .populate("user", "firstname lastname")
+//             .populate("dailyconnectors", "comment debt")
+//             .populate("packman", "name") // Populate packman field
+//             .lean();
+//
+//         const debtsreport = saleconnector.map((sale) => {
+//             const reduce = (arr, el) => arr.reduce((prev, item) => prev + (item[el] || 0), 0);
+//             const discount = reduce(sale.discounts, "discount");
+//             const discountuzs = reduce(sale.discounts, "discountuzs");
+//             const payment = reduce(sale.payments, "payment");
+//             const paymentuzs = reduce(sale.payments, "paymentuzs");
+//             const totalprice = reduce(sale.products, "totalprice");
+//             const totalpriceuzs = reduce(sale.products, "totalpriceuzs");
+//
+//             const debtComment = sale.debts.length > 0 ? sale.debts[sale.debts.length - 1].comment : "";
+//             const debtId = sale.debts.length > 0 ? sale.debts[sale.debts.length - 1]._id : "";
+//             const payEndDate = sale.debts.length > 0 ? sale.debts[sale.debts.length - 1].pay_end_date : "";
+//
+//             return {
+//                 _id: sale._id,
+//                 id: sale.id,
+//                 createdAt: sale.createdAt,
+//                 client: sale.client && sale.client,
+//                 totalprice,
+//                 totalpriceuzs,
+//                 debt: Math.round((totalprice - payment - discount) * 1000) / 1000,
+//                 debtuzs: Math.round((totalpriceuzs - paymentuzs - discountuzs) * 1) / 1,
+//                 debtid: debtId,
+//                 pay_end_date: payEndDate, // Adding pay_end_date to the response
+//                 comment: debtComment,
+//                 packman: sale.packman && sale.packman.name, // Add packman to the response
+//                 saleconnector: {...sale},
+//                 totaldebtuzs: Math.round((totalpriceuzs - paymentuzs - discountuzs) * 1) / 1
+//             };
+//         }).filter((sales) => sales.debtuzs > 0);
+//         let clientDebtMap = new Map();
+//
+// // Step 1: Sum the totaldebtuzs for each client
+//         debtsreport.forEach(sale => {
+//             if (sale && sale.client && sale.client._id) {
+//                 const clientId = sale.client._id;
+//                 const existingDebt = clientDebtMap.get(clientId) || 0;
+//                 clientDebtMap.set(clientId, existingDebt + sale.totaldebtuzs);
+//             }
+//         });
+//
+// // Step 2: Update each sale connector with the total debt for its client
+//         debtsreport.forEach(sale => {
+//             if (sale && sale.client && sale.client._id) {
+//                 const clientId = sale.client._id;
+//                 sale.totaldebtuzs = clientDebtMap.get(clientId);
+//             }
+//         });
+//
+//         res.status(201).json({data: debtsreport});
+//     } catch (error) {
+//         console.log(error);
+//         res.status(400).json({error: "Serverda xatolik yuz berdi..."});
+//     }
+// };
 
 
 module.exports.getDiscountsReport = async (req, res) => {

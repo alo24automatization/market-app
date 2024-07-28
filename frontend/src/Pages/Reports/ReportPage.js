@@ -1,7 +1,7 @@
-import React, { useEffect, useMemo, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { useParams } from 'react-router-dom'
-import { roundUsd, roundUzs, UsdToUzs, UzsToUsd } from '../../App/globalFunctions'
+import React, {useEffect, useMemo, useState} from 'react'
+import {useDispatch, useSelector} from 'react-redux'
+import {useParams} from 'react-router-dom'
+import {roundUsd, roundUzs, UsdToUzs, UzsToUsd} from '../../App/globalFunctions'
 import LinkToBack from '../../Components/LinkToBack/LinkToBack'
 import UniversalModal from '../../Components/Modal/UniversalModal'
 import Pagination from '../../Components/Pagination/Pagination'
@@ -30,20 +30,20 @@ import {
     payDebt,
     setDebtComment,
 } from './reportsSlice'
-import { getExpense } from '../Expense/expenseSlice'
-import { ReportsTableHeaders } from './ReportsTableHeaders'
-import { filter } from 'lodash'
-import { universalSort } from './../../App/globalFunctions'
-import { excelAllSellings, getSellings } from '../Sale/Slices/sellingsSlice'
-import { VscClose } from 'react-icons/vsc'
-import { GrSettingsOption } from 'react-icons/gr'
-import { t } from 'i18next'
+import {getExpense} from '../Expense/expenseSlice'
+import {ReportsTableHeaders} from './ReportsTableHeaders'
+import {filter} from 'lodash'
+import {universalSort} from './../../App/globalFunctions'
+import {excelAllSellings, getSellings} from '../Sale/Slices/sellingsSlice'
+import {VscClose} from 'react-icons/vsc'
+import {GrSettingsOption} from 'react-icons/gr'
+import {t} from 'i18next'
 import ReactHTMLTableToExcel from 'react-html-table-to-excel'
 import Excel from '../../Images/Excel.svg'
 import SelectForm from '../../Components/Select/SelectForm.js'
 import SmallLoader from '../../Components/Spinner/SmallLoader.js'
 
-const ReportPage = () => {
+const ReportPage = ({accessToSaller}) => {
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
     useEffect(() => {
         const handleResize = () => {
@@ -56,16 +56,19 @@ const ReportPage = () => {
             window.removeEventListener('resize', handleResize)
         }
     }, [])
-    const { id } = useParams()
+    let {id} = useParams();
+    if(accessToSaller){
+        id="debts"
+    }
 
     const dispatch = useDispatch()
 
-    const { market: _id, user } = useSelector((state) => state.login)
-    const { expenses } = useSelector((state) => state.expense)
-    const { datas, count, startDate, endDate, successDebtComment, totalpayment } =
+    const {market: _id, user} = useSelector((state) => state.login)
+    const {expenses} = useSelector((state) => state.expense)
+    const {datas, count, startDate, endDate, successDebtComment, totalpayment} =
         useSelector((state) => state.reports)
-    const { sellings } = useSelector((state) => state.sellings)
-    const { currencyType, currency } = useSelector((state) => state.currency)
+    const {sellings} = useSelector((state) => state.sellings)
+    const {currencyType, currency} = useSelector((state) => state.currency)
     const [currentPage, setCurrentPage] = useState(0)
     const [countPage, setCountPage] = useState(10)
     const [totalPage, setTotalPage] = useState(1)
@@ -80,7 +83,8 @@ const ReportPage = () => {
     })
     const [storageData, setStorageData] = useState([])
     const [currentData, setCurrentData] = useState(datas)
-
+    const [currentInnerData, setCurrentInnerData] = useState([])
+    const [innerModalVisible, setInnerModalVisible] = useState(false)
     // Payments STATES
     const [modalVisible, setModalVisible] = useState(false)
     const [paymentModalVisible, setPaymentModalVisible] = useState(false)
@@ -126,16 +130,16 @@ const ReportPage = () => {
     const [printBody, setPrintBody] = useState({})
 
     const headers = [
-        { title: '№' },
-        { title: 'Kodi' },
-        { title: 'Nomi' },
-        { title: 'Soni' },
-        { title: 'Narxi' },
-        { title: 'Jami', styles: 'w-[10rem]' },
-        { title: '' },
+        {title: '№'},
+        {title: 'Kodi'},
+        {title: 'Nomi'},
+        {title: 'Soni'},
+        {title: 'Narxi'},
+        {title: 'Jami', styles: 'w-[10rem]'},
+        {title: ''},
     ]
 
-    const filterByTotal = ({ value }) => {
+    const filterByTotal = ({value}) => {
         setCountPage(Number(value))
         setCurrentPage(0)
     }
@@ -145,36 +149,36 @@ const ReportPage = () => {
             cash: {
                 uzs: expenses
                     .filter((item) => item.type === 'cash')
-                    .reduce((prev, { sumuzs }) => {
+                    .reduce((prev, {sumuzs}) => {
                         return prev + sumuzs
                     }, 0),
                 usd: expenses
                     .filter((item) => item.type === 'cash')
-                    .reduce((prev, { sum }) => {
+                    .reduce((prev, {sum}) => {
                         return prev + sum
                     }, 0),
             },
             card: {
                 uzs: expenses
                     .filter((item) => item.type === 'card')
-                    .reduce((prev, { sumuzs }) => {
+                    .reduce((prev, {sumuzs}) => {
                         return prev + sumuzs
                     }, 0),
                 usd: expenses
                     .filter((item) => item.type === 'card')
-                    .reduce((prev, { sum }) => {
+                    .reduce((prev, {sum}) => {
                         return prev + sum
                     }, 0),
             },
             transfer: {
                 uzs: expenses
                     .filter((item) => item.type === 'transfer')
-                    .reduce((prev, { sumuzs }) => {
+                    .reduce((prev, {sumuzs}) => {
                         return prev + sumuzs
                     }, 0),
                 usd: expenses
                     .filter((item) => item.type === 'transfer')
-                    .reduce((prev, { sum }) => {
+                    .reduce((prev, {sum}) => {
                         return prev + sum
                     }, 0),
             },
@@ -199,9 +203,9 @@ const ReportPage = () => {
             }
 
             const [
-                { saleconnectors },
-                { income, debts, discounts },
-                { totalpieces },
+                {saleconnectors},
+                {income, debts, discounts},
+                {totalpieces},
                 {
                     totalpieces: numberOfRemaningProducts,
                     totalprice,
@@ -327,7 +331,7 @@ const ReportPage = () => {
         setPaymentDiscountPercent('')
         setPaymentDebt(0)
         setPaymentDebtUzs(0)
-        setDiscountSelectOption({ label: '%', value: '%' })
+        setDiscountSelectOption({label: '%', value: '%'})
     }
     const toggleCheckModal = () => {
         setModalVisible(!modalVisible)
@@ -342,17 +346,41 @@ const ReportPage = () => {
 
     const convertToUsd = (value) => Math.round(value * 1000) / 1000
     const convertToUzs = (value) => Math.round(value)
+
+
     const handleClickPayment = (debt) => {
-        const all = debt.debt
-        const allUzs = debt.debtuzs
-        setAllPayment(all)
-        setAllPaymentUzs(allUzs)
-        setPaymentCash(all)
-        setPaymentCashUzs(allUzs)
-        setPaid(all)
-        setPaidUzs(allUzs)
-        setSaleConnectorId(debt._id)
-        setPaymentModalVisible(true)
+        const {useSessionStorage} = debt;
+        if (useSessionStorage) {
+            const debtsFromSessionStorage = JSON.parse(sessionStorage.getItem("selected_debts")) || [];
+            const all = debtsFromSessionStorage.reduce((prev, item) => prev + item.debt, 0)
+            const allUzs = debtsFromSessionStorage.reduce((prev, item) => prev + item.debtuzs, 0)
+            setAllPayment(all)
+            setAllPaymentUzs(allUzs)
+            setPaymentCash(all)
+            setPaymentCashUzs(allUzs)
+            setPaid(all)
+            setPaidUzs(allUzs)
+            setSaleConnectorId(debtsFromSessionStorage)
+            setPaymentModalVisible(true)
+            setInnerModalVisible(false)
+        } else {
+            const all = debt.debt
+            const allUzs = debt.debtuzs
+            setAllPayment(all)
+            setAllPaymentUzs(allUzs)
+            setPaymentCash(all)
+            setPaymentCashUzs(allUzs)
+            setPaid(all)
+            setPaidUzs(allUzs)
+            setSaleConnectorId(debt._id)
+            if (debt.saleconnectors.length === 0) {
+                setPaymentModalVisible(true)
+            } else {
+                setModalBody('debtsList')
+                setInnerModalVisible(true)
+                setCurrentInnerData(debt.saleconnectors)
+            }
+        }
     }
     const handleChangePaymentType = (type) => {
         const all = allPayment - Number(paymentDiscount)
@@ -652,6 +680,8 @@ const ReportPage = () => {
         setPaidUzs(0)
         setUserValue('')
         setSaleConnectorId(null)
+        setCurrentInnerData([])
+        setInnerModalVisible(false)
         togglePaymentModal(bool)
     }
     const handleClickPay = () => {
@@ -666,7 +696,6 @@ const ReportPage = () => {
     }
     const handleApprovePay = () => {
         handleClosePay()
-
         const totalSumFromInputs =
             Number(paymentCard) +
             Number(paymentCardUzs) +
@@ -679,32 +708,87 @@ const ReportPage = () => {
             warningLessPayment()
             return
         }
-        const body = {
-            payment: {
-                totalprice: Number(allPayment),
-                totalpriceuzs: Number(allPaymentUzs),
-                type: paymentType,
-                cash: Number(paymentCash),
-                cashuzs: Number(paymentCashUzs),
-                card: Number(paymentCard),
-                carduzs: Number(paymentCardUzs),
-                transfer: Number(paymentTransfer),
-                transferuzs: Number(paymentTransferUzs),
-                discount: 0,
-                discountuzs: 0,
-            },
-            user: user._id,
-            saleconnectorid: saleConnectorId,
+        if (Array.isArray(saleConnectorId)) {
+            let debtCheckData = {
+                paymentuzs: 0,
+                cashuzs: 0,
+                carduzs: 0,
+                transferuzs: 0,
+            };
+            let promises = [];
+
+            for (let saleConnector of saleConnectorId) {
+                const body = {
+                    payment: {
+                        totalprice: Number(saleConnector.debt),
+                        totalpriceuzs: Number(saleConnector.debtuzs),
+                        type: paymentType,
+                        cash: paymentType === "cash" ? Number(saleConnector.debt) : 0,
+                        cashuzs: paymentType === "cash" ? Number(saleConnector.debtuzs) : 0,
+                        card: paymentType === "card" ? Number(saleConnector.debt) : 0,
+                        carduzs: paymentType === "card" ? Number(saleConnector.debtuzs) : 0,
+                        transfer: paymentType === "transfer" ? Number(saleConnector.debt) : 0,
+                        transferuzs: paymentType === "transfer" ? Number(saleConnector.debtuzs) : 0,
+                        discount: 0,
+                        discountuzs: 0,
+                    },
+                    user: user._id,
+                    saleconnectorid: saleConnector._id,
+                };
+                promises.push(dispatch(payDebt(body)));
+            }
+
+            Promise.all(promises).then(results => {
+                for (let result of results) {
+                    let payload = result.payload;
+                    debtCheckData = {
+                        ...debtCheckData,
+                        ...payload,
+                        paymentuzs: debtCheckData.paymentuzs + payload.paymentuzs,
+                        cashuzs: debtCheckData.cashuzs + payload.cashuzs,
+                        carduzs: debtCheckData.carduzs + payload.carduzs,
+                        transferuzs: debtCheckData.transferuzs + payload.transferuzs,
+                    };
+                    setModalData(debtCheckData)
+                    dispatch(getDebts())
+                    setTimeout(() => {
+                        setModalBody('allDebtPayedCheck')
+                        setModalVisible(true)
+                        clearAll()
+                    }, 500)
+                }
+                sessionStorage.removeItem("selected_debts");
+
+            });
+        } else {
+            const body = {
+                payment: {
+                    totalprice: Number(allPayment),
+                    totalpriceuzs: Number(allPaymentUzs),
+                    type: paymentType,
+                    cash: Number(paymentCash),
+                    cashuzs: Number(paymentCashUzs),
+                    card: Number(paymentCard),
+                    carduzs: Number(paymentCardUzs),
+                    transfer: Number(paymentTransfer),
+                    transferuzs: Number(paymentTransferUzs),
+                    discount: 0,
+                    discountuzs: 0,
+                },
+                user: user._id,
+                saleconnectorid: saleConnectorId,
+            }
+            dispatch(payDebt(body)).then(({payload}) => {
+                setModalData(payload)
+                dispatch(getDebts())
+                setTimeout(() => {
+                    setModalBody('allDebtPayedCheck')
+                    setModalVisible(true)
+                    clearAll()
+                }, 500)
+            })
         }
-        dispatch(payDebt(body)).then(({ payload }) => {
-            setModalData(payload)
-            dispatch(getDebts())
-            setTimeout(() => {
-                setModalBody('allDebtPayedCheck')
-                setModalVisible(true)
-                clearAll()
-            }, 500)
-        })
+
     }
 
     const toggleModal = () => {
@@ -717,9 +801,6 @@ const ReportPage = () => {
 
     const handleClickPrint = (saleconnector) => {
         if (id === 'debts') {
-            console.log("----")
-            console.log(saleconnector)
-            console.log('-----')
             setModalData(saleconnector)
             setModalBody('allChecks')
             setModalVisible(true)
@@ -783,23 +864,23 @@ const ReportPage = () => {
             client: target,
         })
     }
-    const [clientPhoneNumber,setClinetPhoneNumber]=useState("")
-const handleChangeClientPhoneNumber=(e)=>{
-    let target = e.target.value.toLowerCase();
-    setClinetPhoneNumber(target)
-    setCurrentData([
-        ...filter(
-            [...storageData],
-            (item) =>
-                item.client &&
-                item.client.phoneNumber.toLowerCase().includes(target)
-        ),
-    ])
-    setLocalSearch({
-        ...localSearch,
-        client: target,
-    })
-}
+    const [clientPhoneNumber, setClinetPhoneNumber] = useState("")
+    const handleChangeClientPhoneNumber = (e) => {
+        let target = e.target.value.toLowerCase();
+        setClinetPhoneNumber(target)
+        setCurrentData([
+            ...filter(
+                [...storageData],
+                (item) =>
+                    item.client &&
+                    item.client.phoneNumber.toLowerCase().includes(target)
+            ),
+        ])
+        setLocalSearch({
+            ...localSearch,
+            client: target,
+        })
+    }
     const onKeySearch = (e) => {
         if (e.key === 'Enter') {
             setSendingSearch(localSearch)
@@ -870,18 +951,19 @@ const handleChangeClientPhoneNumber=(e)=>{
     }
 
     const handleModalDebtComment = (comment, debtid) => {
-        dispatch(setDebtComment({ comment, debtid }))
+        console.log(comment)
+        dispatch(setDebtComment({comment, debtid}))
         setModalBody('debtcomment')
         setModalVisible(!modalVisible)
     }
 
     const toggleDebtCommentModal = () => {
-        dispatch(setDebtComment({ comment: null, debtid: null }))
+        dispatch(setDebtComment({comment: null, debtid: null}))
         setModalBody('')
         setModalVisible(!modalVisible)
     }
 
-    
+
     useEffect(() => {
         const check = (page) => id === page
         let body = {
@@ -940,9 +1022,9 @@ const handleChangeClientPhoneNumber=(e)=>{
     useEffect(() => {
         if (id === 'debts') {
             setTotalDebt({
-                usd: roundUsd(datas.reduce((prev, { debt }) => prev + debt, 0)),
+                usd: roundUsd(datas.reduce((prev, {debt}) => prev + debt, 0)),
                 uzs: roundUzs(
-                    datas.reduce((prev, { debtuzs }) => prev + debtuzs, 0)
+                    datas.reduce((prev, {debtuzs}) => prev + debtuzs, 0)
                 ),
             })
         }
@@ -1006,17 +1088,17 @@ const handleChangeClientPhoneNumber=(e)=>{
             }
         }
     }, [id, startDate, endDate])
-  
     return (
         <div className='relative overflow-auto '>
             {customLoading && (
-                <div className='fixed backdrop-blur-[2px] z-[100] left-0 top-0 right-0 bottom-0 bg-white-700 flex flex-col items-center justify-center w-full h-full'>
-                    <SmallLoader />
+                <div
+                    className='fixed backdrop-blur-[2px] z-[100] left-0 top-0 right-0 bottom-0 bg-white-700 flex flex-col items-center justify-center w-full h-full'>
+                    <SmallLoader/>
                 </div>
             )}
             <div className='flex lg:justify-start mb-3 justify-between items-center pe-4'>
                 <span className='lg:mt-[20px]'>
-                    <LinkToBack link={'/kassa'} />
+                    <LinkToBack link={'/kassa'}/>
                 </span>
                 {isMobile ? (
                     <div className='flex justify-between items-center gap-4'>
@@ -1054,7 +1136,7 @@ const handleChangeClientPhoneNumber=(e)=>{
                             onClick={() => setModalOpen(true)}
                             className='hover:bg-blue-200  bg-blue-400 focus-visible:outline-none w-[50px] h-[33px] lg:mt-2 lg:ms-2 mt-[50px]  createElement '
                         >
-                            <GrSettingsOption />
+                            <GrSettingsOption/>
                         </button>
                     </div>
                 ) : (
@@ -1068,7 +1150,7 @@ const handleChangeClientPhoneNumber=(e)=>{
                         <SearchForm
                             filterBy={
                                 id === 'debts'
-                                    ? ['id', 'clientName',"clientPhoneNumber"]
+                                    ? ['id', 'clientName', "clientPhoneNumber"]
                                     : id === 'income'
                                         ? ['total', 'id', 'startDate', 'endDate']
                                         : id === 'expenses'
@@ -1096,7 +1178,7 @@ const handleChangeClientPhoneNumber=(e)=>{
                             }
                             filterById={searchId}
                             filterByClientPhoneNumber={handleChangeClientPhoneNumber}
-phoneNumber={clientPhoneNumber}                            filterByClientName={searchClientName}
+                            phoneNumber={clientPhoneNumber} filterByClientName={searchClientName}
                             filterByIdWhenPressEnter={onKeySearch}
                             filterByClientNameWhenPressEnter={onKeySearch}
                             startDate={beginDay}
@@ -1125,7 +1207,7 @@ phoneNumber={clientPhoneNumber}                            filterByClientName={s
                                 }
                             />
                             <span className={'btn-icon bg-white-900 p-[8px]'}>
-                                <img src={Excel} alt='excel icon' />
+                                <img src={Excel} alt='excel icon'/>
                             </span>
                         </button>
                     </>
@@ -1155,7 +1237,7 @@ phoneNumber={clientPhoneNumber}                            filterByClientName={s
                                             'endDate',
                                             'id',
                                             'clientName',
-                                            
+
                                         ]
                                         : id === 'income'
                                             ? [
@@ -1202,7 +1284,7 @@ phoneNumber={clientPhoneNumber}                            filterByClientName={s
                                 onClick={() => setModalOpen(false)}
                                 className=' hover:bg-blue-200  bg-blue-400 focus-visible:outline-none w-[150px] lg:h-[33px] h=[40px] createElement '
                             >
-                                <GrSettingsOption /> {t('izlash')}
+                                <GrSettingsOption/> {t('izlash')}
                             </button>
                         </div>
                     </div>
@@ -1275,7 +1357,8 @@ phoneNumber={clientPhoneNumber}                            filterByClientName={s
                     </ul>
                 )} */}
                 {id === 'payments' && totalpayment?.payment?.cash && (
-                    <div className='flex items-center justify-between gap-10 mt-6 bg-white py-6 md:py-0 flex-col md:flex-row'>
+                    <div
+                        className='flex items-center justify-between gap-10 mt-6 bg-white py-6 md:py-0 flex-col md:flex-row'>
                         <div className='flex flex-col items-start gap-2'>
                             <div className='text-[18px] font-bold mb-2'>
                                 {t('Tushumlar')}
@@ -1339,7 +1422,8 @@ phoneNumber={clientPhoneNumber}                            filterByClientName={s
                                 {t('Qaytarilganlar')}
                             </div>
                             <div className='font-semibold w-full gap-5 flex justify-between'>
-                                <div>{t('Naqt')}:</div>{' '}
+                                <div>{t('Naqt')}:</div>
+                                {' '}
                                 <span>
                                     {currencyType === 'USD'
                                         ? roundUsd(
@@ -1398,7 +1482,8 @@ phoneNumber={clientPhoneNumber}                            filterByClientName={s
                                     {t('Xarajatlar')}
                                 </div>
                                 <div className='font-semibold w-full gap-5 flex justify-between'>
-                                    <div>{t('Naqt')}:</div>{' '}
+                                    <div>{t('Naqt')}:</div>
+                                    {' '}
                                     <span>
                                         -
                                         {currencyType === 'USD'
@@ -1565,6 +1650,29 @@ phoneNumber={clientPhoneNumber}                            filterByClientName={s
                 />
             </div>
             <UniversalModal
+                body={'debtsList'}
+                isOpen={innerModalVisible}
+                closeModal={() => clearAll(false)}
+                payDebt={() => handleClickPayment({useSessionStorage: true, tableType: "innerDebts"})}
+            > <Table
+                page={"debtsList"}
+                hiddenPayButton={true}
+                hiddenInfoButton={true}
+                headers={ReportsTableHeaders(id)}
+                data={currentInnerData}
+                currentPage={currentPage}
+                countPage={countPage}
+                currency={currencyType}
+                type={id}
+                Pay={handleClickPayment}
+                reports={true}
+                Print={handleClickPrint}
+                Sort={filterData}
+                sortItem={sorItem}
+                Edit={handleModalDebtComment}
+                totalDebt={totalDebt}
+            /></UniversalModal>
+            <UniversalModal
                 body={modalBody}
                 toggleModal={
                     modalBody === 'sell'
@@ -1594,6 +1702,7 @@ phoneNumber={clientPhoneNumber}                            filterByClientName={s
                     "To'lovni amalga oshirgach bu ma`lumotlarni o'zgaritirib bo'lmaydi!"
                 }
             />
+
         </div>
     )
 }

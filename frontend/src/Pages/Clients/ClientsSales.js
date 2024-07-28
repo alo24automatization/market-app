@@ -1,15 +1,15 @@
-import React, { useEffect, useMemo, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import React, {useEffect, useMemo, useState} from 'react'
+import {useDispatch, useSelector} from 'react-redux'
 import UniversalModal from '../../Components/Modal/UniversalModal'
 import Table from '../../Components/Table/Table'
 import TableMobile from '../../Components/Table/TableMobile'
-import { universalSort, UsdToUzs, UzsToUsd } from './../../App/globalFunctions'
-import { t } from 'i18next'
+import {universalSort, UsdToUzs, UzsToUsd} from './../../App/globalFunctions'
+import {t} from 'i18next'
 import SmallLoader from '../../Components/Spinner/SmallLoader.js'
-import { getClientsSales, payClientSalesDebt } from './clientsSlice'
-import { useLocation } from 'react-router-dom'
+import {getClientsSales, payClientSalesDebt} from './clientsSlice'
+import {useLocation} from 'react-router-dom'
 import CustomerPayment from '../../Components/Payment/CustomerPayment.js'
-import { warningMorePayment } from '../../Components/ToastMessages/ToastMessages.js'
+import {warningMorePayment} from '../../Components/ToastMessages/ToastMessages.js'
 
 export const convertToUsd = (value) => Math.round(value * 1000) / 1000
 export const convertToUzs = (value) => Math.round(value)
@@ -31,10 +31,10 @@ const ClientsSales = () => {
 
     const location = useLocation()
 
-    const { market: _id, user } = useSelector((state) => state.login)
-    const { clients_info } = useSelector((state) => state.clients)
-    const { sellings } = useSelector((state) => state.sellings)
-    const { currencyType, currency } = useSelector((state) => state.currency)
+    const {market: _id, user} = useSelector((state) => state.login)
+    const {clients_info} = useSelector((state) => state.clients)
+    const {sellings} = useSelector((state) => state.sellings)
+    const {currencyType, currency} = useSelector((state) => state.currency)
     const [currentPage, setCurrentPage] = useState(0)
     const [countPage, setCountPage] = useState(10)
     const [sendingSearch, setSendingSearch] = useState({
@@ -138,7 +138,6 @@ const ClientsSales = () => {
     }
 
     const handleClickPrint = (saleconnector, key) => {
-        console.log(key)
         if (key === 'firstPay') {
             setModalBody('checkSell')
             setModalData(saleconnector)
@@ -149,7 +148,11 @@ const ClientsSales = () => {
             setModalVisible(!modalVisible)
         } else {
             setModalBody('allSaleDebtPayments')
-            setModalData(saleconnector[saleconnector.length - 1])
+            let sales = [];
+            saleconnector.map(sale => {
+                sales.push(...sale.saleconnector.payments)
+            })
+            setModalData({payments: sales.filter((item) => item.totalpriceuzs === undefined)})
             setModalVisible(!modalVisible)
         }
     }
@@ -434,7 +437,7 @@ const ClientsSales = () => {
     }
     const handlePayButtonClick = (data) => {
         setPaymentModalVisible(true)
-        const { debt: debts, saleconnector, products } = data
+        const {debt: debts, saleconnector, products} = data
         setProducts(products)
         setSaleConnectorId(saleconnector._id)
         const all = debts.debt
@@ -470,7 +473,7 @@ const ClientsSales = () => {
             products,
             debt_id: currentId,
         }
-        dispatch(payClientSalesDebt(body)).then(({ payload }) => {
+        dispatch(payClientSalesDebt(body)).then(({payload}) => {
             setClickDelay(true)
             setModalData(payload)
             setTimeout(() => {
@@ -486,8 +489,9 @@ const ClientsSales = () => {
     return (
         <div className='relative overflow-auto '>
             {customLoading && (
-                <div className='fixed backdrop-blur-[2px] z-[100] left-0 top-0 right-0 bottom-0 bg-white-700 flex flex-col items-center justify-center w-full h-full'>
-                    <SmallLoader />
+                <div
+                    className='fixed backdrop-blur-[2px] z-[100] left-0 top-0 right-0 bottom-0 bg-white-700 flex flex-col items-center justify-center w-full h-full'>
+                    <SmallLoader/>
                 </div>
             )}
             <div className='lg:ps-[20px] lg:tableContainerPadding '>
@@ -531,8 +535,8 @@ const ClientsSales = () => {
                 onChange={handleChangePaymentInput}
                 client={null}
                 allPayment={allPaymentUzs}
-                card={ paymentCardUzs}
-                cash={ paymentCashUzs}
+                card={paymentCardUzs}
+                cash={paymentCashUzs}
                 debt={paymentDebtUzs}
                 discount={null}
                 handleChangeDiscount={handleChangeDiscount}
@@ -540,7 +544,7 @@ const ClientsSales = () => {
                 changeComment={() => setComment('')}
                 transfer={
 
-                         paymentTransferUzs
+                    paymentTransferUzs
                 }
                 handleClickDiscountBtn={handleClickDiscountBtn}
                 discountSelectOption={discountSelectOption}

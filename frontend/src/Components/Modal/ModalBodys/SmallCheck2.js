@@ -16,6 +16,7 @@ export const SmallCheck2 = forwardRef((props, ref) => {
         isReturned,
         totalOfBackAndDebt
     } = props;
+
     const {market} = useSelector((state) => state.login)
     const {currencyType} = useSelector((state) => state.currency)
     const calculateDebt = (total = 0, payment = 0, discount = 0) => {
@@ -144,7 +145,7 @@ export const SmallCheck2 = forwardRef((props, ref) => {
                                 item?.more_parameters1?.piece !== 0
                             ) {
                                 return (
-                                    <div>
+                                    <div key={index}>
                                         <div className='text-left text-[12px] text-black-900 font-bold'>
                                             {index + 1}.{' '}
                                             {item?.product?.productdata?.name}
@@ -597,7 +598,10 @@ export const SmallCheck2 = forwardRef((props, ref) => {
                 </h3>
 
                 <h3
-                    style={{fontWeight: 'bolder', display: returned?.length>0 ? "none" : "block"}}
+                    style={{
+                        fontWeight: 'bolder',
+                        display: returned?.length > 0 ? "block" : "none"
+                    }}
                     className='text-black-900 text-[12px] font-bold pt-4'
                 >
                     {' '}

@@ -297,7 +297,7 @@ const Expense = () => {
     ]
 
     const createExpenseType = (value) => {
-        dispatch(createExpenseTypes({market: _id, comment: value, expense})).then(({payload}) => {
+        dispatch(createExpenseTypes({market: _id, comment: value})).then(({payload}) => {
             setExpenseTypes(prev => [...prev, payload])
         })
     }

@@ -14,6 +14,8 @@ export const DebtsTableRow = ({
                                   Edit,
                                   salerDebts,
                                   totalDebt,
+                                  hiddenInfoButton,
+                                  hiddenPayButton
                               }) => {
     const [isEditComment, setIsEditComment] = useState(null)
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
@@ -36,12 +38,25 @@ export const DebtsTableRow = ({
             replace: true,
             state: clientID,
         })
+
     const showRedLinePayDateComing = (pay_end_date) => {
         const now = moment();
         const debtEndDate = moment(pay_end_date);
         const daysUntilPayment = debtEndDate.diff(now, 'days');
         return daysUntilPayment <= 3;
     }
+    const [debts, setDebts] = useState([]);
+    const handleSelectDebt = (checked, debt) => {
+        if (debts.some((item) => item._id === debt._id)) {
+            setDebts((prev) => prev.filter(item => item._id !== debt._id))
+        } else {
+            setDebts([...debts, debt])
+        }
+    }
+    useEffect(() => {
+        sessionStorage.setItem("selected_debts", JSON.stringify(debts))
+    }, [debts.length])
+
     return (
         <>
             {map(data, (debt, index) =>
@@ -114,16 +129,28 @@ export const DebtsTableRow = ({
                                         Print({...debt.saleconnector, totaldebtuzs: debt.totaldebtuzs})
                                     }}
                                 />
-                                <TableBtn
-                                    type={'info'}
-                                    bgcolor={'bg-blue-600'}
-                                    onClick={() => linkToSale(debt.client._id)}
-                                />
-                                <TableBtn
-                                    type={'pay'}
-                                    bgcolor={'bg-success-500'}
-                                    onClick={() => Pay(debt)}
-                                />
+                                {
+                                    hiddenInfoButton ? null :
+                                        <TableBtn
+                                            type={'info'}
+                                            bgcolor={'bg-blue-600'}
+                                            onClick={() => linkToSale(debt.client._id)}
+                                        />
+                                }
+                                {
+                                    hiddenPayButton ? null :
+                                        <TableBtn
+                                            type={'pay'}
+                                            bgcolor={'bg-success-500'}
+                                            onClick={() => Pay(debt)}
+                                        />
+                                }
+                                {hiddenPayButton && hiddenInfoButton ?
+                                    <input type={"checkbox"}
+                                           checked={debts.some(item => item._id === debt._id)}
+                                           onChange={(e) => handleSelectDebt(e.currentTarget.checked, debt)}/>
+                                    : null
+                                }
                             </div>
                         </td>
                     </tr>
@@ -210,16 +237,21 @@ export const DebtsTableRow = ({
                                     bgcolor={'bg-blue-600'}
                                     onClick={() => Print(debt.saleconnector)}
                                 />
-                                <TableBtn
-                                    type={'info'}
-                                    bgcolor={'bg-blue-600'}
-                                    onClick={() => linkToSale(debt)}
-                                />
-                                <TableBtn
-                                    type={'pay'}
-                                    bgcolor={'bg-success-500'}
-                                    onClick={() => Pay(debt)}
-                                />
+                                {hiddenInfoButton
+                                    ? null :
+                                    <TableBtn
+                                        type={'info'}
+                                        bgcolor={'bg-blue-600'}
+                                        onClick={() => linkToSale(debt)}
+                                    />
+                                }
+                                {hiddenPayButton ? null :
+                                    <TableBtn
+                                        type={'pay'}
+                                        bgcolor={'bg-success-500'}
+                                        onClick={() => Pay(debt)}
+                                    />
+                                }
                             </div>
                         </li>
                     </li>
@@ -228,12 +260,13 @@ export const DebtsTableRow = ({
             <tr className='tr bg-transparent'>
                 <td
                     className='text-left td border-none bg-none'
-                    colSpan={user.type==="Director"?9:8}
+                    colSpan={hiddenPayButton && hiddenInfoButton?1:user.type === "Director" ? 9 : 8}
                 ></td>
                 <td
                     className='text-left td py-[0.625rem] font-medium border-none bg-none'
-                    colSpan={2}
+                    colSpan={hiddenPayButton && hiddenInfoButton?3:2}
                 >
+                    {hiddenPayButton && hiddenInfoButton?<span>{t('Umumiy qarz')}:{" "}</span>:null}
                     {currency === 'UZS'
                         ? (
                             Math.round(

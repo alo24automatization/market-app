@@ -570,10 +570,11 @@ module.exports.getClientsSales = async (req, res) => {
             .populate("user", "firstname lastname")
             .populate({
                 path: "saleconnector",
-                populate: {
-                    path: "payments",
-                    match: {totalprice: {$exists: false}},
-                },
+                populate: [
+                    {path: "payments", }, // Populate payments in saleconnector
+                    {path: "products"}, // Populate products in saleconnector
+                    {path: "discounts"} // Populate discounts in saleconnector
+                ]
             })
             .lean()
             .then((connectors) => connectors.filter((connector) => connector.client));

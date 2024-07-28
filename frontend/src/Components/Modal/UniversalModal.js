@@ -9,58 +9,66 @@ import Check from './ModalBodys/Check.js'
 import AllChecks from './ModalBodys/AllChecks.js'
 import StepperPage from './ModalBodys/StepperPage.js'
 import AdminMarkets from './ModalBodys/AdminMarkets.js'
-import { SavedSalesCheck } from '../SaleCheck/SavedSalesCheck.js'
+import {SavedSalesCheck} from '../SaleCheck/SavedSalesCheck.js'
 import ExchangesBody from './ModalBodys/ExchangesBody'
-import { useTranslation } from 'react-i18next'
+import {useTranslation} from 'react-i18next'
 import SalesList from './ModalBodys/SalesList'
 import TotalReports from '../TotalReports/TotalReports.js'
-import { SavedIncomingsCheck } from '../SaleCheck/SavedIncomingsCheck.js'
+import {SavedIncomingsCheck} from '../SaleCheck/SavedIncomingsCheck.js'
 import RequestConnection from './ModalBodys/RequestConnection.js'
 import RequestApplication from './ModalBodys/ReuqestApplication.js'
 import SendingApplication from './ModalBodys/SendingApplication.js'
-import { SavedOrdersCheck } from '../OrdersCheck/SavedOrdersCheck.js'
+import {SavedOrdersCheck} from '../OrdersCheck/SavedOrdersCheck.js'
 import DebtComment from './ModalBodys/DebtComment'
 import ChangeComment from './ModalBodys/ChangeComment'
-import { DailySaleCheck } from './ModalBodys/DailySaleCheck.js'
+import {DailySaleCheck} from './ModalBodys/DailySaleCheck.js'
 import MiniSaleDebtPaymentCheck from './ModalBodys/MiniSaleDebtPaymentCheck.js'
+import DebtsList from "../DebtsList/DebtsList";
+import TableBtn from "../Buttons/TableBtn";
+import React from "react";
+import {Payment} from "../Buttons/SaleBtns";
+import {t} from "i18next";
 
 function UniversalModal({
-    isOpen,
-    toggleModal,
-    body,
-    approveFunction,
-    closeModal,
-    excelData,
-    headers,
-    setCreatedData,
-    createdData,
-    headerText,
-    title,
-    product,
-    changeProduct,
-    currency,
-    printedSelling,
-    printedIncomings,
-    printedInventories,
-    payment,
-    addMarket,
-    incomingreport,
-    productreport,
-    saleproductsreport,
-    totalreports,
-    dataObject,
-    marketByInn,
-    sendingRequests,
-    handleDeleteRequest,
-    incomingRequests,
-    handleAcceptRequest,
-    handleRejectRequest,
-    order,
-    commentText,
-    dailyid,
-    isSalesList,
-}) {
-    const { t } = useTranslation(['common'])
+                            isOpen,
+                            toggleModal,
+                            body,
+                            approveFunction,
+                            closeModal,
+                            excelData,
+                            headers,
+                            setCreatedData,
+                            createdData,
+                            headerText,
+                            title,
+                            product,
+                            changeProduct,
+                            currency,
+                            printedSelling,
+                            printedIncomings,
+                            printedInventories,
+                            payment,
+                            addMarket,
+                            incomingreport,
+                            productreport,
+                            saleproductsreport,
+                            totalreports,
+                            dataObject,
+                            marketByInn,
+                            sendingRequests,
+                            handleDeleteRequest,
+                            incomingRequests,
+                            handleAcceptRequest,
+                            handleRejectRequest,
+                            order,
+                            commentText,
+                            dailyid,
+                            isSalesList,
+                            children,
+                            payDebt = () => {
+                            }
+                        }) {
+    const {t} = useTranslation(['common'])
 
     const customStyles = {
         content: {
@@ -80,6 +88,8 @@ function UniversalModal({
     }
     const switchBody = () => {
         switch (body) {
+            case 'debtsList':
+                return children
             case 'approve':
                 return (
                     <Approve
@@ -144,19 +154,19 @@ function UniversalModal({
                     />
                 )
             case 'checkSell':
-                return <Check returned={false} product={product} />
+                return <Check returned={false} product={product}/>
             case 'checkSellReturn':
-                return <Check returned={true} product={product} />
+                return <Check returned={true} product={product}/>
             case 'checkOrder':
-                return <Check isOrder={true} order={order} />
+                return <Check isOrder={true} order={order}/>
             case 'checkPayment':
-                return <Check payment={payment} noXPrint={true} isPayment={true} />
+                return <Check payment={payment} noXPrint={true} isPayment={true}/>
             case 'allChecks':
-                return <AllChecks product={printedSelling} />
+                return <AllChecks product={printedSelling}/>
             case 'allChecksWithDetails':
-                return <AllChecks allDetails={true} product={printedSelling} />
+                return <AllChecks allDetails={true} product={printedSelling}/>
             case 'addMarket':
-                return <StepperPage addMarket={addMarket} />
+                return <StepperPage addMarket={addMarket}/>
             case 'filterBranch':
                 return (
                     <AdminMarkets
@@ -166,11 +176,11 @@ function UniversalModal({
                     />
                 )
             case 'savedsalescheck':
-                return <SavedSalesCheck product={printedSelling} />
+                return <SavedSalesCheck product={printedSelling}/>
             case 'savedorderscheck':
-                return <SavedOrdersCheck order={order} />
+                return <SavedOrdersCheck order={order}/>
             case 'savedincomingscheck':
-                return <SavedIncomingsCheck incomings={printedIncomings} />
+                return <SavedIncomingsCheck incomings={printedIncomings}/>
             case 'totalReport':
                 return (
                     <div className={'flex items-center justify-center'}>
@@ -218,7 +228,7 @@ function UniversalModal({
                     />
                 )
             case 'debtcomment':
-                return <DebtComment toggleModal={toggleModal} />
+                return <DebtComment toggleModal={toggleModal}/>
             case 'dailySaleCheck':
                 return (
                     <DailySaleCheck
@@ -227,11 +237,11 @@ function UniversalModal({
                     />
                 )
             case 'oneSaleDebtPayments':
-                return <MiniSaleDebtPaymentCheck data={payment} type={'one'} />
+                return <MiniSaleDebtPaymentCheck data={payment} type={'one'}/>
             case 'allSaleDebtPayments':
-                return <MiniSaleDebtPaymentCheck data={payment} type={'all'} />
+                return <MiniSaleDebtPaymentCheck data={payment} type={'all'}/>
             case 'allDebtPayedCheck':
-                return <MiniSaleDebtPaymentCheck data={payment} type={'debtPayed'} />
+                return <MiniSaleDebtPaymentCheck data={payment} type={'debtPayed'}/>
             default:
                 return t('Bunday jadval topilmadi')
         }
@@ -241,25 +251,36 @@ function UniversalModal({
             isOpen={isOpen}
             style={
                 body === 'checkSell' ||
-                    body === 'allChecks' ||
-                    body === 'addMarket' ||
-                    body === 'filterBranch'
-                    ? { ...modalFull }
+                body === 'allChecks' ||
+                body === 'addMarket' ||
+                body === 'filterBranch'
+                    ? {...modalFull}
                     : body === 'exchanges'
-                        ? { content: { width: '70%' } }
+                        ? {content: {width: '70%'}}
                         : body === 'approve' ||
-                            body === 'complete' ||
-                            body === 'requestconnection'
+                        body === 'complete' ||
+                        body === 'requestconnection'
                             ? {}
-                            : { ...customStyles }
+                            : {...customStyles}
             }
             onRequestClose={closeModal || toggleModal}
             closeTimeoutMS={100}
             contentLabel='Example Modal'
             appElement={document.getElementById('root') || undefined}
         >
-            <ModalHeader toggleModal={closeModal || toggleModal} />
+            <ModalHeader toggleModal={closeModal || toggleModal}/>
             {switchBody()}
+            {body === "debtsList" ?
+                <div className={"absolute bottom-5 right-5"}>
+                    <Payment
+                        text={t(`To'lovga o'tish`)}
+                        disablePayButton={false}
+                        loading={false}
+                        onClick={payDebt}
+                        // onDoubleClick={onDoubleClick}
+                    />
+                </div>
+                : null}
         </Modal>
     )
 }

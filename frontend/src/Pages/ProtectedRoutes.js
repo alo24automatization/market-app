@@ -331,7 +331,7 @@ const sellerRoutes = [
     },
     {
         path: '/qarzdorlar',
-        element: <PayDebts />
+        element: <ReportPage accessToSaller={true} />
     },
     {
         path: '/xarajatlar',

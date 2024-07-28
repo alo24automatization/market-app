@@ -1160,7 +1160,6 @@ module.exports.registeredit = async (req, res) => {
 module.exports.payment = async (req, res) => {
     try {
         const {payment, market, user, saleconnectorid} = req.body;
-
         const marke = await Market.findById(market);
         if (!marke) {
             return res.status(400).json({
@@ -1175,6 +1174,7 @@ module.exports.payment = async (req, res) => {
                 message: `Diqqat! Avtorizatsiyadan o'tilmagan!`,
             });
         }
+
         const saleconnector = await SaleConnector.findById(saleconnectorid)
             .populate("client", "name")
             .populate("packman", "name");

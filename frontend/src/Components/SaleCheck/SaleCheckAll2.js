@@ -517,8 +517,8 @@ export const SaleCheckAll2 = forwardRef((props, ref) => {
                     {t('To\'langan')}:{' '}
                     <span className='text-black-900 font-bold'>
                         {(
-                            calculateAllPayments(selledPayments?.filter(item => item.totalpriceuzs)) +
-                            calculateAllPayments(returnedPayments?.filter(item => item.totalpriceuzs))
+                            calculateAllPayments(selledPayments) +
+                            calculateAllPayments(returnedPayments)
                         ).toLocaleString('ru-Ru')}{' '}
                         {currencyType}
                     </span>
