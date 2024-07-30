@@ -794,13 +794,20 @@ module.exports.getDebtsReport = async (req, res) => {
         // Filter out duplicate client reports
         const uniqueClientDebts = new Set();
         const filteredDebtsReport = debtsreport.filter(sale => {
-            if (uniqueClientDebts.has(sale.client._id)) {
-                return false;
+            if (sale.client && sale.client._id) {
+                if (uniqueClientDebts.has(sale.client._id)) {
+                    return false;
+                } else {
+                    uniqueClientDebts.add(sale.client._id);
+                    return true;
+                }
             } else {
-                uniqueClientDebts.add(sale.client._id);
-                return true;
+                // Handle the case where sale.client is undefined or doesn't have an _id
+                console.warn('Skipping sale with undefined client or client._id', sale);
+                return false;
             }
         });
+        
 
         res.status(201).json({data: filteredDebtsReport.filter(sale=>sale.debtuzs>0)});
     } catch (error) {
