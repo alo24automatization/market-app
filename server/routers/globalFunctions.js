@@ -142,12 +142,12 @@ const sendMessage = async () => {
                 pay_end_date: payEndDate,
             };
         }));
-        const filteredDebtsReport = debtsreport.filter((sales) => sales.debt > 0);
+        const filteredDebtsReport = debtsreport.filter((sales) => sales.debtuzs > 0);
         for (const debt of filteredDebtsReport) {
             const debtEndDate = moment(debt.pay_end_date);
             const daysUntilPayment = debtEndDate.diff(now, 'days');
             const isOverdue = daysUntilPayment < 0;
-            if (debt.debt > 0 && debt.debtuzs && (isOverdue || (daysUntilPayment >= 0 && daysUntilPayment <= 3))) {
+            if (debt.debtuzs&&debt.debtuzs>0 && (isOverdue || (daysUntilPayment >= 0 && daysUntilPayment <= 3))) {
                 const client = await Client.findById(debt.client).populate({path: "market", populate: "director"});
                 const {market} = client;
                 const SMS_API_KEY = market.SMS_API_KEY;

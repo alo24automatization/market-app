@@ -229,7 +229,7 @@ module.exports.register = async (req, res) => {
             }
         }
 
-        if (debt.debt > 0) {
+        if (debt.debtuzs > 0) {
             const newDebt = new Debt({
                 comment: comment,
                 debt: convertToUsd(debt.debt),
@@ -311,6 +311,7 @@ module.exports.register = async (req, res) => {
         dailysaleconnector.id = 1;
         dailysaleconnector.products = [...products];
         await dailysaleconnector.save();
+
         const connector = await DailySaleConnector.findById(dailysaleconnector._id)
             .select("-isArchive -updatedAt -market -__v")
             .populate({
@@ -395,10 +396,11 @@ module.exports.register = async (req, res) => {
                 totaldebtuzs: totaldebtuzs,
             });
         }
-        totaldebtuzs = filteredProductsSale.length > 0 ? filteredProductsSale.reduce((sum, item) => sum + item.totaldebtuzs, 0) : 0
+        totaldebtuzs = filteredProductsSale.length > 0 ? filteredProductsSale.reduce((sum, item) => sum + item.totaldebtuzs, 0) : 0;
+        console.log(client);
         res.status(201).send({
             ...connector,
-            totaldebtuzs
+            totaldebtuzs:client?._id===null?0:totaldebtuzs
         });
     } catch
         (error) {
@@ -635,7 +637,7 @@ module.exports.addproducts = async (req, res) => {
             }
         }
 
-        if (debt.debt > 0) {
+        if (debt.debtuzs > 0) {
             const newDebt = new Debt({
                 comment: comment,
                 debt: debt.debt,
@@ -1077,7 +1079,7 @@ module.exports.registeredit = async (req, res) => {
             await Discount.findByIdAndUpdate(discount._id, discount);
         }
 
-        if (debt.debt > 0) {
+        if (debt.debtuzs > 0) {
             const newDebt = new Debt({
                 comment: debt.comment,
                 debt: debt.debt,
