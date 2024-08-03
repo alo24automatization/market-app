@@ -82,13 +82,8 @@ module.exports.register = async (req, res) => {
                 message: `Diqqat! Avtorizatsiyadan o'tilmagan!`,
             });
         }
-        if (!client._id) {
-            return res.status(400).json({
-                message: `Diqqat! Mijoz haqida malumotlar topilmadi!`,
-            });
-        }
         let foundedClient = await Client.findById(client._id)
-        if (!foundedClient) {
+        if (!foundedClient&&client._id!==null) {
             return res.status(400).json({
                 message: `Diqqat! Mijoz haqida malumotlar topilmadi!`,
             });
