@@ -8,36 +8,38 @@ import {useLocation} from 'react-router-dom'
 import Dates from '../Dates/Dates.js'
 
 function CustomerPayment({
-                             returned,
-                             active,
-                             togglePaymentModal,
-                             hasCalendar,
-                             type = 'cash',
-                             showPayEndDate,
-                             cash = '',
-                             card = '',
-                             transfer = '',
-                             discount,
-                             hasDiscount,
-                             hasDiscountBtn,
-                             debt,
-                             allPayment,
-                             paid = 0,
-                             client = '',
-                             onChange,
-                             onClose,
-                             changePaymentType,
-                             discountSelectOption,
-                             handleClickDiscountBtn,
-                             handleChangeDiscountSelectOption,
-                             handleChangeDiscount,
-                             handleClickPay,
-                             clickdelay,
-                             disableInputsCashCard,
-                             payEndDate,
-                             handlePayEndDateChange,
-                             disablePayButton,
-                         }) {
+    returned,
+    active,
+    togglePaymentModal,
+    hasCalendar,
+    hiddenDebt,
+    type = 'cash',
+    showPayEndDate,
+    cash = '',
+    card = '',
+    transfer = '',
+    hiddenMixed,
+    discount,
+    hasDiscount,
+    hasDiscountBtn,
+    debt,
+    allPayment,
+    paid = 0,
+    client = '',
+    onChange,
+    onClose,
+    changePaymentType,
+    discountSelectOption,
+    handleClickDiscountBtn,
+    handleChangeDiscountSelectOption,
+    handleChangeDiscount,
+    handleClickPay,
+    clickdelay,
+    disableInputsCashCard,
+    payEndDate,
+    handlePayEndDateChange,
+    disablePayButton,
+}) {
     const location = useLocation()
     const defineLabel = () => {
         switch (type) {
@@ -101,9 +103,10 @@ function CustomerPayment({
     const {currencyType} = useSelector((state) => state.currency)
     return (
         <section
-            className={`fixed transition-all left-0 top-0 right-0 bottom-0 overflow-hidden duration-200 ease-out bg-black-300 backdrop-blur-[3px] z-20 ${active
-                ? 'opacity-100 pointer-events-auto'
-                : 'opacity-0 pointer-events-none'
+            className={`fixed transition-all left-0 top-0 right-0 bottom-0 overflow-hidden duration-200 ease-out bg-black-300 backdrop-blur-[3px] z-20 ${
+                active
+                    ? 'opacity-100 pointer-events-auto'
+                    : 'opacity-0 pointer-events-none'
             }`}
             onClick={togglePaymentModal}
         >
@@ -115,7 +118,8 @@ function CustomerPayment({
                 {t('')}
             </h3>
             <div
-                className={`customerPay-head-style transition-all duration-200 ease-linear h-full overflow-auto absolute top-0 bottom-0 right-0 ${active ? 'translate-x-0' : 'translate-x-full'
+                className={`customerPay-head-style transition-all duration-200 ease-linear h-full overflow-auto absolute top-0 bottom-0 right-0 ${
+                    active ? 'translate-x-0' : 'translate-x-full'
                 }`}
                 onClick={(e) => e.stopPropagation()}
                 autoFocus
@@ -124,7 +128,7 @@ function CustomerPayment({
                     {client && (
                         <div className='customer-head-icon'>
                             <div className='flex items-center custom-payment-text-style'>
-                                <IoPerson className='mr-[0.75rem]'/>
+                                <IoPerson className='mr-[0.75rem]' />
                                 <span>{t('Mijoz')} : </span>
                             </div>
                             <h3 className='text-[0.875rem]'>{client}</h3>
@@ -136,13 +140,13 @@ function CustomerPayment({
                     <ul className='w-full pb-[1.25rem]'>
                         {!returned && defineLabel()}
                         {(location.pathname.includes('/kassa/debts') ||
-                                location.pathname.includes('/qarzdorlar') ||
-                                location.pathname.includes(
-                                    '/maxsulotlar/qabul/qabulqilish'
-                                ) ||
-                                location.pathname.includes(
-                                    '/maxsulotlar/qabul/qabullar'
-                                )) &&
+                            location.pathname.includes('/qarzdorlar') ||
+                            location.pathname.includes(
+                                '/maxsulotlar/qabul/qabulqilish'
+                            ) ||
+                            location.pathname.includes(
+                                '/maxsulotlar/qabul/qabullar'
+                            )) &&
                             defineLabel()}
                         {hasDiscount && (
                             <DiscountInput
@@ -165,7 +169,8 @@ function CustomerPayment({
                                 />
                             </li>
                         )}
-                        <li className='custom-payment-ul-li'>
+                        {
+                            hiddenDebt?null: <li className='custom-payment-ul-li'>
                             <span className='custom-payment-text-style'>
                                 {t('Qarzlar')} :{' '}
                             </span>
@@ -173,7 +178,8 @@ function CustomerPayment({
                                 {debt.toLocaleString('ru-Ru')} {currencyType}
                             </h3>
                         </li>
-
+                        }
+                       
                         <li className='custom-payment-ul-li'>
                             <span className='custom-payment-text-style'>
                                 {allPayment < 0
@@ -187,8 +193,7 @@ function CustomerPayment({
                         </li>
                     </ul>
                 </div>
-                <div
-                    className='bottom-payment w-full flex flex-col gap-[1.25rem] border-t-[1px] border-black-200 pt-[1.25rem]'>
+                <div className='bottom-payment w-full flex flex-col gap-[1.25rem] border-t-[1px] border-black-200 pt-[1.25rem]'>
                     <div className='custom-paymet-btn'>
                         <SaleBtn
                             text={t(`Naqd`)}
@@ -208,7 +213,7 @@ function CustomerPayment({
                             active={type === 'transfer'}
                             onClick={changePaymentType}
                         />
-                        {!returned && (
+                        {!returned || hiddenMixed && (
                             <SaleBtn
                                 text={t(`Aralash`)}
                                 type='mixed'
@@ -225,7 +230,7 @@ function CustomerPayment({
                             />
                         )}
                     </div>
-                    {!returned && hasDiscountBtn&& (
+                    {!returned && hasDiscountBtn && (
                         <DiscountBtn
                             text={t(`Chegirma`)}
                             onClick={handleClickDiscountBtn}

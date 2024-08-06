@@ -482,7 +482,6 @@ module.exports.register = async (req, res) => {
             filteredProductsSale.length > 0
                 ? filteredProductsSale.reduce((sum, item) => sum + item.totaldebtuzs, 0)
                 : 0;
-        console.log(client);
         res.status(201).send({
             ...connector,
             totaldebtuzs: client?._id === null ? 0 : totaldebtuzs,
@@ -1217,7 +1216,6 @@ module.exports.registeredit = async (req, res) => {
             comment,
             totalOfBackAndDebt,
         } = req.body;
-        console.log(req.body);
         const marke = await Market.findById(market);
         if (!marke) {
             return res.status(400).json({

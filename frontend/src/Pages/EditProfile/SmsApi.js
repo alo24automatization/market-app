@@ -21,7 +21,6 @@ const SmsApi = () => {
 
     const handleSaveUserApiKey = useCallback(async () => {
         await dispatch(smsApiKey({ key: apiKeyInputValue })).then(({ payload }) => {
-            console.log(payload);
             universalToast(payload.message, 'success');
             getApiKey();
         });

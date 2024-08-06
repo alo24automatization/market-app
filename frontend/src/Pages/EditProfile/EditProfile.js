@@ -51,7 +51,6 @@ function EditProfile() {
         })
     }
     const handleChangeImage = (croppedImage) => {
-        console.log("okkk");
         const formData = new FormData()
         formData.append('file', croppedImage)
         dispatch(editProfileImage(formData)).then(({ error, payload }) => {
@@ -65,7 +64,6 @@ function EditProfile() {
             }
         })
     }
-    // console.log(currentUser);
     // const handleChangeQr = (croppedImage) => {
         
     //     const formData = new FormData()

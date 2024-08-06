@@ -413,7 +413,7 @@ module.exports.register = async (req, res) => {
         } else {
            filialunitt = isfilialunitt
         }
-        console.log(filialunitt);
+        (filialunitt);
 
         const newFilialProductData = new ProductData({
           code,

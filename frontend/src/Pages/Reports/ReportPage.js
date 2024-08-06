@@ -1419,6 +1419,65 @@ const ReportPage = ({accessToSaller}) => {
                         </div>
                         <div className='flex flex-col items-start gap-2'>
                             <div className='text-[18px] font-bold mb-2'>
+                                {t("Komissiya to'lovi")}
+                            </div>
+                            <div className='font-semibold w-full gap-5 flex justify-between'>
+                                <div>{t('Naqt')}:</div>
+                                {' '}
+                                <span>
+                                    {currencyType === 'USD'
+                                        ? roundUsd(
+                                           totalpayment?.agentProfit?.cash
+                                        ).toLocaleString('ru-RU')
+                                        : roundUzs(
+                                           totalpayment?.agentProfit?.cashuzs
+                                        ).toLocaleString('ru-RU')}{' '}
+                                    {currencyType}
+                                </span>
+                            </div>
+                            <div className='font-semibold w-full gap-5 flex justify-between'>
+                                <div>{t('Plastik')}:</div>
+                                <span>
+                                    {currencyType === 'USD'
+                                        ? roundUsd(
+                                           totalpayment?.agentProfit?.card
+                                        ).toLocaleString('ru-RU')
+                                        : roundUzs(
+                                           totalpayment?.agentProfit?.carduzs
+                                        ).toLocaleString('ru-RU')}{' '}
+                                    {currencyType}
+                                </span>
+                            </div>
+                            <div className='font-semibold w-full gap-5 flex justify-between'>
+                                <div>{t("O'tkazma")}:</div>
+                                <span>
+                                    {currencyType === 'USD'
+                                        ? roundUsd(
+                                           totalpayment?.agentProfit?.transfer
+                                        ).toLocaleString('ru-RU')
+                                        : roundUzs(
+                                           totalpayment?.agentProfit?.transferuzs
+                                        ).toLocaleString('ru-RU')}{' '}
+                                    {currencyType}
+                                </span>
+                            </div>
+                            <div className='text-[18px] font-semibold w-full text-end'>
+                                {currencyType === 'USD'
+                                    ? roundUsd(
+                                       totalpayment?.agentProfit?.cash +
+                                       totalpayment?.agentProfit?.card +
+                                       totalpayment?.agentProfit?.transfer
+                                    ).toLocaleString('ru-RU')
+                                    : roundUzs(
+                                       totalpayment?.agentProfit?.cashuzs +
+                                       totalpayment?.agentProfit?.carduzs +
+                                       totalpayment?.agentProfit?.transferuzs
+                                    ).toLocaleString('ru-RU')}{' '}
+                                {currencyType}
+                            </div>
+                        </div>
+                        <div className='flex flex-col items-start gap-2'>
+                            <div className='text-[18px] font-bold mb-2'>
                                 {t('Qaytarilganlar')}
                             </div>
                             <div className='font-semibold w-full gap-5 flex justify-between'>
@@ -1533,9 +1592,9 @@ const ReportPage = ({accessToSaller}) => {
                                             memoizedExpenses.transfer.usd
                                         ).toLocaleString('ru-RU')
                                         : roundUzs(
-                                            memoizedExpenses.cash.uzs +
+                                           ( memoizedExpenses.cash.uzs +
                                             memoizedExpenses.card.uzs +
-                                            memoizedExpenses.transfer.uzs
+                                            memoizedExpenses.transfer.uzs)
                                         ).toLocaleString('ru-RU')}{' '}
                                     {currencyType}
                                 </div>
@@ -1555,7 +1614,7 @@ const ReportPage = ({accessToSaller}) => {
                                         ).toLocaleString('ru-RU')
                                         : roundUzs(
                                             totalpayment.result.cashuzs -
-                                            memoizedExpenses.cash.uzs
+                                            memoizedExpenses.cash.uzs-totalpayment.agentProfit.cashuzs
                                         ).toLocaleString('ru-RU')}{' '}
                                     {currencyType}
                                 </span>
@@ -1566,11 +1625,11 @@ const ReportPage = ({accessToSaller}) => {
                                     {currencyType === 'USD'
                                         ? roundUsd(
                                             totalpayment.result.card -
-                                            memoizedExpenses.card.usd
+                                            memoizedExpenses.card.usd-totalpayment.agentProfit.card
                                         ).toLocaleString('ru-RU')
                                         : roundUzs(
                                             totalpayment.result.carduzs -
-                                            memoizedExpenses.card.uzs
+                                            memoizedExpenses.card.uzs-totalpayment.agentProfit.carduzs
                                         ).toLocaleString('ru-RU')}{' '}
                                     {currencyType}
                                 </span>
@@ -1585,7 +1644,7 @@ const ReportPage = ({accessToSaller}) => {
                                         ).toLocaleString('ru-RU')
                                         : roundUzs(
                                             totalpayment.result.transferuzs -
-                                            memoizedExpenses.transfer.uzs
+                                            memoizedExpenses.transfer.uzs-totalpayment.agentProfit.transferuzs
                                         ).toLocaleString('ru-RU')}{' '}
                                     {currencyType}
                                 </span>

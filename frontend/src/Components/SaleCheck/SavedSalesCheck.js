@@ -75,7 +75,7 @@ export const SavedSalesCheck = forwardRef((props, ref) => {
                 pdf.addImage(imgData, 'JPEG', 0, 0, width, height)
                 await pdf.save(`Сакланганлар-${new Date().toISOString()}.pdf`, {returnPromise: true})
             } catch (e) {
-                console.log(e)
+               console.log(e)
             } finally {
                 setLoadContent(false)
             }

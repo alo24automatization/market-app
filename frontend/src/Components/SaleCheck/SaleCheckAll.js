@@ -15,7 +15,6 @@ export const SaleCheckAll = forwardRef((props, ref) => {
         userInfo
     } = props;
 
-    console.log(product)
 
     const { market } = useSelector((state) => state.login)
     const { currencyType } = useSelector((state) => state.currency)

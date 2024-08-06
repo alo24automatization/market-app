@@ -24,6 +24,17 @@ export const addPackman = createAsyncThunk(
         }
     }
 )
+export const payAgentProfit=createAsyncThunk(
+    'agent/payProfit',
+    async (body, {rejectWithValue}) => {
+        try {
+            const {data} = await Api.post('/sales/packman/payProfit', body)
+            return data
+        } catch (error) {
+            return rejectWithValue(error)
+        }
+    }
+)
 
 export const updatePackman = createAsyncThunk(
     'packmans/updatePackman',

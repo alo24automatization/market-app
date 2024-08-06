@@ -537,6 +537,7 @@ const ClientsSales = () => {
                 allPayment={allPaymentUzs}
                 card={paymentCardUzs}
                 cash={paymentCashUzs}
+                hiddenMixed={true}
                 debt={paymentDebtUzs}
                 discount={null}
                 handleChangeDiscount={handleChangeDiscount}

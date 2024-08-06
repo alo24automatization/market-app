@@ -22,6 +22,9 @@ router.delete('/packman/delete', auth, (req, res) => {
 router.post('/packman/getpackmans', auth, (req, res) => {
   require('./packman').getPackmans(req, res);
 });
+router.post('/packman/payProfit', auth, (req, res) => {
+  require('./packman').payProfit(req, res);
+});
 
 // Client CRUD
 router.post('/client/register', auth, (req, res) => {

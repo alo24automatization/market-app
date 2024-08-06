@@ -120,7 +120,6 @@ const IncomingsList = () => {
             }
             setPrintedData([...printedData])
         } else {
-            console.log(product);
             setPrintedData([
                 ...printedData,
                 {product: {

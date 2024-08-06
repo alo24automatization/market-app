@@ -164,7 +164,6 @@ const slice = createSlice({
             state.loading = true
         },
         [createQrcode.fulfilled]: (state, {payload}) => {
-            console.log(payload);
             state.loading = false
             state.market = {
                 ...state.market,

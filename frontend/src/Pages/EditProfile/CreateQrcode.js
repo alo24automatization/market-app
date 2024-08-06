@@ -19,7 +19,6 @@ function CreateQrcode() {
     })
 
     const handleChangeImage = (croppedImage) => {
-        console.log("okkk");
         const formData = new FormData()
         formData.append('file', croppedImage)
         dispatch(editProfileImage(formData)).then(({ error, payload }) => {

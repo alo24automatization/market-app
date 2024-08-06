@@ -300,7 +300,6 @@ const Labels = ({ id }) => {
             dispatch(getProductsByFilter(body))
         }
     }
-    console.log(isShowPrice);
     const exportData = () => {
         let fileName = 'Etiketka'
         const exportProductHead = [

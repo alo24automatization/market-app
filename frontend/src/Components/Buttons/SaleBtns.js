@@ -52,7 +52,7 @@ export const Payment = ({ onClick, text, onDoubleClick, disablePayButton, loadin
         <button
             onClick={onClick}
             onDoubleClick={onDoubleClick}
-            className={`paymentstyle grow px-3`}
+            className={`paymentstyle grow px-3 ${disablePayButton?"cursor-not-allowed":""}`}
             disabled={disablePayButton}
         >
             {loading ?

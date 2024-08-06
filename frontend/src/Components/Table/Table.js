@@ -43,8 +43,12 @@ import {IncomingOrderProductsTableRow} from './TableRows/IncomingOrderProductsTa
 import {ReceiveOrderProductsTableRow} from './TableRows/ReceiveOrderProductsTableRow.js'
 import {LabelsIncome} from './TableRows/LabelsIncome'
 import {ClientSaleTable} from './TableRows/ClientSaleTable'
+import PackmanProfitClientsTableRow from './TableRows/PackmanProfitClientsTableRow.js'
 
 function Table({
+    showClients,
+    changeCheckbox,
+    selectedSale,
                    page,
                    data,
                    headers,
@@ -325,12 +329,27 @@ function Table({
                 return (
                     <PackmanTableRow
                         data={data}
+                        showClients={showClients}
                         currentPage={currentPage}
                         countPage={countPage}
                         Edit={Edit}
                         Delete={Delete}
                     />
                 )
+                case "packmanProfitClients":
+                    return (
+                        <PackmanProfitClientsTableRow
+                        data={data}
+                        showClients={showClients}
+                        selectedSale={selectedSale}
+                        currentPage={currentPage}
+                        countPage={countPage}
+                        Edit={Edit}
+                        changeCheckbox={changeCheckbox}
+                        Delete={Delete}
+                        currency={currency}
+                    />
+                    )
             case 'seller':
                 return (
                     <SellerTableRow

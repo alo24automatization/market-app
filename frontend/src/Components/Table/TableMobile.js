@@ -49,6 +49,7 @@ import DailyReportMobile from './TableRows/DailyReportMobile.js'
 import ProductMinimum from '../../Pages/ProductReport/ProductMinimum.js'
 import { ProductMinimumTableRow } from './ProductMinimumTableRow.js'
 function TableMobile({
+    showClients,
     page,
     data,
     headers,
@@ -325,6 +326,7 @@ function TableMobile({
                         countPage={countPage}
                         Edit={Edit}
                         Delete={Delete}
+                        showClients={showClients}
                     />
                 )
             case 'seller':
