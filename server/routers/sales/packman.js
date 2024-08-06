@@ -497,7 +497,7 @@ const fetchClientTotalSaleSum = async (clients, market) => {
   return {
     totalSum:
       allClients.reduce(
-        (prev, item) => prev + item?.saleconnector?.totalsalesuzs || 0,
+        (prev, item) => prev + item.saleconnector?.totalsalesuzs || 0,
         0
       ) || 0,
     allClients,
