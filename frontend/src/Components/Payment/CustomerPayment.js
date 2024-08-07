@@ -169,17 +169,18 @@ function CustomerPayment({
                                 />
                             </li>
                         )}
-                        {
-                            hiddenDebt?null: <li className='custom-payment-ul-li'>
-                            <span className='custom-payment-text-style'>
-                                {t('Qarzlar')} :{' '}
-                            </span>
-                            <h3 className='text-error-500 text-[1rem]'>
-                                {debt.toLocaleString('ru-Ru')} {currencyType}
-                            </h3>
-                        </li>
-                        }
-                       
+                        {hiddenDebt ? null : (
+                            <li className='custom-payment-ul-li'>
+                                <span className='custom-payment-text-style'>
+                                    {t('Qarzlar')} :{' '}
+                                </span>
+                                <h3 className='text-error-500 text-[1rem]'>
+                                    {debt.toLocaleString('ru-Ru')}{' '}
+                                    {currencyType}
+                                </h3>
+                            </li>
+                        )}
+
                         <li className='custom-payment-ul-li'>
                             <span className='custom-payment-text-style'>
                                 {allPayment < 0
@@ -213,7 +214,7 @@ function CustomerPayment({
                             active={type === 'transfer'}
                             onClick={changePaymentType}
                         />
-                        {!returned || hiddenMixed && (
+                        {!returned && (
                             <SaleBtn
                                 text={t(`Aralash`)}
                                 type='mixed'

@@ -25,17 +25,21 @@ const PackmanProfitClientsTableRow = ({
         )
     }
     const isPayed = (clientSaleconnector) => {
-        return data?.payments?.some((payment) =>
-            payment?.packman_saleconnectors?.some(
-                (saleconnector) => saleconnector === clientSaleconnector
-            )
+        return (
+            data?.payments?.some((payment) =>
+                payment?.packman_saleconnectors?.some(
+                    (saleconnector) => saleconnector === clientSaleconnector
+                )
+            ) || 0
         )
     }
     const findPayment = (clientSaleconnector) => {
-        return data?.payments?.find((payment) =>
-            payment?.packman_saleconnectors?.some(
-                (saleconnector) => saleconnector === clientSaleconnector
-            )
+        return (
+            data?.payments?.find((payment) =>
+                payment?.packman_saleconnectors?.some(
+                    (saleconnector) => saleconnector === clientSaleconnector
+                )
+            ) || 0
         )
     }
     const totalNotPayments = (packman) => {
@@ -47,7 +51,6 @@ const PackmanProfitClientsTableRow = ({
             ) || 0
         return packman.commissionProfit - paymentsTotal
     }
-
 
     return (
         <>
@@ -120,7 +123,6 @@ const PackmanProfitClientsTableRow = ({
                     </td>
                 </tr>
             ))}
-            
         </>
     )
 }

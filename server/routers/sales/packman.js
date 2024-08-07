@@ -89,11 +89,7 @@ module.exports.getAll = async (req, res) => {
       .populate("payments")
       .populate("clients")
       .lean();
-    const packmansWithAllProfitAndTotalSum = await getTotalSumPackmanClientsSum(
-      market,
-      packmans
-    );
-    res.status(201).json(packmansWithAllProfitAndTotalSum);
+    res.status(201).json(packmans);
   } catch (error) {
     console.log(error.message);
     res.status(501).json({ error: "Serverda xatolik yuz berdi..." });

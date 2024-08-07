@@ -15,6 +15,7 @@ import {
     successUpdatePackmanMessage,
     universalToast,
     warningEmptyInput,
+    warningMorePayment,
 } from '../../Components/ToastMessages/ToastMessages'
 import {
     addPackman,
@@ -29,7 +30,11 @@ import {
     payAgentProfit,
     updatePackman,
 } from './packmanSlice'
-import {checkEmptyString} from '../../App/globalFunctions.js'
+import {
+    checkEmptyString,
+    UsdToUzs,
+    UzsToUsd,
+} from '../../App/globalFunctions.js'
 import {useTranslation} from 'react-i18next'
 import {filter} from 'lodash'
 import TableMobile from '../../Components/Table/TableMobile.js'
@@ -386,9 +391,54 @@ function Packman() {
             : setPaymentModalVisible(bool)
         setPaymentType('cash')
         clearForm()
+        setSelectedSale([])
+        setSelectedPackman(null)
     }
     // dont use
-    const handleChangePaymentInput = () => {}
+    const handleChangePaymentInput = (value, key) => {
+        writePayment(value, key)
+    }
+    const {currency} = useSelector((state) => state.currency)
+    const writePayment = (value, type) => {
+        const maxSumUzs = Math.abs(allPaymentUzs)
+        if (currencyType === 'UZS') {
+            if (type === 'cash') {
+                const all =
+                    Number(value) +
+                    Number(paymentCardUzs) +
+                    Number(paymentTransferUzs)
+                if (all <= maxSumUzs) {
+                    setPaymentCashUzs(value)
+                    setPaidUzs(all)
+                } else {
+                    warningMorePayment()
+                }
+            } else if (type === 'card') {
+                const all =
+                    Number(value) +
+                    Number(paymentCashUzs) +
+                    Number(paymentTransferUzs)
+                if (all <= maxSumUzs) {
+                    setPaymentCardUzs(value)
+                    setPaidUzs(all)
+                } else {
+                    warningMorePayment()
+                }
+            } else {
+                const all =
+                    Number(value) +
+                    Number(paymentCashUzs) +
+                    Number(paymentCardUzs)
+                if (all <= maxSumUzs) {
+                    setPaymentTransfer(UzsToUsd(value, currency))
+                    setPaymentTransferUzs(value)
+                    setPaidUzs(all)
+                } else {
+                    warningMorePayment()
+                }
+            }
+        }
+    }
     // change payment type
     const handleChangePaymentType = (type) => {
         if (paymentType !== type) {
@@ -486,7 +536,7 @@ function Packman() {
                     'totalpriceuzs'
                 )
             )
-            .reduce((prev, item) => prev + item, 0)
+            .reduce((prev, item) => prev + item, 0)||0
     const calcTotalCommission = () =>
         (clickedPackman?.clients
             ?.map((client) =>
@@ -498,18 +548,18 @@ function Packman() {
             )
             .reduce((prev, item) => prev + item, 0) *
             clickedPackman?.commission) /
-        100
+            100 || 0
     const totalPayed = () =>
         clickedPackman?.payments?.reduce(
             (prev, item) => prev + item.paymentuzs,
             0
-        )
+        ) || 0
     const totalNotPayed = () =>
         clickedPackman?.commissionProfit -
-        clickedPackman?.payments?.reduce(
-            (prev, item) => prev + item.paymentuzs,
-            0
-        )
+            clickedPackman?.payments?.reduce(
+                (prev, item) => prev + item.paymentuzs,
+                0
+            ) || 0
     return (
         <motion.section
             key='content'
@@ -692,25 +742,25 @@ function Packman() {
                     <li className='flex items-center gap-x-2'>
                         <span className='font-semibold '>Umumiy savdo:</span>
                         <span className='font-semibold '>
-                            {calcTotalSum()} UZS
+                            {calcTotalSum().toLocaleString('ru-Ru')} UZS
                         </span>
                     </li>
                     <li className='flex items-center gap-x-2'>
                         <span className='font-semibold '>Komissiya:</span>
                         <span className='font-semibold '>
-                            {calcTotalCommission()} UZS
+                            {calcTotalCommission().toLocaleString('ru-Ru')} UZS
                         </span>
                     </li>
                     <li className='flex items-center gap-x-2'>
                         <span className='font-semibold '>To'langan:</span>
                         <span className='font-semibold '>
-                            {totalPayed()} UZS
+                            {totalPayed().toLocaleString('ru-Ru')} UZS
                         </span>
                     </li>
                     <li className='flex items-center gap-x-2'>
                         <span className='font-semibold '>To'lanmagan:</span>
                         <span className='font-semibold '>
-                            {totalNotPayed()} UZS
+                            {totalNotPayed()?.toLocaleString('ru-Ru')} UZS
                         </span>
                     </li>
                 </ul>

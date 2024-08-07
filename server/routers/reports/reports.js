@@ -723,13 +723,9 @@ module.exports.getPayment = async (req, res) => {
         ) || 0;
       let agentProfit = totalSum;
       if (payment.type === "mixed") {
-        const totalPayment = payment.cash + payment.card + payment.transfer;
-        const cashShare = payment.cash / totalPayment;
-        const cardShare = payment.card / totalPayment;
-        const transferShare = payment.transfer / totalPayment;
-        total.agentProfit.cashuzs += agentProfit * cashShare;
-        total.agentProfit.carduzs += agentProfit * cardShare;
-        total.agentProfit.transferuzs += agentProfit * transferShare;
+        total.agentProfit.cashuzs += payment.cashuzs;
+        total.agentProfit.carduzs += payment.carduzs;
+        total.agentProfit.transferuzs += payment.transferuzs;
       } else {
         total.agentProfit[payment.type + "uzs"] += agentProfit;
       }
