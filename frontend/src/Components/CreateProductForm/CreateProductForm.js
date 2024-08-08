@@ -167,14 +167,14 @@ function CreateProductForm({
                 <FieldContainer
                     value={productWidth}
                     onChange={handleChangeProductWidth}
-                    label={t(`O'lcham`)}
+                    label={t(`Eni`)}
                     placeholder={`${t('misol')}: 100 metr`}
                     type={'text'}
                 />
                  <FieldContainer
                     value={productHeight}
                     onChange={handleChangeProductHeight}
-                    label={t(`Bo'yi`)}
+                    label={t(`Uzunligi`)}
                     placeholder={`${t('misol')}: 100 metr`}
                     type={'text'}
                 />

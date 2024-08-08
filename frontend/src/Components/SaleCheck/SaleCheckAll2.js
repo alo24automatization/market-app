@@ -143,8 +143,9 @@ export const SaleCheckAll2 = forwardRef((props, ref) => {
                                             {item?.product?.productdata?.name}
                                         </div>
                                         {item?.forWhat !== "" || item.forWhat ?
-                                            <div className='text-start text-[12px] border  border-b-0 !text-black-900 p-1 pr-3 border-slate-400'>
+                                            <div className='flex justify-between text-[12px] border  border-b-0 !text-black-900 p-1 pr-3 border-slate-400'>
                                                 <b>{item?.forWhat}</b> {" "}
+                                                <b>{item?.pieces}</b> {" "}
                                             </div> : null
                                         }
                                         <table className='border-collapse border border-slate-400 w-full break-inside-auto'>

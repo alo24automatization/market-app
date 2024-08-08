@@ -152,8 +152,9 @@ export const SmallCheck2 = forwardRef((props, ref) => {
                                         </div>
                                         {item?.forWhat !== "" || item.forWhat ?
                                             <div
-                                                className='text-start text-[12px] border  border-b-0 !text-black-900 p-1 pr-3 border-slate-400'>
+                                                className='flex justify-between text-[12px] border  border-b-0 !text-black-900 p-1 pr-3 border-slate-400'>
                                                 <b>{item?.forWhat}</b>{" "}
+                                                <b>{item?.pieces}</b>{" "}
                                             </div> : null
                                         }
                                         <table

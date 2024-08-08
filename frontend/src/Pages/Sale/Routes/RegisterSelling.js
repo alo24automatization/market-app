@@ -1832,6 +1832,7 @@ const RegisterSelling = () => {
     const handlePieceInputsChange = (value, key) => {
         const validNumberRegex = /^[0-9]+(\.[0-9]*)?$/
         if (anableHight) {
+            console.log(key);
             if (validNumberRegex.test(value) || value === '') {
                 const updatedProduct = {...isClickedProduct, [key]: value}
                 if (key === 'size') {
@@ -1844,6 +1845,7 @@ const RegisterSelling = () => {
                         updatedProduct.length =(
                             updatedProduct.piece * updatedProduct?.height || 0
                         ).toFixed(2)
+                        updatedProduct.lengthAmout=updatedProduct.length 
                     }else{
                         updatedProduct.length=0
                         updatedProduct.piece=0
@@ -1858,7 +1860,6 @@ const RegisterSelling = () => {
                         updatedProduct.length =(
                             updatedProduct.piece * updatedProduct?.height || 0
                         ).toFixed(2)
-                       
                         updatedProduct.lengthAmout=updatedProduct.length 
                     }else{
                         updatedProduct.length=0;
@@ -1866,7 +1867,6 @@ const RegisterSelling = () => {
                     }
                 } else if (key === 'length') {
                     const lengthValue = value
-                    updatedProduct.lengthAmout = lengthValue
                     updatedProduct.length = lengthValue
                     if (value !== '') {
                         let pieces = lengthValue / updatedProduct.piece
@@ -1879,8 +1879,11 @@ const RegisterSelling = () => {
                         let old= (
                             updatedProduct.piece * updatedProduct?.height || 0
                         );
-                        updatedProduct.length=(old*value).toFixed(2)
+                        updatedProduct.length=(old*value).toFixed(2);
+                        updatedProduct.lengthAmout=updatedProduct.length
                         updatedProduct.pieces=Number(value) 
+                    const totalpriceuzs = convertToUzs(updatedProduct.sizePrice * Number(updatedProduct.length))
+                    updatedProduct.totalpriceuzs = totalpriceuzs;
                     }
                 }else if (key === 'sizePrice') {
                     const totalPieces =
@@ -1889,7 +1892,7 @@ const RegisterSelling = () => {
                         0;
                     updatedProduct.priceFromLengthAmout = Number(value)
                     // const totalprice = convertToUsd(totalPieces * value)
-                    const totalpriceuzs = convertToUzs(totalPieces * Number(value))
+                    const totalpriceuzs = convertToUzs(updatedProduct.sizePrice * Number(updatedProduct.length))
                     const sumUzs =
                         updatedProduct.pieces * updatedProduct.incomingpriceuzs
                     const sumUsd =
@@ -2017,6 +2020,7 @@ const RegisterSelling = () => {
             }
         }
     }
+    console.log(tableProducts);
 
     const handleParameters1InputsAdd = () => {
         const updatedProduct = {
@@ -2144,7 +2148,7 @@ const RegisterSelling = () => {
                         }}
                         className='flex gap-x-2 items-center pb-4'
                     >
-                        <span>{t("Bo'yi")}</span>{' '}
+                        <span>{t("Uzunligi")}</span>{' '}
                         <input
                             type='checkbox'
                             label={`Bo'lib sotish turi - ${modalProduct.mode}`}
