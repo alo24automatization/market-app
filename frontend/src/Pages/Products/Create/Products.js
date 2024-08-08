@@ -116,7 +116,8 @@ function Products() {
     const [tableRowId, setTableRowId] = useState('')
     const [modalOpen, setModalOpen] = useState(false)
     const [filterModal, setFilterModal] = useState(false)
-    const [productWidth, setProductWidth] = useState('')
+    const [productWidth, setProductWidth] = useState('');
+    const [productHeight, setProductHeight] = useState('');
     // modal toggle
     const toggleModal = () => setModalVisible(!modalVisible)
 
@@ -516,6 +517,7 @@ function Products() {
                         tradepriceuzs: tradePriceUzs,
                         minimumcount: minimumCount,
                         width: productWidth === "" ? 0 : productWidth,
+                        height: productHeight === "" ? 0 : productHeight,
                     },
                 }
                 dispatch(addProduct(body)).then(({ error }) => {
@@ -560,7 +562,8 @@ function Products() {
         setStickyForm(false)
         setSellingPriceOfProcient('')
         setTradePriceProcient('')
-        setProductWidth(0)
+        setProductWidth('')
+        setProductHeight('')
     }
     const handleEdit = (e) => {
         e.preventDefault()
@@ -624,6 +627,7 @@ function Products() {
                     tradepriceuzs: tradePriceUzs,
                     minimumcount: minimumCount,
                     width: productWidth === "" ? 0 : productWidth,
+                    height: productHeight === "" ? 0 : productHeight,
                 },
                 currentPage,
                 countPage: showByTotal,
@@ -707,6 +711,7 @@ function Products() {
         setTableRowId(ident)
         setCurrentProduct(product)
         setStickyForm(true)
+        
     }
     const handleDeleteProduct = (product) => {
         const body = {
@@ -851,6 +856,10 @@ function Products() {
     const handleChangeProductWidth = ({ target }) => {
         setProductWidth(target.value)
     }
+    const handleChangeProductHeight=({target})=>{
+        console.log(target.value);
+        setProductHeight(target.value)
+    }
     const handleError = () => {
         universalToast(`${t("Mahsulot kodi o'qilmadi!")}`, 'warning')
     }
@@ -954,6 +963,7 @@ function Products() {
                 category,
                 minimumcount,
                 width,
+                height,
                 price: {
                     sellingprice,
                     incomingprice,
@@ -966,6 +976,7 @@ function Products() {
             setCodeOfProduct(code)
             setNameOfProduct(name)
             setProductWidth(width)
+            setProductHeight(height)
             setNumberOfProduct(total)
             setUnitOfProduct({
                 value: unit._id,
@@ -1092,6 +1103,8 @@ function Products() {
                     categoryOfProduct={categoryOfProduct}
                     codeOfProduct={codeOfProduct}
                     checkOfProduct={checkOfProduct}
+                    productHeight={productHeight}
+                    handleChangeProductHeight={handleChangeProductHeight}
                     tradePriceProcient={tradePriceProcient}
                     handleChangeTradePriceProcient={
                         handleChangeTradePriceProcient
@@ -1154,6 +1167,8 @@ function Products() {
                             codeOfProduct={codeOfProduct}
                             checkOfProduct={checkOfProduct}
                             productWidth={productWidth}
+                            productHeight={productHeight}
+                            handleChangeProductHeight={handleChangeProductHeight}
                             handleChangeProductWidth={handleChangeProductWidth}
                             tradePriceProcient={tradePriceProcient}
                             handleChangeTradePriceProcient={

@@ -11,6 +11,8 @@ function CreateProductForm({
     nameOfProduct,
     numberOfProduct,
     handleChangeNumberOfProduct,
+    handleChangeProductHeight,
+    productHeight,
     unitOfProduct,
     handleChangeUnitOfProduct,
     handleChangePriceOfProduct,
@@ -165,7 +167,14 @@ function CreateProductForm({
                 <FieldContainer
                     value={productWidth}
                     onChange={handleChangeProductWidth}
-                    label={t('O`lcham')}
+                    label={t(`O'lcham`)}
+                    placeholder={`${t('misol')}: 100 metr`}
+                    type={'text'}
+                />
+                 <FieldContainer
+                    value={productHeight}
+                    onChange={handleChangeProductHeight}
+                    label={t(`Bo'yi`)}
                     placeholder={`${t('misol')}: 100 metr`}
                     type={'text'}
                 />

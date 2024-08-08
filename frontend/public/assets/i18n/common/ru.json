@@ -176,6 +176,7 @@
   "Kategoriya kodi": "Код категории",
   "Sotilganlar soni": "Проданные",
   "O`lcham":"Размер",
+  "Bo'yi": "Высота",
   "misol: Alo24": "пример: alo24",
   "Sotilganlar jami": "Всего Продано",
   "qidirish...": "поиск...",
@@ -328,6 +329,8 @@
   "Maxsulot": "Товар",
   "To'langan": "Оплачено",
   "Umumiy": "Общий",
+  "Sotish turini o'zgaritirish":"Изменение типа продажи",
+
   "ID": "ИД",
   "Mahsulot turi": "Тип товара",
   "misol: soliq uchun": "пример: налог",

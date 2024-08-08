@@ -34,7 +34,7 @@ const getProductsByCount = async ({ socket, market }) => {
         { timestamp: 1 }
       )
         .sort({ timestamp: -1 })
-        .select("market total productdata price category unit width minimumcount")
+        .select("market total productdata price category unit width height minimumcount")
         .populate("productdata", "name code barcode")
         .populate(
           "price",
@@ -153,7 +153,7 @@ const getPartnerProducts = async ({ socket, market, partner }) => {
         { timestamp: 1 }
       )
         .sort({ timestamp: -1 })
-        .select("market total productdata price category unit")
+        .select("market total productdata price category width height unit")
         .populate("productdata", "name code barcode")
         .populate(
           "price",
