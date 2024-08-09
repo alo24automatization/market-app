@@ -280,7 +280,7 @@ module.exports.getPackmans = async (req, res) => {
       market,
       packmans
     );
-
+    packmansWithAllProfitAndTotalSum.sort((a, b) => b.totalSum - a.totalSum);
     res.status(201).json({
       packmans: packmansWithAllProfitAndTotalSum,
       count: packmansCount,

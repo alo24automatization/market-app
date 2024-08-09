@@ -62,8 +62,8 @@ export const SmallCheck =   forwardRef((props, ref) => {
     return (
         <div ref={ref} className={'px-2'}>
             <div className='flex pb-2 flex-col text-center justify-center border-b-[0.8px] border-black-700'>
-                <div>
-                    <img src={market?.image} alt="logo" />
+                <div className='py-4 object-contain flex items-center justify-center'>
+                    <img src={market?.image} alt='logo' className='w-[170px] mx-auto  object-contain h-full'/>
                 </div>
                 {/* <h2 className='text-[16px] mb-4 font-bold'>{market.name}</h2> */}
                 <div className='flex justify-between items-center py-1 text-[12px] font-bold'>
@@ -74,7 +74,7 @@ export const SmallCheck =   forwardRef((props, ref) => {
                 </div>
                 <div className='flex justify-between items-center py-1 text-[12px] font-bold'>
                     {t('Manzil')}:
-                    <span className='text-[12px] text-black-900 font-bold' >
+                    <span className='text-[12px] text-black-900 font-bold'>
                         {market?.address}
                     </span>
                 </div>
