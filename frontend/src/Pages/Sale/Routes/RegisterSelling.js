@@ -1042,7 +1042,6 @@ const RegisterSelling = () => {
               )
             : allProducts.find((obj) => obj._id === option.value)
         const newID = uuidv4()
-        console.log(product)
         let currentProduct = {
             total: product.total,
             product: {
@@ -1832,7 +1831,6 @@ const RegisterSelling = () => {
     const handlePieceInputsChange = (value, key) => {
         const validNumberRegex = /^[0-9]+(\.[0-9]*)?$/
         if (anableHight) {
-            console.log(key);
             if (validNumberRegex.test(value) || value === '') {
                 const updatedProduct = {...isClickedProduct, [key]: value}
                 if (key === 'size') {
@@ -1842,28 +1840,28 @@ const RegisterSelling = () => {
                         updatedProduct.piece = parseFloat(
                             (updatedProduct.width / sizeValue).toFixed(2)
                         )
-                        updatedProduct.length =(
+                        updatedProduct.length = (
                             updatedProduct.piece * updatedProduct?.height || 0
                         ).toFixed(2)
-                        updatedProduct.lengthAmout=updatedProduct.length 
-                    }else{
-                        updatedProduct.length=0
-                        updatedProduct.piece=0
+                        updatedProduct.lengthAmout = updatedProduct.length
+                    } else {
+                        updatedProduct.length = 0
+                        updatedProduct.piece = 0
                     }
                 } else if (key === 'piece') {
                     const pieceValue = value
-                    updatedProduct.piece = pieceValue;
+                    updatedProduct.piece = pieceValue
                     if (value !== '') {
                         updatedProduct.size = parseFloat(
                             (updatedProduct.width / pieceValue).toFixed(2)
                         )
-                        updatedProduct.length =(
+                        updatedProduct.length = (
                             updatedProduct.piece * updatedProduct?.height || 0
                         ).toFixed(2)
-                        updatedProduct.lengthAmout=updatedProduct.length 
-                    }else{
-                        updatedProduct.length=0;
-                        updatedProduct.size=0;
+                        updatedProduct.lengthAmout = updatedProduct.length
+                    } else {
+                        updatedProduct.length = 0
+                        updatedProduct.size = 0
                     }
                 } else if (key === 'length') {
                     const lengthValue = value
@@ -1872,33 +1870,37 @@ const RegisterSelling = () => {
                         let pieces = lengthValue / updatedProduct.piece
                         updatedProduct.pieces = parseFloat(pieces.toFixed(2))
                     }
-                } else if(key==="product_piece"){
-                    if(value===""){
-                        updatedProduct.pieces=Number(value);    
-                    }else{
-                        let old= (
+                } else if (key === 'product_piece') {
+                    if (value === '') {
+                        updatedProduct.pieces = Number(value)
+                    } else {
+                        let old =
                             updatedProduct.piece * updatedProduct?.height || 0
-                        );
-                        updatedProduct.length=(old*value).toFixed(2);
-                        updatedProduct.lengthAmout=updatedProduct.length
-                        updatedProduct.pieces=Number(value) 
-                    const totalpriceuzs = convertToUzs(updatedProduct.sizePrice * Number(updatedProduct.length))
-                    updatedProduct.totalpriceuzs = totalpriceuzs;
+                        updatedProduct.length = (old * value).toFixed(2)
+                        updatedProduct.lengthAmout = updatedProduct.length
+                        updatedProduct.pieces = Number(value)
+                        const totalpriceuzs = convertToUzs(
+                            updatedProduct.sizePrice *
+                                Number(updatedProduct.length)
+                        )
+                        updatedProduct.totalpriceuzs = totalpriceuzs
                     }
-                }else if (key === 'sizePrice') {
+                } else if (key === 'sizePrice') {
                     const totalPieces =
                         Number(totalFromPieceProduct) ||
                         Number(updatedProduct.fromFilial) ||
-                        0;
+                        0
                     updatedProduct.priceFromLengthAmout = Number(value)
                     // const totalprice = convertToUsd(totalPieces * value)
-                    const totalpriceuzs = convertToUzs(updatedProduct.sizePrice * Number(updatedProduct.length))
+                    const totalpriceuzs = convertToUzs(
+                        updatedProduct.sizePrice * Number(updatedProduct.length)
+                    )
                     const sumUzs =
                         updatedProduct.pieces * updatedProduct.incomingpriceuzs
                     const sumUsd =
                         updatedProduct.pieces * updatedProduct.incomingprice
                     // updatedProduct.totalprice = totalprice
-                    updatedProduct.totalpriceuzs = totalpriceuzs;
+                    updatedProduct.totalpriceuzs = totalpriceuzs
                 }
 
                 // if (key === 'length' || key === 'piece' || key === 'size') {
@@ -1925,7 +1927,11 @@ const RegisterSelling = () => {
                 )
 
                 if (updatedProduct.pieces !== -1) {
-                    setTotalFromPieceProduct(isNaN(parseFloat(updatedProduct.pieces))?"":parseFloat(updatedProduct.pieces))
+                    setTotalFromPieceProduct(
+                        isNaN(parseFloat(updatedProduct.pieces))
+                            ? ''
+                            : parseFloat(updatedProduct.pieces)
+                    )
                 }
             } else if (key === 'forWhat') {
                 const updatedProduct = {...isClickedProduct, [key]: value}
@@ -1958,7 +1964,7 @@ const RegisterSelling = () => {
                         )
                     }
                 } else if (key === 'length') {
-                    const lengthValue = value   
+                    const lengthValue = value
                     updatedProduct.lengthAmout = lengthValue
                     updatedProduct.length = lengthValue
                     if (value !== '') {
@@ -2020,7 +2026,6 @@ const RegisterSelling = () => {
             }
         }
     }
-    console.log(tableProducts);
 
     const handleParameters1InputsAdd = () => {
         const updatedProduct = {
@@ -2112,6 +2117,25 @@ const RegisterSelling = () => {
             handleParamtersModalClose('2')
         }
     }
+    const changeHeightVisible = (e) => {
+        setAnableHight(e.target.checked)
+        const newObj = {
+            ...isClickedProduct,
+            columns: [],
+            size: '',
+            piece: '',
+            length: '',
+            forWhat: '',
+            sizePrice: '',
+            priceFromLengthAmout: '',
+            lengthAmout: '',
+            sizePrice: '',
+            piece: '',
+            pieces: 1,
+        }
+        setTotalFromPieceProduct('');
+        setIsClickedProduct(newObj)
+    }
     return (
         <div className={'flex grow relative overflow-auto'}>
             {loadingMakePayment && (
@@ -2148,12 +2172,12 @@ const RegisterSelling = () => {
                         }}
                         className='flex gap-x-2 items-center pb-4'
                     >
-                        <span>{t("Uzunligi")}</span>{' '}
+                        <span>{t('Uzunligi')}</span>{' '}
                         <input
                             type='checkbox'
                             label={`Bo'lib sotish turi - ${modalProduct.mode}`}
                             checked={anableHight}
-                            onChange={(e) => setAnableHight(e.target.checked)}
+                            onChange={changeHeightVisible}
                         />
                     </div>
                     <button
@@ -2292,7 +2316,6 @@ const RegisterSelling = () => {
                                             'product_piece'
                                         )
                                     }
-                                    
                                 />
                             </div>
                             <div className='grid grid-cols-2 gap-x-2'>
@@ -2376,7 +2399,6 @@ const RegisterSelling = () => {
                                     label={t('Maxsulot miqdori')}
                                     type={'text'}
                                     value={totalFromPieceProduct}
-
                                 />
                                 <FieldContainer
                                     placeholder={t('Maxsulot')}
