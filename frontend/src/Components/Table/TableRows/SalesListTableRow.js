@@ -400,13 +400,13 @@ export const SalesListTableRow = ({
                                                 )
                                             }
                                         />
-                                        <TableBtn
+                                        {/* <TableBtn
                                             type={'add'}
                                             bgcolor={'bg-success-500'}
                                             onClick={() =>
                                                 linkToSale(saleconnector)
                                             }
-                                        />
+                                        /> */}
                                         {login.user.type === "Seller" ? null :
                                             <TableBtn
                                                 type={'delete'}

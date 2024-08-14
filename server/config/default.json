@@ -1,7 +1,7 @@
 {
   "PORT": 8801,
   "mongoUriONLINE": "mongodb+srv://fullstackdeveloper4413:_DVvp%YLyq2cT3A@mydb.svis6ii.mongodb.net/market?retryWrites=true&w=majority",
-  "mongoUri":"mongodb://127.0.0.1/market",
+  "mongoUri":"mongodb://127.0.0.1/market-bazaV1",
   "jwtSecret": "market",
   "baseUrl": "http://localhost:8801" 
 }

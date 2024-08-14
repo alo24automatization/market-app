@@ -1777,7 +1777,7 @@ const RegisterSelling = () => {
                     })
                 return ''
             })
-
+            
             setReturnProducts(
                 filter(returned, (product) => product.product.pieces > 0)
             )
