@@ -283,13 +283,13 @@ module.exports.register = async (req, res) => {
             if (!findedMarket) {
                return res.status(400).json({message: "Market not found!"});
             }
-            await sendMessageToClientAboutHisDebt(
-                client,
-                debt.debtuzs,
-                debt.pay_end_date,
-                use.phone,
-                findedMarket
-            );
+            // await sendMessageToClientAboutHisDebt(
+            //     client,
+            //     debt.debtuzs,
+            //     debt.pay_end_date,
+            //     use.phone,
+            //     findedMarket
+            // );
         }
 
         if (payment.totalprice > 0) {
