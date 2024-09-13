@@ -263,7 +263,6 @@ module.exports.register = async (req, res) => {
         }
 
         if (debt.debtuzs > 0) {
-
             const newDebt = new Debt({
                 comment: comment,
                 debt: convertToUsd(debt.debt),
@@ -282,15 +281,15 @@ module.exports.register = async (req, res) => {
             dailysaleconnector.debt = newDebt._id;
             const findedMarket = await Market.findById(market);
             if (!findedMarket) {
-                res.status(400).json({message: "Market not found!"});
+               return res.status(400).json({message: "Market not found!"});
             }
-            await sendMessageToClientAboutHisDebt(
-                client,
-                debt.debtuzs,
-                debt.pay_end_date,
-                use.phone,
-                findedMarket
-            );
+            // await sendMessageToClientAboutHisDebt(
+            //     client,
+            //     debt.debtuzs,
+            //     debt.pay_end_date,
+            //     use.phone,
+            //     findedMarket
+            // );
         }
 
         if (payment.totalprice > 0) {
