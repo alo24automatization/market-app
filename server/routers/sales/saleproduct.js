@@ -454,74 +454,41 @@ module.exports.register = async (req, res) => {
         // console.log('========================');
         // console.log("after old for", (performance.now() - start)/1000);
 
-        //   // ==========================================
-        // const connectorIds = saleconnectors.map(connector => connector._id);
+        const connectorIds = saleconnectors.map(connector => connector._id);
 
-        // const [allProducts, allPayments, allDiscounts] = await Promise.all([
-        //     SaleProduct.find({ saleconnector: { $in: connectorIds } }).lean(),
-        //     Payment.find({ saleconnector: { $in: connectorIds } }).lean(),
-        //     Discount.find({ saleconnector: { $in: connectorIds } }).lean(),
-        // ]);
+        const [allProducts, allPayments, allDiscounts] = await Promise.all([
+            SaleProduct.find({ saleconnector: { $in: connectorIds } }).lean(),
+            Payment.find({ saleconnector: { $in: connectorIds } }).lean(),
+            Discount.find({ saleconnector: { $in: connectorIds } }).lean(),
+        ]);
 
-        // const productsByConnector = {};
-        // allProducts.forEach(product => {
-        //     productsByConnector[product.saleconnector] = (productsByConnector[product.saleconnector] || 0) + product.totalpriceuzs;
-        // });
+        const productsByConnector = {};
+        allProducts.forEach(product => {
+            productsByConnector[product.saleconnector] = (productsByConnector[product.saleconnector] || 0) + product.totalpriceuzs;
+        });
 
-        // const paymentsByConnector = {};
-        // allPayments.forEach(payment => {
-        //     paymentsByConnector[payment.saleconnector] = (paymentsByConnector[payment.saleconnector] || 0) + payment.paymentuzs;
-        // });
+        const paymentsByConnector = {};
+        allPayments.forEach(payment => {
+            paymentsByConnector[payment.saleconnector] = (paymentsByConnector[payment.saleconnector] || 0) + payment.paymentuzs;
+        });
 
-        // const discountsByConnector = {};
-        // allDiscounts.forEach(discount => {
-        //     discountsByConnector[discount.saleconnector] = (discountsByConnector[discount.saleconnector] || 0) + discount.discountuzs;
-        // });
+        const discountsByConnector = {};
+        allDiscounts.forEach(discount => {
+            discountsByConnector[discount.saleconnector] = (discountsByConnector[discount.saleconnector] || 0) + discount.discountuzs;
+        });
 
-        // saleconnectors.forEach(connector => {
-        //     const productstotaluzs = productsByConnector[connector._id] || 0;
-        //     const paymentstotaluzs = paymentsByConnector[connector._id] || 0;
-        //     const discountstotaluzs = discountsByConnector[connector._id] || 0;
+        saleconnectors.forEach(connector => {
+            const productstotaluzs = productsByConnector[connector._id] || 0;
+            const paymentstotaluzs = paymentsByConnector[connector._id] || 0;
+            const discountstotaluzs = discountsByConnector[connector._id] || 0;
 
-        //     const totaldebtuzs = productstotaluzs - paymentstotaluzs - discountstotaluzs;
+            const totaldebtuzs = productstotaluzs - paymentstotaluzs - discountstotaluzs;
 
-        //     filteredProductsSale.push({ totaldebtuzs });
-        // });
-        // // ==========================================
+            filteredProductsSale.push({ totaldebtuzs });
+        });
         // console.log('========================');
         // console.log("after new for", (performance.now() - start) / 1000);
  // NEW ======================================
-           // OLD ======================================
-        for (const connector of saleconnectors) {
-            const products = await SaleProduct.find({
-                saleconnector: connector._id,
-            }).lean();
-            const productstotaluzs = [...products].reduce(
-                (prev, el) => prev + el.totalpriceuzs,
-                0
-            );
-            const payments = await Payment.find({
-                saleconnector: connector._id,
-            }).lean();
-            const paymentstotaluzs = [...payments].reduce(
-                (prev, el) => prev + el.paymentuzs,
-                0
-            );
-
-            const discounts = await Discount.find({
-                saleconnector: connector._id,
-            }).lean();
-
-            const discountstotaluzs = [...discounts].reduce(
-                (prev, el) => prev + el.discountuzs,
-                0
-            );
-            totaldebtuzs = productstotaluzs - paymentstotaluzs - discountstotaluzs;
-            filteredProductsSale.push({
-                totaldebtuzs: totaldebtuzs,
-            });
-        }
-        // OLD ======================================
 
         totaldebtuzs =
             filteredProductsSale.length > 0
