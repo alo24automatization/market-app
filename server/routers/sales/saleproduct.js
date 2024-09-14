@@ -56,6 +56,7 @@ const transferWarhouseProducts = async (products) => {
 };
 module.exports.register = async (req, res) => {
     const start = performance.now()
+    start
     try {
         let {
             saleproducts,
