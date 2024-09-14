@@ -37,7 +37,7 @@ import {
 import {getProducts} from '../../Incomings/incomingSlice.js'
 import SessionBtn from '../../../Components/Buttons/SessionBtn.js'
 
-const Sellings = ({id}) => {
+const Sellings = ({ id }) => {
     const {t} = useTranslation(['common'])
     const headers = [
         {
@@ -89,7 +89,7 @@ const Sellings = ({id}) => {
     const [storeData, setStoreData] = useState(sellings)
     const [filteredDataTotal, setFilteredDataTotal] = useState(total)
     const [searchedData, setSearchedData] = useState(searchedSellings)
-    const [showByTotal, setShowByTotal] = useState(50)
+    const [showByTotal, setShowByTotal] = useState(2)
     const [currentPage, setCurrentPage] = useState(0)
     const [searchingStatus,setSearchingStatus]=useState(false)
     const [search, setSearch] = useState({
