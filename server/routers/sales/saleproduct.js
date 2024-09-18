@@ -54,8 +54,8 @@ const transferWarhouseProducts = async (products) => {
         await warhouseproduct.save();
     }
 };
+
 module.exports.register = async (req, res) => {
-    const start = performance.now()
     try {
         let {
             saleproducts,
@@ -263,6 +263,7 @@ module.exports.register = async (req, res) => {
         }
 
         if (debt.debtuzs > 0) {
+
             const newDebt = new Debt({
                 comment: comment,
                 debt: convertToUsd(debt.debt),
@@ -281,7 +282,7 @@ module.exports.register = async (req, res) => {
             dailysaleconnector.debt = newDebt._id;
             const findedMarket = await Market.findById(market);
             if (!findedMarket) {
-               return res.status(400).json({message: "Market not found!"});
+                res.status(400).json({message: "Market not found!"});
             }
             await sendMessageToClientAboutHisDebt(
                 client,
@@ -448,47 +449,35 @@ module.exports.register = async (req, res) => {
             .populate("user", "firstname lastname")
             .populate("dailyconnectors", "comment ")
             .lean();
+        for (const connector of saleconnectors) {
+            const products = await SaleProduct.find({
+                saleconnector: connector._id,
+            }).lean();
+            const productstotaluzs = [...products].reduce(
+                (prev, el) => prev + el.totalpriceuzs,
+                0
+            );
+            const payments = await Payment.find({
+                saleconnector: connector._id,
+            }).lean();
+            const paymentstotaluzs = [...payments].reduce(
+                (prev, el) => prev + el.paymentuzs,
+                0
+            );
 
-        // NEW ======================================
-        // console.log('========================');
-        // console.log("after old for", (performance.now() - start)/1000);
+            const discounts = await Discount.find({
+                saleconnector: connector._id,
+            }).lean();
 
-        const connectorIds = saleconnectors.map(connector => connector._id);
-
-        const [allProducts, allPayments, allDiscounts] = await Promise.all([
-            SaleProduct.find({ saleconnector: { $in: connectorIds } }).lean(),
-            Payment.find({ saleconnector: { $in: connectorIds } }).lean(),
-            Discount.find({ saleconnector: { $in: connectorIds } }).lean(),
-        ]);
-
-        const productsByConnector = {};
-        allProducts.forEach(product => {
-            productsByConnector[product.saleconnector] = (productsByConnector[product.saleconnector] || 0) + product.totalpriceuzs;
-        });
-
-        const paymentsByConnector = {};
-        allPayments.forEach(payment => {
-            paymentsByConnector[payment.saleconnector] = (paymentsByConnector[payment.saleconnector] || 0) + payment.paymentuzs;
-        });
-
-        const discountsByConnector = {};
-        allDiscounts.forEach(discount => {
-            discountsByConnector[discount.saleconnector] = (discountsByConnector[discount.saleconnector] || 0) + discount.discountuzs;
-        });
-
-        saleconnectors.forEach(connector => {
-            const productstotaluzs = productsByConnector[connector._id] || 0;
-            const paymentstotaluzs = paymentsByConnector[connector._id] || 0;
-            const discountstotaluzs = discountsByConnector[connector._id] || 0;
-
-            const totaldebtuzs = productstotaluzs - paymentstotaluzs - discountstotaluzs;
-
-            filteredProductsSale.push({ totaldebtuzs });
-        });
-        // console.log('========================');
-        // console.log("after new for", (performance.now() - start) / 1000);
- // NEW ======================================
-
+            const discountstotaluzs = [...discounts].reduce(
+                (prev, el) => prev + el.discountuzs,
+                0
+            );
+            totaldebtuzs = productstotaluzs - paymentstotaluzs - discountstotaluzs;
+            filteredProductsSale.push({
+                totaldebtuzs: totaldebtuzs,
+            });
+        }
         totaldebtuzs =
             filteredProductsSale.length > 0
                 ? filteredProductsSale.reduce((sum, item) => sum + item.totaldebtuzs, 0)
