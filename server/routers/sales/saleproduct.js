@@ -54,8 +54,9 @@ const transferWarhouseProducts = async (products) => {
         await warhouseproduct.save();
     }
 };
-
 module.exports.register = async (req, res) => {
+    const start = performance.now()
+    start
     try {
         let {
             saleproducts,
@@ -263,7 +264,6 @@ module.exports.register = async (req, res) => {
         }
 
         if (debt.debtuzs > 0) {
-
             const newDebt = new Debt({
                 comment: comment,
                 debt: convertToUsd(debt.debt),
@@ -282,7 +282,7 @@ module.exports.register = async (req, res) => {
             dailysaleconnector.debt = newDebt._id;
             const findedMarket = await Market.findById(market);
             if (!findedMarket) {
-                res.status(400).json({message: "Market not found!"});
+               return res.status(400).json({message: "Market not found!"});
             }
             await sendMessageToClientAboutHisDebt(
                 client,
@@ -449,35 +449,47 @@ module.exports.register = async (req, res) => {
             .populate("user", "firstname lastname")
             .populate("dailyconnectors", "comment ")
             .lean();
-        for (const connector of saleconnectors) {
-            const products = await SaleProduct.find({
-                saleconnector: connector._id,
-            }).lean();
-            const productstotaluzs = [...products].reduce(
-                (prev, el) => prev + el.totalpriceuzs,
-                0
-            );
-            const payments = await Payment.find({
-                saleconnector: connector._id,
-            }).lean();
-            const paymentstotaluzs = [...payments].reduce(
-                (prev, el) => prev + el.paymentuzs,
-                0
-            );
 
-            const discounts = await Discount.find({
-                saleconnector: connector._id,
-            }).lean();
+        // NEW ======================================
+        // console.log('========================');
+        // console.log("after old for", (performance.now() - start)/1000);
 
-            const discountstotaluzs = [...discounts].reduce(
-                (prev, el) => prev + el.discountuzs,
-                0
-            );
-            totaldebtuzs = productstotaluzs - paymentstotaluzs - discountstotaluzs;
-            filteredProductsSale.push({
-                totaldebtuzs: totaldebtuzs,
-            });
-        }
+        const connectorIds = saleconnectors.map(connector => connector._id);
+
+        const [allProducts, allPayments, allDiscounts] = await Promise.all([
+            SaleProduct.find({ saleconnector: { $in: connectorIds } }).lean(),
+            Payment.find({ saleconnector: { $in: connectorIds } }).lean(),
+            Discount.find({ saleconnector: { $in: connectorIds } }).lean(),
+        ]);
+
+        const productsByConnector = {};
+        allProducts.forEach(product => {
+            productsByConnector[product.saleconnector] = (productsByConnector[product.saleconnector] || 0) + product.totalpriceuzs;
+        });
+
+        const paymentsByConnector = {};
+        allPayments.forEach(payment => {
+            paymentsByConnector[payment.saleconnector] = (paymentsByConnector[payment.saleconnector] || 0) + payment.paymentuzs;
+        });
+
+        const discountsByConnector = {};
+        allDiscounts.forEach(discount => {
+            discountsByConnector[discount.saleconnector] = (discountsByConnector[discount.saleconnector] || 0) + discount.discountuzs;
+        });
+
+        saleconnectors.forEach(connector => {
+            const productstotaluzs = productsByConnector[connector._id] || 0;
+            const paymentstotaluzs = paymentsByConnector[connector._id] || 0;
+            const discountstotaluzs = discountsByConnector[connector._id] || 0;
+
+            const totaldebtuzs = productstotaluzs - paymentstotaluzs - discountstotaluzs;
+
+            filteredProductsSale.push({ totaldebtuzs });
+        });
+        // console.log('========================');
+        // console.log("after new for", (performance.now() - start) / 1000);
+ // NEW ======================================
+
         totaldebtuzs =
             filteredProductsSale.length > 0
                 ? filteredProductsSale.reduce((sum, item) => sum + item.totaldebtuzs, 0)
@@ -856,7 +868,6 @@ module.exports.addproducts = async (req, res) => {
             .json({error: "Serverda xatolik yuz berdi...", message: error.message});
     }
 };
-console.log('change!');
 const sendMessageToClientAboutHisDebt = async (
     client,
     debtUzs,
@@ -924,7 +935,6 @@ module.exports.check = async (req, res) => {
 };
 
 module.exports.getsaleconnectors = async (req, res) => {
-    const start = performance.now()
     try {
         const {
             market,
@@ -935,8 +945,8 @@ module.exports.getsaleconnectors = async (req, res) => {
             search,
             filialId,
         } = req.body;
-        
         const marketId = filialId || market;
+
         const marke = await Market.findById(marketId);
         if (!marke) {
             return res.status(400).json({
@@ -944,21 +954,11 @@ module.exports.getsaleconnectors = async (req, res) => {
             });
         }
 
-        const id = new RegExp(".*" + (search ? search.id : "") + ".*", "i");
-        const name = new RegExp(".*" + (search ? search.client : "") + ".*", "i");
-        // const product = new RegExp(".*" + (search ? search.product : "") + ".*", "i");
+        const id = new RegExp(".*" + search ? search.id : "" + ".*", "i");
 
-        const skip = countPage * currentPage;
-        const limit = countPage;
-        // Get total count of matching sale connectors (without pagination)
-        const totalCount = await SaleConnector.countDocuments({
-            market: marketId,
-            id,
-            updatedAt: {
-                $gte: startDate,
-                $lt: endDate,
-            },
-        });
+        const name = new RegExp(".*" + search ? search.client : "" + ".*", "i");
+
+        const product = new RegExp(".*" + search ? search.product : "" + ".*", "i");
 
         const saleconnectors = await SaleConnector.find({
             market: marketId,
@@ -969,7 +969,7 @@ module.exports.getsaleconnectors = async (req, res) => {
             },
         })
             .select("-isArchive -market -__v")
-            .sort({ updatedAt: -1 })
+            .sort({updatedAt: -1})
             .populate("debts")
             .populate({
                 path: "products",
@@ -985,20 +985,20 @@ module.exports.getsaleconnectors = async (req, res) => {
                 populate: {
                     path: "product",
                     select: "category",
-                    populate: { path: "category", select: "code" },
+                    populate: {path: "category", select: "code"},
                 },
             })
             .populate({
                 path: "products",
                 select:
                     "totalprice  unitprice totalpriceuzs unitpriceuzs pieces createdAt discount saleproducts product fromFilial",
-                options: { sort: { createdAt: -1 } },
+                options: {sort: {createdAt: -1}},
                 populate: {
                     path: "product",
                     select: "productdata",
                     populate: {
                         path: "productdata",
-                        select: "name code",
+                        select: "name code", // match: {name: product}
                     },
                 },
             })
@@ -1006,7 +1006,7 @@ module.exports.getsaleconnectors = async (req, res) => {
                 path: "products",
                 select:
                     "totalprice  priceFromLengthAmout lengthAmout sizePrice forWhat more_parameters1 more_parameters2 unitprice totalpriceuzs unitpriceuzs pieces createdAt discount saleproducts product fromFilial",
-                options: { sort: { createdAt: -1 } },
+                options: {sort: {createdAt: -1}},
                 populate: {
                     path: "saleproducts",
                     select: "pieces totalprice totalpriceuzs",
@@ -1022,17 +1022,17 @@ module.exports.getsaleconnectors = async (req, res) => {
             )
             .populate({
                 path: "client",
-                match: { name: name },
+                match: {name: name},
                 select: "name phoneNumber",
             })
             .populate("packman", "name")
             .populate("user", "firstname lastname")
-            .populate("dailyconnectors", "comment")
-            .skip(skip)
-            .limit(limit)
+            .populate("dailyconnectors", "comment ")
+            .limit(countPage)
             .lean()
             .then((connectors) => {
-                return connectors.filter(
+                return filter(
+                    connectors,
                     (connector) =>
                         ((search.client.length > 0 &&
                                 connector.client !== null &&
@@ -1045,66 +1045,90 @@ module.exports.getsaleconnectors = async (req, res) => {
                         )
                 );
             });
-
+        let totaldebtusd = 0;
+        let totaldebtuzs = 0;
         let filteredProductsSale = [];
-        console.log('========================');
-        console.log("before old loop", (performance.now()-start)/1000);
-const filterByDate = (items, startDate, endDate) => {
-    return items.filter(item => 
-        new Date(item.createdAt) > new Date(startDate) && 
-        new Date(item.createdAt) < new Date(endDate)
-    );
-};
+        for (const connector of saleconnectors) {
+            const filterProducts = connector.products.filter((product) => {
+                return (
+                    new Date(product.createdAt) > new Date(startDate) &&
+                    new Date(product.createdAt) < new Date(endDate)
+                );
+            });
+            const filterPayment = connector.payments.filter((payment) => {
+                return (
+                    new Date(payment.createdAt) > new Date(startDate) &&
+                    new Date(payment.createdAt) < new Date(endDate)
+                );
+            });
+            const filterDiscount = connector.discounts.filter((discount) => {
+                return (
+                    new Date(discount.createdAt) > new Date(startDate) &&
+                    new Date(discount.createdAt) < new Date(endDate)
+                );
+            });
 
-for (const connector of saleconnectors) {
-    // Fetch products, payments, and discounts in parallel
-    const [products, payments, discounts] = await Promise.all([
-        SaleProduct.find({ saleconnector: connector._id }).lean(),
-        Payment.find({ saleconnector: connector._id }).lean(),
-        Discount.find({ saleconnector: connector._id }).lean(),
-    ]);
+            const products = await SaleProduct.find({
+                saleconnector: connector._id,
+            }).lean();
+            const productstotalusd = [...products].reduce(
+                (prev, el) => prev + el.totalprice,
+                0
+            );
+            const productstotaluzs = [...products].reduce(
+                (prev, el) => prev + el.totalpriceuzs,
+                0
+            );
+            const payments = await Payment.find({
+                saleconnector: connector._id,
+            }).lean();
+            const paymentstotalusd = [...payments].reduce(
+                (prev, el) => prev + el.payment,
+                0
+            );
+            const paymentstotaluzs = [...payments].reduce(
+                (prev, el) => prev + el.paymentuzs,
+                0
+            );
 
-    // Filter products, payments, and discounts by date
-    const filterProducts = filterByDate(connector.products, startDate, endDate);
-    const filterPayment = filterByDate(connector.payments, startDate, endDate);
-    const filterDiscount = filterByDate(connector.discounts, startDate, endDate);
+            const discounts = await Discount.find({
+                saleconnector: connector._id,
+            }).lean();
 
-    // Get total sums for products, payments, and discounts
-    const productstotalusd = products.reduce((total, p) => total + p.totalprice, 0);
-    const productstotaluzs = products.reduce((total, p) => total + p.totalpriceuzs, 0);
-    const paymentstotalusd = payments.reduce((total, p) => total + p.payment, 0);
-    const paymentstotaluzs = payments.reduce((total, p) => total + p.paymentuzs, 0);
-    const discountstotalusd = discounts.reduce((total, d) => total + d.discount, 0);
-    const discountstotaluzs = discounts.reduce((total, d) => total + d.discountuzs, 0);
+            const discountstotalusd = [...discounts].reduce(
+                (prev, el) => prev + el.discount,
+                0
+            );
+            const discountstotaluzs = [...discounts].reduce(
+                (prev, el) => prev + el.discountuzs,
+                0
+            );
 
-    // Calculate total debts
-    const totaldebtusd = productstotalusd - paymentstotalusd - discountstotalusd;
-    const totaldebtuzs = productstotaluzs - paymentstotaluzs - discountstotaluzs;
-
-    // Push the result into the filteredProductsSale array
-    filteredProductsSale.push({
-        _id: connector._id,
-        dailyconnectors: connector.dailyconnectors,
-        discounts: filterDiscount,
-        debts: connector.debts.length > 0 ? [connector.debts[connector.debts.length - 1]] : connector.debts,
-        user: connector.user,
-        createdAt: connector.createdAt,
-        updatedAt: connector.updatedAt,
-        client: connector.client,
-        id: connector.id,
-        products: filterProducts,
-        payments: filterPayment,
-        saleconnector: connector,
-        totaldebtusd,
-        totaldebtuzs,
-    });
-}
-
-        console.log('========================');
-        console.log("after old loop", (performance.now()-start)/1000);
-
-        // Same debt mapping and updating logic as before
+            totaldebtusd = productstotalusd - paymentstotalusd - discountstotalusd;
+            totaldebtuzs = productstotaluzs - paymentstotaluzs - discountstotaluzs;
+            filteredProductsSale.push({
+                _id: connector._id,
+                dailyconnectors: connector.dailyconnectors,
+                discounts: filterDiscount,
+                debts:
+                    connector.debts.length > 0
+                        ? [connector.debts[connector.debts.length - 1]]
+                        : connector.debts,
+                user: connector.user,
+                createdAt: connector.createdAt,
+                updatedAt: connector.updatedAt,
+                client: connector.client,
+                id: connector.id,
+                products: filterProducts,
+                payments: filterPayment,
+                saleconnector: connector,
+                totaldebtusd: totaldebtusd,
+                totaldebtuzs: totaldebtuzs,
+            });
+        }
         let clientDebtMap = new Map();
+
+        // Step 1: Sum the totaldebtuzs for each client
         filteredProductsSale.forEach((sale) => {
             if (sale && sale.client && sale.client._id) {
                 const clientId = sale.client._id;
@@ -1113,6 +1137,7 @@ for (const connector of saleconnectors) {
             }
         });
 
+        // Step 2: Update each sale connector with the total debt for its client
         filteredProductsSale.forEach((sale) => {
             if (sale && sale.client && sale.client._id) {
                 const clientId = sale.client._id;
@@ -1120,17 +1145,17 @@ for (const connector of saleconnectors) {
             }
         });
 
-        // Send response
+        // send response
+        const count = filteredProductsSale.length;
         res.status(200).json({
             saleconnectors: filteredProductsSale,
-            count: totalCount,
+            count,
         });
     } catch (error) {
         console.log(error.message);
-        res.status(400).json({ error: "Serverda xatolik yuz berdi..." });
+        res.status(400).json({error: "Serverda xatolik yuz berdi..."});
     }
 };
-
 
 module.exports.getsaleconnectorsexcel = async (req, res) => {
     try {
