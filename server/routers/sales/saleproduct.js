@@ -868,6 +868,7 @@ module.exports.addproducts = async (req, res) => {
             .json({error: "Serverda xatolik yuz berdi...", message: error.message});
     }
 };
+console.log('change!');
 const sendMessageToClientAboutHisDebt = async (
     client,
     debtUzs,
