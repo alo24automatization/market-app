@@ -10,7 +10,7 @@ const {start} = require("./connectDB/db");
 const {socketIO} = require("./socketio/socket");
 const {routers} = require("./routers/routers");
 const mongoose = require("mongoose");
-const {sendMessage} = require("./routers/globalFunctions");
+const {sendMessage, sendMessageFromMorning} = require("./routers/globalFunctions");
 const io = new Server(server, {
     cors: {
         origin: "*",
@@ -37,7 +37,7 @@ if (process.env.NODE_ENV === "production") {
     });
 }
 schedule.scheduleJob('0 9 * * *', async () => {
-    await sendMessage();
+    await sendMessageFromMorning();
 });
 // (async () => {
 //     await sendMessage();
