@@ -3,7 +3,6 @@ import {IoChevronBack, IoChevronForward} from 'react-icons/io5'
 import ReactPaginate from 'react-paginate'
 
 const Pagination = ({ countPage, totalDatas, setCurrentPage, currentPage }) => {
-    console.log({ countPage, totalDatas, setCurrentPage, currentPage });
     const pageNumbers = []
 
     for (let i = 1; i <= Math.ceil(totalDatas / countPage); i++) {

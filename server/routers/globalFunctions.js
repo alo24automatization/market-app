@@ -193,7 +193,8 @@ const sendMessage = async () => {
 };
 
 //   sendMessageFromMorning
-const sendMessageFromMorning = async () => {
+const sendMessageFromMorning = async (sendLog = function () {}) => {
+  sendLog("Morning message sending has started!");
   console.log("Morning message sending has started!");
   const formatMessage = (
     name,
@@ -209,10 +210,10 @@ const sendMessageFromMorning = async () => {
       return `Xurmatli ${name} sizni ${market_name} dan ${debt} uzs miqdorda qarzingiz mavjud. ${pay_end_date} gacha to'lovni amalga oshiring. Murojat uchun ${market_number}`;
     }
   };
+  let currentClient = { phone: "", fullname: "" };
   try {
     const now = moment();
     const saleConnectors = await SaleConnector.find();
-
     const debtsreport = await Promise.all(
       saleConnectors.map(async (sale) => {
         const payments = await Payment.find({ _id: { $in: sale.payments } });
@@ -251,9 +252,12 @@ const sendMessageFromMorning = async () => {
     const filteredDebtsReport = debtsreport.filter(
       (sales) => sales.debtuzs > 0
     );
-    const delayBetweenMessages = 60 * 1000;
-
+    let count = 1;
     for (const debt of filteredDebtsReport) {
+      if(isStoppedSendMorningMessage){
+        sendLog("Sending end",false)
+        break;
+      }
       const debtEndDate = moment(debt.pay_end_date);
       const daysUntilPayment = debtEndDate.diff(now, "days");
       const isOverdue = daysUntilPayment < 0;
@@ -267,11 +271,13 @@ const sendMessageFromMorning = async () => {
           populate: "director",
         });
         const { market } = client;
-        const SMS_API_KEY = market.SMS_API_KEY;
+        const SMS_API_KEY = market.SMS_API_KEY + "demoAPI";
         const validPhoneNumber =
           client.phoneNumber && client.phoneNumber.startsWith("+998")
             ? client.phoneNumber.slice(4)
             : client.phoneNumber;
+        (currentClient.fullname = client.name),
+          (currentClient.phone = client.phoneNumber);
         if (SMS_API_KEY) {
           const response = await axios.get(
             `https://smsapp.uz/new/services/send.php?key=${SMS_API_KEY}&number=${validPhoneNumber}&message=${formatMessage(
@@ -283,16 +289,35 @@ const sendMessageFromMorning = async () => {
               isOverdue
             )}`
           );
-          await new Promise((resolve) =>
-            setTimeout(resolve, delayBetweenMessages)
+          sendLog(
+            `[${count}] Morning message sending ended! success: ${
+              response.data.success
+            } - client phoneNumber: ${
+              currentClient.phone + "  client name:" + currentClient.fullname
+            }`,!response.data.success
           );
           console.log(
-            `Morning message sending ended! success: ${response.data.success}`
+            `[${count}] Morning message sending ended! success: ${
+              response.data.success
+            } - client phoneNumber: ${
+              currentClient.phone + "  client name:" + currentClient.fullname
+            }`
           );
+          count++;
         }
       }
     }
   } catch (error) {
+    sendLog(
+      `Error: client phoneNumber: ${
+        currentClient.phone + "  client name:" + currentClient.fullname
+      }`,true
+    )
+    console.error(
+      `Error: client phoneNumber: ${
+        currentClient.phone + "  client name:" + currentClient.fullname
+      }`,true
+    );
     console.error("Failed to send morning message:", error.message);
   }
 };

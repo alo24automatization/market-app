@@ -882,7 +882,6 @@ module.exports.getDebtsReport = async (req, res) => {
         }
       } else {
         // Handle the case where sale.client is undefined or doesn't have an _id
-        console.warn("Skipping sale with undefined client or client._id", sale);
         return false;
       }
     });

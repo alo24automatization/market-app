@@ -157,7 +157,6 @@ module.exports.updatemarkets = async (req, res) => {
 
     for (const filial of market.filials) {
       const check = await Market.findById(filial)
-      console.log(check); 
       if (check.mainmarket) {
         const filteredId = market.filials.filter(el => String(el) !== String(filial))
         await Market.findByIdAndUpdate(filial, {
