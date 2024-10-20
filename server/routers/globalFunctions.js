@@ -271,7 +271,7 @@ const sendMessageFromMorning = async (sendLog = function () {}) => {
           populate: "director",
         });
         const { market } = client;
-        const SMS_API_KEY = market.SMS_API_KEY + "demoAPI";
+        const SMS_API_KEY = market.SMS_API_KEY;
         const validPhoneNumber =
           client.phoneNumber && client.phoneNumber.startsWith("+998")
             ? client.phoneNumber.slice(4)
