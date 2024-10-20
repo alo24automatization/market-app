@@ -2,6 +2,7 @@ import { lazy, useEffect } from 'react'
 import { map, uniqueId } from 'lodash'
 import { Route, Redirect, Navigate } from 'react-router-dom'
 import SmsApi from './EditProfile/SmsApi.js'
+import MessageLogs from './MessageLogs/MessageLogs.js'
 // pages -->
 const SellersReport = lazy(() => import('./Seller/SellersReport.js'))
 const ProductReport = lazy(() => import('./ProductReport/ProductReport.js'))
@@ -362,6 +363,10 @@ const adminRoutes = [
     {
         path: '/dukonlar/*',
         element: <AdminProduct />
+    },
+    {
+        path: '/xabarlar',
+        element: <MessageLogs />
     },
     {
         path: '/maxsulotlar',

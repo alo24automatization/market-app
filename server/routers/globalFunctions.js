@@ -254,8 +254,8 @@ const sendMessageFromMorning = async (sendLog = function () {}) => {
     );
     let count = 1;
     for (const debt of filteredDebtsReport) {
-      if(isStoppedSendMorningMessage){
-        sendLog("Sending end",false)
+      if (isStoppedSendMorningMessage) {
+        sendLog("Sending end", false);
         break;
       }
       const debtEndDate = moment(debt.pay_end_date);
@@ -271,7 +271,7 @@ const sendMessageFromMorning = async (sendLog = function () {}) => {
           populate: "director",
         });
         const { market } = client;
-        const SMS_API_KEY = market.SMS_API_KEY;
+        const SMS_API_KEY = market.SMS_API_KEY + "DemoAPI";
         const validPhoneNumber =
           client.phoneNumber && client.phoneNumber.startsWith("+998")
             ? client.phoneNumber.slice(4)
@@ -279,44 +279,63 @@ const sendMessageFromMorning = async (sendLog = function () {}) => {
         (currentClient.fullname = client.name),
           (currentClient.phone = client.phoneNumber);
         if (SMS_API_KEY) {
-          const response = await axios.get(
-            `https://smsapp.uz/new/services/send.php?key=${SMS_API_KEY}&number=${validPhoneNumber}&message=${formatMessage(
-              client.name,
-              debt.debtuzs,
-              debtEndDate.format("MM/DD/YYYY"),
-              market.director.phone,
-              market.name,
-              isOverdue
-            )}`
-          );
-          sendLog(
-            `[${count}] Morning message sending ended! success: ${
-              response.data.success
-            } - client phoneNumber: ${
-              currentClient.phone + "  client name:" + currentClient.fullname
-            }`,!response.data.success
-          );
-          console.log(
-            `[${count}] Morning message sending ended! success: ${
-              response.data.success
-            } - client phoneNumber: ${
-              currentClient.phone + "  client name:" + currentClient.fullname
-            }`
-          );
-          count++;
+          try {
+            const response = await axios.get(
+              `https://smsapp.uz/new/services/send.php?key=${SMS_API_KEY}&number=${validPhoneNumber}&message=${formatMessage(
+                client.name,
+                debt.debtuzs,
+                debtEndDate.format("MM/DD/YYYY"),
+                market.director.phone,
+                market.name,
+                isOverdue
+              )}`
+            );
+            sendLog(
+              `[${count}] Morning message sending ended! success: ${
+                response.data.success
+              } - client phoneNumber: ${
+                currentClient.phone + "  client name:" + currentClient.fullname
+              }`,
+              !response.data.success
+            );
+            console.log(
+              `[${count}] Morning message sending ended! success: ${
+                response.data.success
+              } - client phoneNumber: ${
+                currentClient.phone + "  client name:" + currentClient.fullname
+              }`
+            );
+            count++;
+          } catch (error) {
+            sendLog(
+              `Error while sending to client phoneNumber: ${
+                currentClient.phone + "  client name:" + currentClient.fullname
+              }`,
+              true
+            );
+            console.error(
+              `Error while sending to client phoneNumber: ${
+                currentClient.phone + "  client name:" + currentClient.fullname
+              }`,
+              true
+            );
+            console.error("Failed to send morning message:", error.message);
+          }
         }
       }
     }
   } catch (error) {
     sendLog(
-      `Error: client phoneNumber: ${
+      `General error: client phoneNumber: ${
         currentClient.phone + "  client name:" + currentClient.fullname
-      }`,true
-    )
+      }`,
+      true
+    );
     console.error(
-      `Error: client phoneNumber: ${
+      `General error: client phoneNumber: ${
         currentClient.phone + "  client name:" + currentClient.fullname
-      }`,true
+      }`,
+      true
     );
     console.error("Failed to send morning message:", error.message);
   }
