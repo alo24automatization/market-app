@@ -1,102 +1,91 @@
-import React, {useEffect, useState} from 'react'
-import Api, {baseURL} from '../../Config/Api.js'
+import React, { useState } from 'react';
+import Api, { baseURL } from '../../Config/Api.js';
 
 const MessageLogs = () => {
-    const [isSending, setIsSending] = useState(false)
-    const [evtSource, setEvtSource] = useState(null)
-    const [logContainer, setLogContainer] = useState([])
-
-    useEffect(() => {
-        // Cleanup function to close the EventSource when the component unmounts
-        return () => {
-            if (evtSource) {
-                evtSource.close()
-            }
-        }
-    }, [evtSource])
+    const [isSending, setIsSending] = useState(false);
+    const [logContainer, setLogContainer] = useState([]);
 
     const startSendingMessages = () => {
-        if (isSending) return
-        // Start sending messages
-        setIsSending(true)
-        const newEvtSource = new EventSource(baseURL + '/send_message_dev')
-        setEvtSource(newEvtSource)
+        if (isSending) return;
 
-        newEvtSource.onmessage = (event) => {
-            const data = JSON.parse(event.data)
-            if (data.log === 'Task completed') {
-                alert('All messages sent!')
-                newEvtSource.close()
-                setIsSending(false)
-                return
-            }
+        setIsSending(true);
 
-            setLogContainer((prevLogs) => [
-                ...prevLogs,
-                {log: data.log, isError: data.isError},
-            ])
-        }
+        // Use fetch to stream the logs
+        fetch(baseURL + '/send_message_dev')
+            .then((response) => {
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
 
-        newEvtSource.onclose = () => {
-            alert('Message sending process completed.')
-            setIsSending(false)
-            newEvtSource.close()
-        }
-    }
+                const readStream = () => {
+                    reader.read().then(({ done, value }) => {
+                        if (done) {
+                            console.log("Stream finished");
+                            setIsSending(false);
+                            return;
+                        }
+
+                        const chunk = decoder.decode(value);
+                        const logs = chunk.split("\n").filter(Boolean);  // Split by newlines
+
+                        logs.forEach((logStr) => {
+                            const data = JSON.parse(logStr);  // Parse each JSON chunk
+                            setLogContainer((prevLogs) => [
+                                ...prevLogs,
+                                { log: data.log, isError: data.isError },
+                            ]);
+
+                            if (data.log === "Task completed") {
+                                alert("All messages sent!");
+                            }
+                        });
+
+                        // Continue reading next chunk
+                        readStream();
+                    });
+                };
+
+                readStream();
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                setIsSending(false);
+            });
+    };
 
     const stopSendingMessages = () => {
-        if (!isSending || !evtSource) return
+        if (!isSending) return;
 
-        // Stop sending messages on server side
         Api.post('/stop_message_sending')
-            .then(({data}) => {
-                alert(data.message)
-                evtSource.close()
-                setIsSending(false)
+            .then(({ data }) => {
+                alert(data.message);
+                setIsSending(false);
             })
-    }
-
-    // Function to handle window before unload event
-    const handleBeforeUnload = (e) => {
-        if (isSending) {
-            const confirmationMessage =
-                'Messages are still being sent. Are you sure you want to leave?'
-            e.returnValue = confirmationMessage // Standard for most browsers
-            return confirmationMessage // For others (Chrome, Firefox)
-        }
-    }
-
-    useEffect(() => {
-        window.addEventListener('beforeunload', handleBeforeUnload)
-        return () => {
-            window.removeEventListener('beforeunload', handleBeforeUnload)
-        }
-    }, [isSending])
+            .catch((error) => {
+                console.error('Error stopping messages:', error);
+            });
+    };
 
     return (
         <div className='py-2 pt-16 md:pt-2 bg-black-800 px-1 h-full overflow-y-auto'>
-            <div className='flex items-center gap-x-3  '>
+            <div className='flex items-center gap-x-3'>
                 <button
-                    className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-white-900'
+                    className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'
                     onClick={startSendingMessages}
                     disabled={isSending}
                 >
                     Start Sending Messages
                 </button>
                 <button
-                    className='bg-blue-500 hover:bg-blue-700 disabled:text-blue-800 disabled:cursor-not-allowed text-white font-bold py-2 px-4 rounded text-white-900'
+                    className='bg-blue-500 hover:bg-blue-700 disabled:text-blue-800 disabled:cursor-not-allowed text-white font-bold py-2 px-4 rounded'
                     onClick={stopSendingMessages}
                     disabled={!isSending}
                 >
                     Stop Sending Messages
                 </button>
             </div>
-            <div id='log-container' className='overflow-y-auto p-2' >
+            <div id='log-container' className='overflow-y-auto p-2'>
                 {logContainer.map((log, index) => (
-                    <p
-                        key={index}
-                        className={log.isError ? 'error-log' : 'success-log'}
-                    >
+                    <p key={index} className={log.isError ? 'error-log' : 'success-log'}>
                         {log.isError
                             ? `Error: ${log.log} ❌`
                             : `Success: ${log.log} ✅`}
@@ -104,7 +93,7 @@ const MessageLogs = () => {
                 ))}
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default MessageLogs
+export default MessageLogs;

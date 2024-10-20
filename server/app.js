@@ -58,7 +58,8 @@ app.post("/api/stop_message_sending", async (req, res) => {
 app.get("/api/send_message_dev", (req, res) => {
   try {
     global.isStoppedSendMorningMessage = false;
-    res.setHeader("Content-Type", "text/event-stream");
+
+    res.setHeader("Content-Type", "application/json");
     res.setHeader("Cache-Control", "no-cache");
     res.setHeader("Connection", "keep-alive");
 
@@ -67,17 +68,17 @@ app.get("/api/send_message_dev", (req, res) => {
 
     const sendLog = (log, isError = false) => {
       const message = { log, isError };
-      res.write(`data: ${JSON.stringify(message)}\n\n`);
+      res.write(JSON.stringify(message) + "\n"); // Send JSON as a chunk
     };
 
     sendMessageFromMorning(sendLog)
       .then(() => {
         sendLog("Task completed", false);
-        res.end();
+        res.end(); // Finish the response after the task is complete
       })
       .catch((error) => {
         sendLog(`Error occurred: ${error.message}`, true);
-        res.end();
+        res.end(); // End the response in case of error
       });
   } catch (err) {
     res.status(500).json({ error: "An error occurred while streaming" });
