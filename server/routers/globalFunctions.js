@@ -270,6 +270,10 @@ const sendMessageFromMorning = async (sendLog = function () {}) => {
           path: "market",
           populate: "director",
         });
+        // if client or market is null continue;
+        if (!client || !client.market) {
+          continue;
+        }
         const { market } = client;
         const SMS_API_KEY = market.SMS_API_KEY;
         const validPhoneNumber =
