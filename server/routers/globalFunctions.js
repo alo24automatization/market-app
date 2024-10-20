@@ -296,7 +296,7 @@ const sendMessageFromMorning = async (sendLog = function () {}) => {
               } - client phoneNumber: ${
                 currentClient.phone + "  client name:" + currentClient.fullname
               }`,
-              !response.data.success
+              response.data.success
             );
             console.log(
               `[${count}] Morning message sending ended! success: ${

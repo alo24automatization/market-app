@@ -55,32 +55,32 @@ app.post("/api/stop_message_sending", async (req, res) => {
   });
 });
 // Route to send the event stream
-app.get("/api/send_message_dev", (req, res) => {
-  try {
-    global.isStoppedSendMorningMessage = false;
+app.post("/api/send_message_dev", (req, res) => {
+    try {
+      global.isStoppedSendMorningMessage = false;
 
-    res.setHeader("Content-Type", "application/json");
-    res.setHeader("Cache-Control", "no-cache");
-    res.setHeader("Connection", "keep-alive");
-
-    // Preventing buffering for better streaming in some environments
-    res.flushHeaders(); // Ensure headers are sent immediately
-
-    const sendLog = (log, isError = false) => {
-      const message = { log, isError };
-      res.write(JSON.stringify(message) + "\n"); // Send JSON as a chunk
-    };
-
-    sendMessageFromMorning(sendLog)
-      .then(() => {
-        sendLog("Task completed", false);
-        res.end(); // Finish the response after the task is complete
-      })
-      .catch((error) => {
-        sendLog(`Error occurred: ${error.message}`, true);
-        res.end(); // End the response in case of error
-      });
-  } catch (err) {
-    res.status(500).json({ error: "An error occurred while streaming" });
-  }
-});
+      res.setHeader("Content-Type", "application/json");
+      res.setHeader("Cache-Control", "no-cache");
+      res.setHeader("Connection", "keep-alive");
+  
+      // Preventing buffering for better streaming in some environments
+      res.flushHeaders(); // Ensure headers are sent immediately
+  
+      const sendLog = (log, isError = false) => {
+        const message = { log, isError };
+        res.write(JSON.stringify(message) + "\n"); // Send JSON as a chunk
+      };
+  
+      sendMessageFromMorning(sendLog)
+        .then(() => {
+          sendLog("Task completed", false);
+          res.end(); // Finish the response after the task is complete
+        })
+        .catch((error) => {
+          sendLog(`Error occurred: ${error.message}`, true);
+          res.end(); // End the response in case of error
+        });
+    } catch (err) {
+      res.status(500).json({ error: "An error occurred while streaming" });
+    }
+  });

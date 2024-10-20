@@ -11,7 +11,7 @@ const MessageLogs = () => {
         setIsSending(true);
 
         // Use fetch to stream the logs
-        fetch(baseURL + '/send_message_dev')
+        Api.post('/send_message_dev')
             .then((response) => {
                 const reader = response.body.getReader();
                 const decoder = new TextDecoder();
