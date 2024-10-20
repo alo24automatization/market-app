@@ -18,6 +18,8 @@ const io = new Server(server, {
   cors: {
     origin: "*",
     method: ["*"],
+    allowedHeaders: ["Content-Type"],
+    credentials: true,
   },
 });
 
@@ -54,25 +56,30 @@ app.post("/api/stop_message_sending", async (req, res) => {
 });
 // Route to send the event stream
 app.get("/api/send_message_dev", (req, res) => {
-  global.isStoppedSendMorningMessage = false;
-  res.setHeader("Content-Type", "text/event-stream");
-  res.setHeader("Cache-Control", "no-cache");
-  res.setHeader("Connection", "keep-alive");
+  try {
+    global.isStoppedSendMorningMessage = false;
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
 
-  const sendLog = (log, isError = false) => {
-    const message = {
-      log: log,
-      isError: isError,
+    // Preventing buffering for better streaming in some environments
+    res.flushHeaders(); // Ensure headers are sent immediately
+
+    const sendLog = (log, isError = false) => {
+      const message = { log, isError };
+      res.write(`data: ${JSON.stringify(message)}\n\n`);
     };
-    res.write(`data: ${JSON.stringify(message)}\n\n`);
-  };
-  sendMessageFromMorning(sendLog)
-    .then(() => {
-      sendLog("Task completed", false);
-      res.end();
-    })
-    .catch((error) => {
-      sendLog(`Error occurred: ${error.message}`, true);
-      res.end();
-    });
+
+    sendMessageFromMorning(sendLog)
+      .then(() => {
+        sendLog("Task completed", false);
+        res.end();
+      })
+      .catch((error) => {
+        sendLog(`Error occurred: ${error.message}`, true);
+        res.end();
+      });
+  } catch (err) {
+    res.status(500).json({ error: "An error occurred while streaming" });
+  }
 });

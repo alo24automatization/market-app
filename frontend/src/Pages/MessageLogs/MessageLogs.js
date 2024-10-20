@@ -74,8 +74,8 @@ const MessageLogs = () => {
     }, [isSending])
 
     return (
-        <div className=' py-2 bg-black-800 px-1 h-full overflow-y-auto'>
-            <div className='flex items-center gap-x-3'>
+        <div className='py-2 pt-16 md:pt-2 bg-black-800 px-1 h-full overflow-y-auto'>
+            <div className='flex items-center gap-x-3  '>
                 <button
                     className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-white-900'
                     onClick={startSendingMessages}
