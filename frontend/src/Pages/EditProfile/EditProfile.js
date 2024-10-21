@@ -106,14 +106,14 @@ function EditProfile() {
             warningEmptyInput(message)
         } else {
             const body = {
-                _id: currentUser._id,
-                market: currentUser.market,
-                password: currentUser.newPassword.replace(/\s+/g, ' ').trim(),
-                login: currentUser.newLogin.replace(/\s+/g, ' ').trim(),
-                image: currentUser.image.replace(/\s+/g, ' ').trim(),
+                _id: currentUser?._id,
+                market: currentUser?.market,
+                password: currentUser?.newPassword?.replace(/\s+/g, ' ').trim(),
+                login: currentUser.newLogin?.replace(/\s+/g, ' ').trim(),
+                image: currentUser?.image?.replace(/\s+/g, ' ').trim(),
                 qrcode: currentUser?.qrcode?.replace(/\s+/g, ' ').trim(),
-                firstname: currentUser.firstname.replace(/\s+/g, ' ').trim(),
-                lastname: currentUser.lastname.replace(/\s+/g, ' ').trim()
+                firstname: currentUser?.firstname?.replace(/\s+/g, ' ').trim(),
+                lastname: currentUser?.lastname?.replace(/\s+/g, ' ').trim()
             }
             dispatch(editUser(body))
         }
