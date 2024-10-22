@@ -193,7 +193,7 @@ const sendMessage = async () => {
 };
 
 const sendMessageFromMorning = async () => {
-  console.log("Morning message sending has started!");
+  console.log("Morning message sending process has been started.");
   const formatMessage = (
     name,
     debt,
@@ -296,7 +296,7 @@ const sendMessageFromMorning = async () => {
               )}`
             );
             console.log(
-              `[${count}] Morning message sending ended! success: ${
+              `[${count}] The SMS message has been sent. success: ${
                 response.data.success
               } - client phoneNumber: ${
                 currentClient.phone + "  client name:" + currentClient.fullname
@@ -304,9 +304,11 @@ const sendMessageFromMorning = async () => {
             );
             // next client number
             count++;
+            // Display seconds countdown (30 seconds)
+            await displayCountdown(30);
           } catch (error) {
             console.error(
-              "SMS-APP-INNER Failed to send message:",
+              "SMS-APP-INNER Failed to sent message:",
               error.message
             );
           }
@@ -316,7 +318,23 @@ const sendMessageFromMorning = async () => {
   } catch (error) {
     console.error("SMS-APP Failed to send message:", error.message);
   }
-  console.log("------ Morning message sending ended! \n TASK END! ------");
+  console.log(
+    "------ The morning message sending process has ended. ------ \n ------ TASK END! ------"
+  );
+};
+const displayCountdown = async (seconds) => {
+  return new Promise((resolve) => {
+    let currentSecond = 0;
+    const interval = setInterval(() => {
+      currentSecond++;
+      process.stdout.write(`\rWaiting: ${currentSecond}/${seconds} seconds`); // Overwrite the same line
+      if (currentSecond === seconds || global.isStoppedSendMorningMessage) {
+        clearInterval(interval);
+        process.stdout.write("\n");
+        resolve(); 
+      }
+    }, 1000); 
+  });
 };
 // //   sendMessageFromMorning
 // const sendMessageFromMorning = async (sendLog = function () {}) => {

@@ -1,9 +1,13 @@
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import Api, {baseURL} from '../../Config/Api.js'
 
 const MessageLogs = () => {
-    const [isSending, setIsSending] = useState(false)
-    const [logContainer, setLogContainer] = useState([])
+    const localStorage_isSending = Boolean(localStorage.getItem('isSending'))
+    const [isSending, setIsSending] = useState(localStorage_isSending || false)
+
+    useEffect(() => {
+        localStorage.setItem('isSending', isSending)
+    }, [isSending])
 
     const startSendingMessages = async () => {
         if (isSending) return
@@ -16,7 +20,7 @@ const MessageLogs = () => {
             setIsSending(false)
         }
         // Use fetch to stream the logs
-     }
+    }
 
     const stopSendingMessages = () => {
         if (!isSending) return
@@ -48,18 +52,6 @@ const MessageLogs = () => {
                 >
                     Stop Sending Messages
                 </button>
-            </div>
-            <div id='log-container' className='overflow-y-auto p-2'>
-                {logContainer.map((log, index) => (
-                    <p
-                        key={index}
-                        className={log.isError ? 'error-log' : 'success-log'}
-                    >
-                        {log.isError
-                            ? `Error: ${log.log} ❌`
-                            : `Success: ${log.log} ✅`}
-                    </p>
-                ))}
             </div>
         </div>
     )

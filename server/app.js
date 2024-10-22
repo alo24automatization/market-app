@@ -61,7 +61,7 @@ app.post("/api/send_message_dev", async (req, res) => {
     await sendMessageFromMorning();
     res.status(201, {
       success: true,
-      message: "Message sending process has been started.",
+      message: "The message sending process has ended.",
     });
   } catch (err) {
     res.status(500).json({ error: "An error occurred while sending message" });
