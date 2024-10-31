@@ -1069,7 +1069,7 @@ const ReportPage = ({accessToSaller}) => {
             let month = date.getMonth()
             let year = date.getFullYear()
             let day = date.getDate()
-            let startDate = new Date(year, month - 3, day)
+            let startDate = new Date(year, month - 24, day)
             setBeginDay(startDate)
         } else {
             if (startDate) {

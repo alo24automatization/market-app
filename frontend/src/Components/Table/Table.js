@@ -49,60 +49,60 @@ function Table({
     showClients,
     changeCheckbox,
     selectedSale,
-                   page,
-                   data,
-                   headers,
-                   currentPage,
-                   countPage,
-                   Sort,
-                   Edit,
-                   salerDebts,
-                   Delete,
-                   hiddenPayButton,
-                   hiddenInfoButton,
-                   currency,
-                   changeHandler,
-                   Print,
-                   inputValue,
-                   inputDisabled,
-                   Excel,
-                   editedIncoming,
-                   saveEditIncoming,
-                   changeNumberHandler,
-                   sortItem,
-                   ReturnPayment,
-                   Save,
-                   onKeyUp,
-                   currencyType,
-                   type,
-                   Pay,
-                   isDisabled,
-                   reports,
-                   onClickTableRow,
-                   linkToSellerReports,
-                   sellers,
-                   addPlus,
-                   footer,
-                   increment,
-                   decrement,
-                   lowUnitpriceProducts,
-                   linkToSupplierReport,
-                   printedData,
-                   productminimumpage,
-                   handleDelete,
-                   wholeSale,
-                   handleShowProduct,
-                   updatePosition,
-                   handleCountProduct,
-                   handleUnitPrice,
-                   selectedFilial,
-                   editComment,
-                   startDate,
-                   endDate,
-                   modalOpen,
-                   totalDebt,
-                   handleClickProduct
-               }) {
+    page,
+    data,
+    headers,
+    currentPage,
+    countPage,
+    Sort,
+    Edit,
+    salerDebts,
+    Delete,
+    hiddenPayButton,
+    hiddenInfoButton,
+    currency,
+    changeHandler,
+    Print,
+    inputValue,
+    inputDisabled,
+    Excel,
+    editedIncoming,
+    saveEditIncoming,
+    changeNumberHandler,
+    sortItem,
+    ReturnPayment,
+    Save,
+    onKeyUp,
+    currencyType,
+    type,
+    Pay,
+    isDisabled,
+    reports,
+    onClickTableRow,
+    linkToSellerReports,
+    sellers,
+    addPlus,
+    footer,
+    increment,
+    decrement,
+    lowUnitpriceProducts,
+    linkToSupplierReport,
+    printedData,
+    productminimumpage,
+    handleDelete,
+    wholeSale,
+    handleShowProduct,
+    updatePosition,
+    handleCountProduct,
+    handleUnitPrice,
+    selectedFilial,
+    editComment,
+    startDate,
+    endDate,
+    modalOpen,
+    totalDebt,
+    handleClickProduct,
+}) {
     const checkRows = () => {
         switch (page) {
             case 'product':
@@ -336,9 +336,9 @@ function Table({
                         Delete={Delete}
                     />
                 )
-                case "packmanProfitClients":
-                    return (
-                        <PackmanProfitClientsTableRow
+            case 'packmanProfitClients':
+                return (
+                    <PackmanProfitClientsTableRow
                         data={data}
                         showClients={showClients}
                         selectedSale={selectedSale}
@@ -349,7 +349,7 @@ function Table({
                         Delete={Delete}
                         currency={currency}
                     />
-                    )
+                )
             case 'seller':
                 return (
                     <SellerTableRow
@@ -517,9 +517,9 @@ function Table({
                     />
                 )
             case 'generalreport':
-                return <GeneralReportTableRow data={data} currency={currency}/>
+                return <GeneralReportTableRow data={data} currency={currency} />
             case 'dailyreport':
-                return <DailyReport data={data}/>
+                return <DailyReport data={data} />
             case 'incomingsupplier':
                 return (
                     <SupplierIncomingsTableRow
@@ -531,7 +531,7 @@ function Table({
                     />
                 )
             case 'categoryreport':
-                return <CategoryReportTableRow data={data}/>
+                return <CategoryReportTableRow data={data} />
             case 'marketProducts':
                 return (
                     <MarketProductsTableRow
@@ -643,7 +643,7 @@ function Table({
             className='overflow-x-auto lg:w-full  ms-3 me-3 mt-2  pb-[1.25rem]  max-h-[35rem] mb-[1rem]'
         >
             <thead className='rounded-t-lg sticky top-0'>
-            <Thead headers={headers} Sort={Sort} sortItem={sortItem}/>
+                <Thead headers={headers} Sort={Sort} sortItem={sortItem} />
             </thead>
             <tbody>{checkRows()}</tbody>
             {footer && <tfoot>{checkFooters()}</tfoot>}
