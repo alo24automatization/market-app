@@ -741,9 +741,19 @@ module.exports.getPayment = async (req, res) => {
     res.status(400).json({ error: "Serverda xatolik yuz berdi..." });
   }
 };
+
+// aslo to this but bro dont change my other codes only add pagination
 module.exports.getDebtsReport = async (req, res) => {
   try {
-    const { market, startDate, endDate } = req.body;
+    const {
+      market,
+      startDate,
+      endDate,
+      currentPage,
+      countPage,
+      clientName,
+      phoneNumber,
+    } = req.body;
     const marketData = await Market.findById(market);
     if (!marketData) {
       return res
@@ -885,10 +895,34 @@ module.exports.getDebtsReport = async (req, res) => {
         return false;
       }
     });
+    let searchedData = filteredDebtsReport;
 
-    res
-      .status(201)
-      .json({ data: filteredDebtsReport.filter((sale) => sale.debtuzs > 0) });
+    if (clientName || phoneNumber) {
+      searchedData = filteredDebtsReport.filter((sale) => {
+        const client = sale.client || {};
+        const nameMatch = clientName
+          ? client.name?.toLowerCase().includes(clientName.toLowerCase())
+          : true;
+        const phoneMatch = phoneNumber
+          ? client.phoneNumber?.includes(phoneNumber)
+          : true;
+        return nameMatch && phoneMatch;
+      });
+    }
+    // Pagination logic (skip and limit)
+    const page = currentPage ? parseInt(currentPage + 1) : 1; // Default to page 1
+    const limit = countPage ? parseInt(countPage) : 10; // Default to 10 items per page
+    const skip = (page - 1) * limit; // Calculate skip
+
+    // Paginate the filtered debts report
+    const validDepts = filteredDebtsReport.filter((sale) => sale.debtuzs > 0);
+    const paginatedReport = validDepts?.slice(skip, skip + limit);
+    res.status(201).json({
+      data: paginatedReport,
+      count: validDepts.length,
+      searchedData: clientName || phoneNumber ? searchedData : [],
+      notFoundClient: searchedData.length === 0,
+    });
   } catch (error) {
     console.error(error);
     res.status(400).json({ error: "Serverda xatolik yuz berdi..." });

@@ -111,7 +111,6 @@ function EditProfile() {
             const body = {
                 _id: currentUser?._id,
                 market: currentUser?.market,
-                ii_user: currentUser.ii_user.replace(/\s+/g, ' ').trim(),
                 password: currentUser?.newPassword?.replace(/\s+/g, ' ').trim(),
                 login: currentUser.newLogin?.replace(/\s+/g, ' ').trim(),
                 image: currentUser?.image?.replace(/\s+/g, ' ').trim(),

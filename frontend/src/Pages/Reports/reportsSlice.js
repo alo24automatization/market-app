@@ -86,7 +86,6 @@ export const payDebt = createAsyncThunk(
     }
 )
 
-
 export const getBackProducts = createAsyncThunk(
     'reports/backProducts',
     async (body, {rejectWithValue}) => {
@@ -202,6 +201,7 @@ const reportSlice = createSlice({
         successDebtComment: false,
         debtid: null,
         totalpayment: null,
+        notFoundClient: false,
         startDate: new Date(
             new Date(
                 new Date().getFullYear(),
@@ -299,9 +299,14 @@ const reportSlice = createSlice({
             state.loading = false
             universalToast(`${payload}`, 'error')
         },
-        [getDebts.fulfilled]: (state, {payload: {data}}) => {
+        [getDebts.fulfilled]: (
+            state,
+            {payload: {data, count, searchedData, notFoundClient}}
+        ) => {
             state.loading = true
-            state.datas = data
+            state.datas = searchedData.length > 0 ? searchedData : data
+            state.count = count
+            state.notFoundClient = notFoundClient
         },
         [getDiscounts.pending]: (state) => {
             state.loading = true
