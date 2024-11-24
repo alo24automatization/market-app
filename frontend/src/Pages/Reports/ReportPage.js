@@ -65,8 +65,15 @@ const ReportPage = ({accessToSaller}) => {
 
     const {market: _id, user} = useSelector((state) => state.login)
     const {expenses} = useSelector((state) => state.expense)
-    const {datas, count, startDate, endDate, successDebtComment, totalpayment,notFoundClient} =
-        useSelector((state) => state.reports)
+    const {
+        datas,
+        count,
+        startDate,
+        endDate,
+        successDebtComment,
+        totalpayment,
+        notFoundClient,
+    } = useSelector((state) => state.reports)
     const {sellings} = useSelector((state) => state.sellings)
     const {currencyType, currency} = useSelector((state) => state.currency)
     const [currentPage, setCurrentPage] = useState(0)
@@ -915,8 +922,8 @@ const ReportPage = ({accessToSaller}) => {
             setIsSearch(false)
             setLocalSearch({
                 ...localSearch,
-               
-                phoneNumber:''
+
+                phoneNumber: '',
             })
             return
         }
@@ -949,7 +956,6 @@ const ReportPage = ({accessToSaller}) => {
             handleChangeClientPhoneNumber(e.target.value)
         }
     }
-
 
     const handleBeginDay = (e) => {
         let date = new Date(e.setHours(0, 0, 0))
@@ -1254,7 +1260,9 @@ const ReportPage = ({accessToSaller}) => {
                             // filterByClientPhoneNumber={
                             //     handleChangeClientPhoneNumber
                             // }
-                            filterByClientPhoneNumberWithEnter={onKeySearchClientPhoneNumber}
+                            filterByClientPhoneNumberWithEnter={
+                                onKeySearchClientPhoneNumber
+                            }
                             // phoneNumber={clientPhoneNumber}
                             // filterByClientName={searchClientName}
                             filterByIdWhenPressEnter={onKeySearch}
@@ -1374,7 +1382,7 @@ const ReportPage = ({accessToSaller}) => {
                         <Table
                             page={id === 'sale' ? 'saleslist' : id}
                             headers={ReportsTableHeaders(id)}
-                            data={notFoundClient?[]:currentData}
+                            data={notFoundClient ? [] : currentData}
                             currentPage={currentPage}
                             countPage={countPage}
                             currency={currencyType}
@@ -1391,7 +1399,7 @@ const ReportPage = ({accessToSaller}) => {
                         <TableMobile
                             page={id === 'sale' ? 'saleslist' : id}
                             headers={ReportsTableHeaders(id)}
-                            data={notFoundClient?[]:currentData}
+                            data={notFoundClient ? [] : currentData}
                             currentPage={currentPage}
                             countPage={countPage}
                             currency={currencyType}

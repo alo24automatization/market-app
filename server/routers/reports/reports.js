@@ -760,6 +760,10 @@ module.exports.getDebtsReport = async (req, res) => {
         .status(400)
         .json({ message: `Diqqat! Do'kon haqida malumotlar topilmadi!` });
     }
+    // Pagination logic (skip and limit)
+    const page = currentPage ? parseInt(currentPage + 1) : 1; // Default to page 1
+    const limit = countPage ? parseInt(countPage) : 10; // Default to 10 items per page
+    const skip = (page - 1) * limit; // Calculate skip
 
     const saleconnectors = await SaleConnector.find({
       market,
@@ -909,17 +913,12 @@ module.exports.getDebtsReport = async (req, res) => {
         return nameMatch && phoneMatch;
       });
     }
-    // Pagination logic (skip and limit)
-    const page = currentPage ? parseInt(currentPage + 1) : 1; // Default to page 1
-    const limit = countPage ? parseInt(countPage) : 10; // Default to 10 items per page
-    const skip = (page - 1) * limit; // Calculate skip
 
     // Paginate the filtered debts report
     const validDepts = filteredDebtsReport.filter((sale) => sale.debtuzs > 0);
-    const paginatedReport = validDepts?.slice(skip, skip + limit);
     res.status(201).json({
-      data: paginatedReport,
-      count: validDepts.length,
+      data: validDepts,
+      count: 0, // validDepts.length
       searchedData: clientName || phoneNumber ? searchedData : [],
       notFoundClient: searchedData.length === 0,
     });
