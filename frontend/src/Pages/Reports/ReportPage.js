@@ -77,7 +77,7 @@ const ReportPage = ({accessToSaller}) => {
     const {sellings} = useSelector((state) => state.sellings)
     const {currencyType, currency} = useSelector((state) => state.currency)
     const [currentPage, setCurrentPage] = useState(0)
-    const [countPage, setCountPage] = useState(10)
+    const [countPage, setCountPage] = useState(20)
     const [totalPage, setTotalPage] = useState(1)
     const [comment, setComment] = useState('')
     const [sendingSearch, setSendingSearch] = useState({

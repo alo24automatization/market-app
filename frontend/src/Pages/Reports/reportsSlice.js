@@ -301,10 +301,10 @@ const reportSlice = createSlice({
         },
         [getDebts.fulfilled]: (
             state,
-            {payload: {data, count, searchedData, notFoundClient}}
+            {payload: {data, count, notFoundClient}}
         ) => {
             state.loading = true
-            state.datas = searchedData.length > 0 ? searchedData : data
+            state.datas = data
             state.count = count
             state.notFoundClient = notFoundClient
         },
