@@ -909,19 +909,34 @@ module.exports.getDebtsReport = async (req, res) => {
       }
     });
 
-    const filteredDebtsReport = debtsreport.reduce(
-      (acc, sale) => {
-        if (sale.client && sale.client._id) {
-          if (!acc.seen.has(sale.client._id)) {
-            acc.seen.add(sale.client._id);
-            acc.result.push(sale);
-          }
-        }
-        return acc;
-      },
-      { seen: new Set(), result: [] }
-    ).result;
+    // const filteredDebtsReport = debtsreport.reduce(
+    //   (acc, sale) => {
+    //     if (sale.client && sale.client._id) {
+    //       if (!acc.seen.has(sale.client._id)) {
+    //         acc.seen.add(sale.client._id);
+    //         acc.result.push(sale);
+    //       }
+    //     }
+    //     return acc;
+    //   },
+    //   { seen: new Set(), result: [] }
+    // ).result;
+    // Filter out duplicate client reports
 
+    const uniqueClientDebts = new Set();
+    const filteredDebtsReport = debtsreport.filter((sale) => {
+      if (sale.client && sale.client._id) {
+        if (uniqueClientDebts.has(sale.client._id)) {
+          return false;
+        } else {
+          uniqueClientDebts.add(sale.client._id);
+          return true;
+        }
+      } else {
+        // Handle the case where sale.client is undefined or doesn't have an _id
+        return false;
+      }
+    });
     // Pagination logic (skip and limit)
     const page = currentPage ? parseInt(currentPage + 1) : 1; // Default to page 1
     const limit = countPage ? parseInt(countPage) : 10; // Default to 10 items per page
@@ -930,32 +945,14 @@ module.exports.getDebtsReport = async (req, res) => {
     // const {data,totalItems,totalPages,} = filteredDebtsReport.filter((sale) => sale.debtuzs > 0);
 
     res.status(201).json({
-      data: filteredDebtsReport,
-      count: filteredDebtsReport.length, // validDepts.length
-      notFoundClient: filteredDebtsReport.length === 0,
+      data: filteredDebtsReport.filter((sale) => sale.debtuzs > 0),
     });
   } catch (error) {
     console.error(error);
     res.status(400).json({ error: "Serverda xatolik yuz berdi..." });
   }
 };
-function paginateArray(data, currentPage, pageSize) {
-  const totalItems = data.length;
 
-  // Calculate the starting index for the current page
-  const skip = (currentPage - 1) * pageSize;
-
-  // Slice the array to get the items for the current page
-  const paginatedData = data.slice(skip, skip + pageSize);
-
-  // Return paginated data along with meta info (total items, current page)
-  return {
-    data: paginatedData,
-    totalItems: totalItems,
-    totalPages: Math.ceil(totalItems / pageSize),
-    currentPage: currentPage,
-  };
-}
 /// chat gpt
 // module.exports.getDebtsReport = async (req, res) => {
 //   try {

@@ -928,7 +928,7 @@ const ReportPage = ({accessToSaller}) => {
 
     const handleChangeClientPhoneNumber = (value) => {
         const target = value.toLowerCase()
-      
+
         setClinetPhoneNumber(target)
         setCurrentData([
             ...filter(
@@ -1406,7 +1406,7 @@ const ReportPage = ({accessToSaller}) => {
                         <Table
                             page={id === 'sale' ? 'saleslist' : id}
                             headers={ReportsTableHeaders(id)}
-                            data={notFoundClient ? [] : currentData}
+                            data={currentData}
                             currentPage={currentPage}
                             countPage={countPage}
                             currency={currencyType}
@@ -1423,7 +1423,7 @@ const ReportPage = ({accessToSaller}) => {
                         <TableMobile
                             page={id === 'sale' ? 'saleslist' : id}
                             headers={ReportsTableHeaders(id)}
-                            data={notFoundClient ? [] : currentData}
+                            data={currentData}
                             currentPage={currentPage}
                             countPage={countPage}
                             currency={currencyType}

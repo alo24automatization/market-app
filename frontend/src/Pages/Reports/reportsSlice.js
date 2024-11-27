@@ -305,8 +305,8 @@ const reportSlice = createSlice({
         ) => {
             state.loading = true
             state.datas = data
-            state.count = 0 
-            state.notFoundClient = notFoundClient
+            state.count = 0
+            state.notFoundClient = false
         },
         [getDiscounts.pending]: (state) => {
             state.loading = true
