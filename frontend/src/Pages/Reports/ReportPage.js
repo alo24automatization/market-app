@@ -883,33 +883,44 @@ const ReportPage = ({accessToSaller}) => {
     const [isSearch, setIsSearch] = useState(false)
     const searchClientName = (value) => {
         const target = value.toLowerCase()
+        setCurrentData([
+            ...filter(
+                [...storageData],
+                (item) =>
+                    item.client &&
+                    item.client.name.toLowerCase().includes(target)
+            ),
+        ])
+        setLocalSearch({
+            ...localSearch,
+            client: target,
+        })
+        // if (target.length === 0) {
+        //     setIsSearch(false)
+        //     setLocalSearch({
+        //         ...localSearch,
+        //         client: '',
+        //     })
+        //     return
+        // }
 
-        if (target.length === 0) {
-            setIsSearch(false)
-            setLocalSearch({
-                ...localSearch,
-                client: '',
-            })
-            return
-        }
+        // // Clear previous timeout if user is still typing
+        // if (typingTimeout) {
+        //     clearTimeout(typingTimeout)
+        // }
 
-        // Clear previous timeout if user is still typing
-        if (typingTimeout) {
-            clearTimeout(typingTimeout)
-        }
+        // // Set new timeout to send the request after 2 seconds
+        // const newTypingTimeout = setTimeout(() => {
+        //     setLocalSearch({
+        //         ...localSearch,
+        //         client: target,
+        //     })
+        //     setSendingSearch(target) // Update sendingSearch after debounce delay
+        //     setIsSearch(true) // Set search active when the search is triggered
+        // }, 300) // 2-second debounce delay
 
-        // Set new timeout to send the request after 2 seconds
-        const newTypingTimeout = setTimeout(() => {
-            setLocalSearch({
-                ...localSearch,
-                client: target,
-            })
-            setSendingSearch(target) // Update sendingSearch after debounce delay
-            setIsSearch(true) // Set search active when the search is triggered
-        }, 300) // 2-second debounce delay
-
-        // Save timeout ID to clear later
-        setTypingTimeout(newTypingTimeout)
+        // // Save timeout ID to clear later
+        // setTypingTimeout(newTypingTimeout)
     }
 
     const [clientPhoneNumber, setClinetPhoneNumber] = useState('')
@@ -917,34 +928,47 @@ const ReportPage = ({accessToSaller}) => {
 
     const handleChangeClientPhoneNumber = (value) => {
         const target = value.toLowerCase()
+      
+        setClinetPhoneNumber(target)
+        setCurrentData([
+            ...filter(
+                [...storageData],
+                (item) =>
+                    item.client &&
+                    item.client.phoneNumber.toLowerCase().includes(target)
+            ),
+        ])
+        setLocalSearch({
+            ...localSearch,
+            client: target,
+        })
+        // if (target.length === 0) {
+        //     setIsSearch(false)
+        //     setLocalSearch({
+        //         ...localSearch,
 
-        if (target.length === 0) {
-            setIsSearch(false)
-            setLocalSearch({
-                ...localSearch,
+        //         phoneNumber: '',
+        //     })
+        //     return
+        // }
 
-                phoneNumber: '',
-            })
-            return
-        }
+        // // Clear previous timeout if user is still typing
+        // if (typingTimeout2) {
+        //     clearTimeout(typingTimeout2)
+        // }
 
-        // Clear previous timeout if user is still typing
-        if (typingTimeout2) {
-            clearTimeout(typingTimeout2)
-        }
+        // // Set new timeout to send the request after 2 seconds
+        // const newTypingTimeout = setTimeout(() => {
+        //     setLocalSearch({
+        //         ...localSearch,
+        //         phoneNumber: target,
+        //     })
+        //     setSendingSearch(target) // Update sendingSearch after debounce delay
+        //     setIsSearch(true) // Set search active when the search is triggered
+        // }, 300) // 2-second debounce delay
 
-        // Set new timeout to send the request after 2 seconds
-        const newTypingTimeout = setTimeout(() => {
-            setLocalSearch({
-                ...localSearch,
-                phoneNumber: target,
-            })
-            setSendingSearch(target) // Update sendingSearch after debounce delay
-            setIsSearch(true) // Set search active when the search is triggered
-        }, 300) // 2-second debounce delay
-
-        // Save timeout ID to clear later
-        setTypingTimeout2(newTypingTimeout)
+        // // Save timeout ID to clear later
+        // setTypingTimeout2(newTypingTimeout)
     }
     const onKeySearch = (e) => {
         if (e.key === 'Enter' || e.key === 'Backspace') {

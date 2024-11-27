@@ -922,38 +922,40 @@ module.exports.getDebtsReport = async (req, res) => {
       { seen: new Set(), result: [] }
     ).result;
 
-    let searchedData = filteredDebtsReport;
-
-    if (clientName || phoneNumber) {
-      searchedData = filteredDebtsReport.filter((sale) => {
-        const client = sale.client || {};
-        const nameMatch = clientName
-          ? client.name?.toLowerCase().includes(clientName.toLowerCase())
-          : true;
-        const phoneMatch = phoneNumber
-          ? client.phoneNumber?.includes(phoneNumber)
-          : true;
-        return nameMatch && phoneMatch;
-      });
-    }
     // Pagination logic (skip and limit)
-    const page = currentPage ? parseInt(currentPage) : 1; // Default to page 1
+    const page = currentPage ? parseInt(currentPage + 1) : 1; // Default to page 1
     const limit = countPage ? parseInt(countPage) : 10; // Default to 10 items per page
     const skip = (page - 1) * limit; // Calculate skip
     // Paginate the filtered debts report
-    const validDepts = filteredDebtsReport.filter((sale) => sale.debtuzs > 0);
-    const paginatedReport = validDepts?.slice(skip, skip + limit);
+    // const {data,totalItems,totalPages,} = filteredDebtsReport.filter((sale) => sale.debtuzs > 0);
+
     res.status(201).json({
-      data: paginatedReport,
-      count: validDepts?.length, // validDepts.length
-      searchedData: clientName || phoneNumber ? searchedData : [],
-      notFoundClient: searchedData.length === 0,
+      data: filteredDebtsReport,
+      count: filteredDebtsReport.length, // validDepts.length
+      notFoundClient: filteredDebtsReport.length === 0,
     });
   } catch (error) {
     console.error(error);
     res.status(400).json({ error: "Serverda xatolik yuz berdi..." });
   }
 };
+function paginateArray(data, currentPage, pageSize) {
+  const totalItems = data.length;
+
+  // Calculate the starting index for the current page
+  const skip = (currentPage - 1) * pageSize;
+
+  // Slice the array to get the items for the current page
+  const paginatedData = data.slice(skip, skip + pageSize);
+
+  // Return paginated data along with meta info (total items, current page)
+  return {
+    data: paginatedData,
+    totalItems: totalItems,
+    totalPages: Math.ceil(totalItems / pageSize),
+    currentPage: currentPage,
+  };
+}
 /// chat gpt
 // module.exports.getDebtsReport = async (req, res) => {
 //   try {
