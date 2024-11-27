@@ -745,58 +745,18 @@ module.exports.getPayment = async (req, res) => {
 // aslo to this but bro dont change my other codes only add pagination
 module.exports.getDebtsReport = async (req, res) => {
   try {
-    // const {
-    //   market,
-    //   startDate,
-    //   endDate,
-    //   currentPage,
-    //   countPage,
-    //   clientName,
-    //   phoneNumber,
-    // } = req.body;
     const { market, startDate, endDate } = req.body;
 
     const marketData = await Market.findById(market);
     const reduce = (arr, el) =>
       arr?.reduce((prev, item) => prev + (item[el] || 0), 0);
+
     if (!marketData) {
       return res
         .status(400)
         .json({ message: `Diqqat! Do'kon haqida malumotlar topilmadi!` });
     }
-    // // Sanitize phone number input by escaping special regex characters
-    // const escapeRegex = (str) => {
-    //   return str.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
-    // };
 
-    // let clientIds = [];
-    // if (clientName || phoneNumber) {
-    //   const clientQuery = {};
-
-    //   if (clientName) {
-    //     clientQuery.name = { $regex: clientName, $options: "i" }; // Case-insensitive search for name
-    //   }
-
-    //   if (phoneNumber) {
-    //     // Escape special characters in phone number before using in regex
-    //     const escapedPhoneNumber = escapeRegex(phoneNumber);
-    //     clientQuery.phoneNumber = { $regex: escapedPhoneNumber, $options: "i" }; // Case-insensitive search for phone number
-    //   }
-
-    //   // Find clients based on the search criteria
-    //   const clients = await Client.find(clientQuery).select("_id");
-    //   clientIds = clients.map((client) => client._id); // Collect the matched client IDs
-    // }
-
-    // // Prepare the query for SaleConnector
-    // const saleConnectorQuery = {
-    //   market,
-    //   createdAt: { $gte: startDate, $lte: endDate },
-    // };
-
-    // if (clientIds.length > 0) {
-    //   saleConnectorQuery.client = { $in: clientIds };
-    // }
     const saleconnectors = await SaleConnector.find({
       market,
       createdAt: { $gte: startDate, $lte: endDate },
@@ -900,7 +860,6 @@ module.exports.getDebtsReport = async (req, res) => {
       }
     });
 
-    // Update each sale connector with the total debt for its client
     debtsreport.forEach((sale) => {
       if (sale.client && sale.client._id) {
         const clientId = sale.client._id;
@@ -913,20 +872,6 @@ module.exports.getDebtsReport = async (req, res) => {
         sale.saleconnectors = clientData.saleconnectors;
       }
     });
-
-    // const filteredDebtsReport = debtsreport.reduce(
-    //   (acc, sale) => {
-    //     if (sale.client && sale.client._id) {
-    //       if (!acc.seen.has(sale.client._id)) {
-    //         acc.seen.add(sale.client._id);
-    //         acc.result.push(sale);
-    //       }
-    //     }
-    //     return acc;
-    //   },
-    //   { seen: new Set(), result: [] }
-    // ).result;
-    // Filter out duplicate client reports
 
     const uniqueClientDebts = new Set();
     const filteredDebtsReport = debtsreport.filter((sale) => {
@@ -942,12 +887,6 @@ module.exports.getDebtsReport = async (req, res) => {
         return false;
       }
     });
-    // Pagination logic (skip and limit)
-    // const page = currentPage ? parseInt(currentPage + 1) : 1; // Default to page 1
-    // const limit = countPage ? parseInt(countPage) : 10; // Default to 10 items per page
-    // const skip = (page - 1) * limit; // Calculate skip
-    // Paginate the filtered debts report
-    // const {data,totalItems,totalPages,} = filteredDebtsReport.filter((sale) => sale.debtuzs > 0);
 
     res.status(201).json({
       data: filteredDebtsReport.filter((sale) => sale.debtuzs > 0),
