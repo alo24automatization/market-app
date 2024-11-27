@@ -58,7 +58,7 @@ app.post("/api/stop_message_sending", async (req, res) => {
 app.post("/api/send_message_dev", async (req, res) => {
   try {
     global.isStoppedSendMorningMessage = false;
-    await sendMessageFromMorning();
+    await sendMessageFromMorning(req,res);
     res.status(201, {
       success: true,
       message: "The message sending process has ended.",
