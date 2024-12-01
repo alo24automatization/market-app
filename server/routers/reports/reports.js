@@ -216,13 +216,13 @@ module.exports.getReport = async (req, res) => {
 
     reports.income.income = roundUsd(
       Number(reports.sale.sale) -
-        Number(incomingprice) -
-        Number(reports.discounts.discounts)
+      Number(incomingprice) -
+      Number(reports.discounts.discounts)
     );
     reports.income.incomeuzs = roundUzs(
       Number(reports.sale.saleuzs) -
-        Number(incomingpriceuzs) -
-        Number(reports.discounts.discountsuzs)
+      Number(incomingpriceuzs) -
+      Number(reports.discounts.discountsuzs)
     );
 
     // Get debts report functions  START
@@ -458,18 +458,18 @@ module.exports.getProfitData = async (req, res) => {
           (prev, item) =>
             prev +
             item.pieces *
-              ((item.price && item.price.incomingprice) ||
-                (item.product && item.product.price.incomingprice) ||
-                0),
+            ((item.price && item.price.incomingprice) ||
+              (item.product && item.product.price.incomingprice) ||
+              0),
           0
         );
         const totalincomingpriceuzs = sale.products.reduce(
           (prev, item) =>
             prev +
             item.pieces *
-              ((item.price && item.price.incomingpriceuzs) ||
-                (item.product && item.product.price.incomingpriceuzs) ||
-                0),
+            ((item.price && item.price.incomingpriceuzs) ||
+              (item.product && item.product.price.incomingpriceuzs) ||
+              0),
           0
         );
         const totalprice = sale.products.reduce(
@@ -617,12 +617,12 @@ module.exports.getPayment = async (req, res) => {
         connectors.filter((connector) =>
           search.client && search.id
             ? connector.saleconnector.client &&
-              connector.saleconnector.id === search.id
+            connector.saleconnector.id === search.id
             : search.id && !search.client
-            ? connector.saleconnector.id === search.id
-            : search.client && !search.id
-            ? connector.saleconnector.client
-            : connector
+              ? connector.saleconnector.id === search.id
+              : search.client && !search.id
+                ? connector.saleconnector.client
+                : connector
         )
       );
 
@@ -745,7 +745,7 @@ module.exports.getPayment = async (req, res) => {
 // aslo to this but bro dont change my other codes only add pagination
 module.exports.getDebtsReport = async (req, res) => {
   try {
-    const { market, startDate, endDate } = req.body;
+    const { market, currentPage, countPage } = req.body;
 
     const marketData = await Market.findById(market);
     const reduce = (arr, el) =>
@@ -759,7 +759,7 @@ module.exports.getDebtsReport = async (req, res) => {
 
     const saleconnectors = await SaleConnector.find({
       market,
-      createdAt: { $gte: startDate, $lte: endDate },
+      // createdAt: { $gte: startDate, $lte: endDate },
     })
       .select("-isArchive -updatedAt -__v")
       .populate(
@@ -791,15 +791,60 @@ module.exports.getDebtsReport = async (req, res) => {
       .populate("packman", "name")
       .lean();
 
-    const debtsreport = saleconnectors
-      .map((sale) => {
-        const discount = reduce(sale.discounts, "discount");
-        const discountuzs = reduce(sale.discounts, "discountuzs");
-        const payment = reduce(sale.payments, "payment");
-        const paymentuzs = reduce(sale.payments, "paymentuzs");
-        const totalprice = reduce(sale.products, "totalprice");
-        const totalpriceuzs = reduce(sale.products, "totalpriceuzs");
+    // const debtsreport = saleconnectors
+    //   .map((sale) => {
+    //     const totalpriceuzs = reduce(sale.products, "totalpriceuzs");
+    //     const paymentuzs = reduce(sale.payments, "paymentuzs");
+    //     const discountuzs = reduce(sale.discounts, "discountuzs");
+    //     if (Math.round((totalpriceuzs - paymentuzs - discountuzs) * 1) / 1) {
 
+    //     }
+    //     const discount = reduce(sale.discounts, "discount");
+    //     const payment = reduce(sale.payments, "payment");
+    //     const totalprice = reduce(sale.products, "totalprice");
+
+    //     const debtComment =
+    //       sale.debts.length > 0
+    //         ? sale.debts[sale.debts.length - 1].comment
+    //         : "";
+    //     const debtId =
+    //       sale.debts.length > 0 ? sale.debts[sale.debts.length - 1]._id : "";
+    //     const payEndDate =
+    //       sale.debts.length > 0
+    //         ? sale.debts[sale.debts.length - 1].pay_end_date
+    //         : "";
+    //     const returnObj = {
+    //       _id: sale._id,
+    //       id: sale.id,
+    //       createdAt: sale.createdAt,
+    //       client: sale.client,
+    //       totalprice,
+    //       totalpriceuzs,
+    //       debt: Math.round((totalprice - payment - discount) * 1000) / 1000,
+    //       debtuzs:
+    //         Math.round((totalpriceuzs - paymentuzs - discountuzs) * 1) / 1,
+    //       pay_end_date: payEndDate,
+    //       comment: debtComment,
+    //       packman: sale.packman ? sale.packman.name : "",
+    //       saleconnector: { ...sale },
+    //       totaldebtuzs: Math.round(totalpriceuzs - paymentuzs - discountuzs),
+    //       debts: [debtId],
+    //       debtid: debtId,
+    //       saleconnectors: [],
+    //     };
+    //     return { ...returnObj, saleconnectors: [returnObj] };
+    //   })
+    // .filter((sale) => sale.debtuzs > 0);
+
+    const debtsreport = []
+    for (const sale of saleconnectors) {
+      const totalpriceuzs = reduce(sale.products, "totalpriceuzs");
+      const paymentuzs = reduce(sale.payments, "paymentuzs");
+      const discountuzs = reduce(sale.discounts, "discountuzs");
+      if ((Math.round((totalpriceuzs - paymentuzs - discountuzs) * 1) / 1) > 0) {
+        const discount = reduce(sale.discounts, "discount");
+        const payment = reduce(sale.payments, "payment");
+        const totalprice = reduce(sale.products, "totalprice");
         const debtComment =
           sale.debts.length > 0
             ? sale.debts[sale.debts.length - 1].comment
@@ -829,9 +874,11 @@ module.exports.getDebtsReport = async (req, res) => {
           debtid: debtId,
           saleconnectors: [],
         };
-        return { ...returnObj, saleconnectors: [returnObj] };
-      })
-      .filter((sale) => sale.debtuzs > 0);
+        debtsreport.push({ ...returnObj, saleconnectors: [returnObj] })
+      } else {
+        continue
+      }
+    }
 
     let clientDebtMap = new Map();
 
@@ -889,7 +936,8 @@ module.exports.getDebtsReport = async (req, res) => {
     });
 
     res.status(201).json({
-      data: filteredDebtsReport.filter((sale) => sale.debtuzs > 0),
+      count: filteredDebtsReport.length,
+      data: filteredDebtsReport.splice(currentPage * countPage, countPage),
     });
   } catch (error) {
     console.error(error);
