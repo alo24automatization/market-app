@@ -837,11 +837,12 @@ module.exports.getDebtsReport = async (req, res) => {
     // .filter((sale) => sale.debtuzs > 0);
 
     const dreports = []
+    const uniqueClientDebts = new Set();
     for (const sale of saleconnectors) {
       const totalpriceuzs = reduce(sale.products, "totalpriceuzs");
       const paymentuzs = reduce(sale.payments, "paymentuzs");
       const discountuzs = reduce(sale.discounts, "discountuzs");
-      if ((Math.round((totalpriceuzs - paymentuzs - discountuzs) * 1) / 1) > 0) {
+      if ((Math.round((totalpriceuzs - paymentuzs - discountuzs) * 1) / 1) > 0 && sale.client && sale.client._id && !uniqueClientDebts.has(sale.client._id)) {
         const discount = reduce(sale.discounts, "discount");
         const payment = reduce(sale.payments, "payment");
         const totalprice = reduce(sale.products, "totalprice");
@@ -874,68 +875,104 @@ module.exports.getDebtsReport = async (req, res) => {
           debtid: debtId,
           saleconnectors: [],
         };
+        uniqueClientDebts.add(sale.client._id);
         dreports.push({ ...returnObj, saleconnectors: [returnObj] })
       } else {
         continue
       }
     }
-    const uniqueClientDebts = new Set();
-    const filteredDebtsReport = dreports.filter((sale) => {
-      if (sale.client && sale.client._id) {
-        if (uniqueClientDebts.has(sale.client._id)) {
-          return false;
-        } else {
-          uniqueClientDebts.add(sale.client._id);
-          return true;
-        }
-      } else {
-        // Handle the case where sale.client is undefined or doesn't have an _id
-        return false;
-      }
-    });
-    const count = filteredDebtsReport.length
+    // const uniqueClientDebts = new Set();
+    // const filteredDebtsReport = dreports.filter((sale) => {
+    //   if (sale.client && sale.client._id) {
+    //     if (uniqueClientDebts.has(sale.client._id)) {
+    //       return false;
+    //     } else {
+    //       uniqueClientDebts.add(sale.client._id);
+    //       return true;
+    //     }
+    //   } else {
+    //     // Handle the case where sale.client is undefined or doesn't have an _id
+    //     return false;
+    //   }
+    // });
+    const count = dreports.length
     console.log(count);
-    const debtsreport = filteredDebtsReport.splice(currentPage * countPage, countPage)
+    const debtsreport = dreports.splice(currentPage * countPage, countPage)
     console.log(debtsreport.length);
+
 
     let clientDebtMap = new Map();
 
-    debtsreport.forEach((sale) => {
-      if (sale.client && sale.client._id) {
-        const clientId = sale.client._id;
-        const existingData = clientDebtMap.get(clientId) || {
-          totaldebtuzs: 0,
-          debtuzs: 0,
-          pay_end_date: null,
-          totalpriceuzs: 0,
-          debts: [],
-          saleconnectors: [],
-        };
-        clientDebtMap.set(clientId, {
-          totaldebtuzs: existingData.totaldebtuzs + sale.totaldebtuzs,
-          debtuzs: existingData.debtuzs + sale.debtuzs,
-          totalpriceuzs: existingData.totalpriceuzs + sale.totalpriceuzs,
-          pay_end_date: sale.pay_end_date || existingData.pay_end_date,
-          debts: [...existingData.debts, ...sale.debts],
-          saleconnectors: [
-            ...existingData.saleconnectors,
-            ...sale.saleconnectors,
-          ],
-        });
-      }
-    });
+    // debtsreport.forEach((sale) => {
+    //   if (sale.client && sale.client._id) {
+    //     const clientId = sale.client._id;
+    //     const existingData = clientDebtMap.get(clientId) || {
+    //       totaldebtuzs: 0,
+    //       debtuzs: 0,
+    //       pay_end_date: null,
+    //       totalpriceuzs: 0,
+    //       debts: [],
+    //       saleconnectors: [],
+    //     };
+    //     clientDebtMap.set(clientId, {
+    //       totaldebtuzs: existingData.totaldebtuzs + sale.totaldebtuzs,
+    //       debtuzs: existingData.debtuzs + sale.debtuzs,
+    //       totalpriceuzs: existingData.totalpriceuzs + sale.totalpriceuzs,
+    //       pay_end_date: sale.pay_end_date || existingData.pay_end_date,
+    //       debts: [...existingData.debts, ...sale.debts],
+    //       saleconnectors: [
+    //         ...existingData.saleconnectors,
+    //         ...sale.saleconnectors,
+    //       ],
+    //     });
+    //   }
+    // });
+
+    // debtsreport.forEach((sale) => {
+    //   if (sale.client && sale.client._id) {
+    //     const clientId = sale.client._id;
+    //     const clientData = clientDebtMap.get(clientId);
+    //     sale.totaldebtuzs = clientData.totaldebtuzs;
+    //     sale.debtuzs = clientData.debtuzs;
+    //     sale.pay_end_date = clientData.pay_end_date;
+    //     sale.totalpriceuzs = clientData.totalpriceuzs;
+    //     sale.debts = clientData.debts;
+    //     sale.saleconnectors = clientData.saleconnectors;
+    //   }
+    // });
 
     debtsreport.forEach((sale) => {
-      if (sale.client && sale.client._id) {
-        const clientId = sale.client._id;
-        const clientData = clientDebtMap.get(clientId);
-        sale.totaldebtuzs = clientData.totaldebtuzs;
-        sale.debtuzs = clientData.debtuzs;
-        sale.pay_end_date = clientData.pay_end_date;
-        sale.totalpriceuzs = clientData.totalpriceuzs;
-        sale.debts = clientData.debts;
-        sale.saleconnectors = clientData.saleconnectors;
-      }
+      const clientId = sale.client._id;
+      const existingData = clientDebtMap.get(clientId) || {
+        totaldebtuzs: 0,
+        debtuzs: 0,
+        pay_end_date: null,
+        totalpriceuzs: 0,
+        debts: [],
+        saleconnectors: [],
+      };
+      clientDebtMap.set(clientId, {
+        totaldebtuzs: existingData.totaldebtuzs + sale.totaldebtuzs,
+        debtuzs: existingData.debtuzs + sale.debtuzs,
+        totalpriceuzs: existingData.totalpriceuzs + sale.totalpriceuzs,
+        pay_end_date: sale.pay_end_date || existingData.pay_end_date,
+        debts: [...existingData.debts, ...sale.debts],
+        saleconnectors: [
+          ...existingData.saleconnectors,
+          ...sale.saleconnectors,
+        ],
+      });
+      // const clientId = sale.client._id;
+      // const clientData = clientDebtMap.get(clientId);
+      sale.totaldebtuzs = existingData.totaldebtuzs + sale.totaldebtuzs;
+      sale.debtuzs = existingData.debtuzs + sale.debtuzs;
+      sale.pay_end_date = sale.pay_end_date || existingData.pay_end_date;
+      sale.totalpriceuzs = existingData.totalpriceuzs + sale.totalpriceuzs;
+      sale.debts = [...existingData.debts, ...sale.debts];
+      sale.saleconnectors = [
+        ...existingData.saleconnectors,
+        ...sale.saleconnectors,
+      ]
     });
 
 
