@@ -355,7 +355,7 @@ module.exports.paymentDebt = async (req, res) => {
 };
 module.exports.getClients = async (req, res) => {
   try {
-    const { market, search } = req.body;
+    const { market, search, currentPage, countPage } = req.body;
     const marke = await Market.findById(market);
     if (!marke) {
       return res
@@ -364,6 +364,7 @@ module.exports.getClients = async (req, res) => {
     }
 
     const name = regExpression(search ? search.client : "");
+    const phone = regExpression(search ? search.phone : "");
     const packman = search.packman;
 
     let clientsCount = [];
@@ -382,7 +383,25 @@ module.exports.getClients = async (req, res) => {
       })
         .sort({ _id: -1 })
         .select("name market packman phoneNumber")
-        .populate("packman", "name");
+        .populate("packman", "name")
+        .skip(currentPage * countPage)
+        .limit(countPage);
+    }
+    if (phone) {
+      clientsCount = await Client.find({
+        market,
+        phoneNumber: phone,
+      }).count();
+
+      clients = await Client.find({
+        market,
+        phoneNumber: phone,
+      })
+        .sort({ _id: -1 })
+        .select("name market phoneNumber packman")
+        .populate("packman", "name")
+        .skip(currentPage * countPage)
+        .limit(countPage);
     } else {
       clientsCount = await Client.find({
         market,
@@ -395,7 +414,9 @@ module.exports.getClients = async (req, res) => {
       })
         .sort({ _id: -1 })
         .select("name market phoneNumber packman")
-        .populate("packman", "name");
+        .populate("packman", "name")
+        .skip(currentPage * countPage)
+        .limit(countPage);
     }
 
     const reduceForSales = (arr, key) => {

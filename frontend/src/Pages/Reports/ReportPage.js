@@ -1,7 +1,7 @@
-import React, {useEffect, useMemo, useState} from 'react'
-import {useDispatch, useSelector} from 'react-redux'
-import {useParams} from 'react-router-dom'
-import {roundUsd, roundUzs, UsdToUzs, UzsToUsd} from '../../App/globalFunctions'
+import React, { useEffect, useMemo, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { useParams } from 'react-router-dom'
+import { roundUsd, roundUzs, UsdToUzs, UzsToUsd } from '../../App/globalFunctions'
 import LinkToBack from '../../Components/LinkToBack/LinkToBack'
 import UniversalModal from '../../Components/Modal/UniversalModal'
 import Pagination from '../../Components/Pagination/Pagination'
@@ -30,20 +30,20 @@ import {
     payDebt,
     setDebtComment,
 } from './reportsSlice'
-import {getExpense} from '../Expense/expenseSlice'
-import {ReportsTableHeaders} from './ReportsTableHeaders'
-import {filter} from 'lodash'
-import {universalSort} from './../../App/globalFunctions'
-import {excelAllSellings, getSellings} from '../Sale/Slices/sellingsSlice'
-import {VscClose} from 'react-icons/vsc'
-import {GrSettingsOption} from 'react-icons/gr'
-import {t} from 'i18next'
+import { getExpense } from '../Expense/expenseSlice'
+import { ReportsTableHeaders } from './ReportsTableHeaders'
+import { filter } from 'lodash'
+import { universalSort } from './../../App/globalFunctions'
+import { excelAllSellings, getSellings } from '../Sale/Slices/sellingsSlice'
+import { VscClose } from 'react-icons/vsc'
+import { GrSettingsOption } from 'react-icons/gr'
+import { t } from 'i18next'
 import ReactHTMLTableToExcel from 'react-html-table-to-excel'
 import Excel from '../../Images/Excel.svg'
 import SelectForm from '../../Components/Select/SelectForm.js'
 import SmallLoader from '../../Components/Spinner/SmallLoader.js'
 
-const ReportPage = ({accessToSaller}) => {
+const ReportPage = ({ accessToSaller }) => {
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
     useEffect(() => {
         const handleResize = () => {
@@ -56,15 +56,15 @@ const ReportPage = ({accessToSaller}) => {
             window.removeEventListener('resize', handleResize)
         }
     }, [])
-    let {id} = useParams()
+    let { id } = useParams()
     if (accessToSaller) {
         id = 'debts'
     }
 
     const dispatch = useDispatch()
 
-    const {market: _id, user} = useSelector((state) => state.login)
-    const {expenses} = useSelector((state) => state.expense)
+    const { market: _id, user } = useSelector((state) => state.login)
+    const { expenses } = useSelector((state) => state.expense)
     const {
         datas,
         count,
@@ -74,10 +74,10 @@ const ReportPage = ({accessToSaller}) => {
         totalpayment,
         notFoundClient,
     } = useSelector((state) => state.reports)
-    const {sellings} = useSelector((state) => state.sellings)
-    const {currencyType, currency} = useSelector((state) => state.currency)
+    const { sellings } = useSelector((state) => state.sellings)
+    const { currencyType, currency } = useSelector((state) => state.currency)
     const [currentPage, setCurrentPage] = useState(0)
-    const [countPage, setCountPage] = useState(20)
+    const [countPage, setCountPage] = useState(100)
     const [totalPage, setTotalPage] = useState(1)
     const [comment, setComment] = useState('')
     const [sendingSearch, setSendingSearch] = useState({
@@ -137,16 +137,16 @@ const ReportPage = ({accessToSaller}) => {
     const [printBody, setPrintBody] = useState({})
 
     const headers = [
-        {title: '№'},
-        {title: 'Kodi'},
-        {title: 'Nomi'},
-        {title: 'Soni'},
-        {title: 'Narxi'},
-        {title: 'Jami', styles: 'w-[10rem]'},
-        {title: ''},
+        { title: '№' },
+        { title: 'Kodi' },
+        { title: 'Nomi' },
+        { title: 'Soni' },
+        { title: 'Narxi' },
+        { title: 'Jami', styles: 'w-[10rem]' },
+        { title: '' },
     ]
 
-    const filterByTotal = ({value}) => {
+    const filterByTotal = ({ value }) => {
         setCountPage(Number(value))
         setCurrentPage(0)
     }
@@ -156,36 +156,36 @@ const ReportPage = ({accessToSaller}) => {
             cash: {
                 uzs: expenses
                     .filter((item) => item.type === 'cash')
-                    .reduce((prev, {sumuzs}) => {
+                    .reduce((prev, { sumuzs }) => {
                         return prev + sumuzs
                     }, 0),
                 usd: expenses
                     .filter((item) => item.type === 'cash')
-                    .reduce((prev, {sum}) => {
+                    .reduce((prev, { sum }) => {
                         return prev + sum
                     }, 0),
             },
             card: {
                 uzs: expenses
                     .filter((item) => item.type === 'card')
-                    .reduce((prev, {sumuzs}) => {
+                    .reduce((prev, { sumuzs }) => {
                         return prev + sumuzs
                     }, 0),
                 usd: expenses
                     .filter((item) => item.type === 'card')
-                    .reduce((prev, {sum}) => {
+                    .reduce((prev, { sum }) => {
                         return prev + sum
                     }, 0),
             },
             transfer: {
                 uzs: expenses
                     .filter((item) => item.type === 'transfer')
-                    .reduce((prev, {sumuzs}) => {
+                    .reduce((prev, { sumuzs }) => {
                         return prev + sumuzs
                     }, 0),
                 usd: expenses
                     .filter((item) => item.type === 'transfer')
-                    .reduce((prev, {sum}) => {
+                    .reduce((prev, { sum }) => {
                         return prev + sum
                     }, 0),
             },
@@ -210,9 +210,9 @@ const ReportPage = ({accessToSaller}) => {
             }
 
             const [
-                {saleconnectors},
-                {income, debts, discounts},
-                {totalpieces},
+                { saleconnectors },
+                { income, debts, discounts },
+                { totalpieces },
                 {
                     totalpieces: numberOfRemaningProducts,
                     totalprice,
@@ -338,7 +338,7 @@ const ReportPage = ({accessToSaller}) => {
         setPaymentDiscountPercent('')
         setPaymentDebt(0)
         setPaymentDebtUzs(0)
-        setDiscountSelectOption({label: '%', value: '%'})
+        setDiscountSelectOption({ label: '%', value: '%' })
     }
     const toggleCheckModal = () => {
         setModalVisible(!modalVisible)
@@ -355,7 +355,7 @@ const ReportPage = ({accessToSaller}) => {
     const convertToUzs = (value) => Math.round(value)
 
     const handleClickPayment = (debt) => {
-        const {useSessionStorage} = debt
+        const { useSessionStorage } = debt
         if (useSessionStorage) {
             const debtsFromSessionStorage =
                 JSON.parse(sessionStorage.getItem('selected_debts')) || []
@@ -810,7 +810,7 @@ const ReportPage = ({accessToSaller}) => {
                 user: user._id,
                 saleconnectorid: saleConnectorId,
             }
-            dispatch(payDebt(body)).then(({payload}) => {
+            dispatch(payDebt(body)).then(({ payload }) => {
                 setModalData(payload)
                 dispatch(getDebts())
                 setTimeout(() => {
@@ -1046,13 +1046,13 @@ const ReportPage = ({accessToSaller}) => {
 
     const handleModalDebtComment = (comment, debtid) => {
         console.log(comment)
-        dispatch(setDebtComment({comment, debtid}))
+        dispatch(setDebtComment({ comment, debtid }))
         setModalBody('debtcomment')
         setModalVisible(!modalVisible)
     }
 
     const toggleDebtCommentModal = () => {
-        dispatch(setDebtComment({comment: null, debtid: null}))
+        dispatch(setDebtComment({ comment: null, debtid: null }))
         setModalBody('')
         setModalVisible(!modalVisible)
     }
@@ -1120,9 +1120,9 @@ const ReportPage = ({accessToSaller}) => {
     useEffect(() => {
         if (id === 'debts') {
             setTotalDebt({
-                usd: roundUsd(datas.reduce((prev, {debt}) => prev + debt, 0)),
+                usd: roundUsd(datas.reduce((prev, { debt }) => prev + debt, 0)),
                 uzs: roundUzs(
-                    datas.reduce((prev, {debtuzs}) => prev + debtuzs, 0)
+                    datas.reduce((prev, { debtuzs }) => prev + debtuzs, 0)
                 ),
             })
         }
@@ -1250,35 +1250,35 @@ const ReportPage = ({accessToSaller}) => {
                             filterBy={
                                 id === 'debts'
                                     ? [
-                                          'id',
-                                          'clientName',
-                                          'clientPhoneNumber',
-                                          'page_changer',
-                                      ]
+                                        'id',
+                                        'clientName',
+                                        'clientPhoneNumber',
+                                        'page_changer',
+                                    ]
                                     : id === 'income'
-                                    ? ['total', 'id', 'startDate', 'endDate']
-                                    : id === 'expenses'
-                                    ? ['startDate', 'endDate']
-                                    : id === 'payments'
-                                    ? [
-                                          'id',
-                                          'clientName',
-                                          'startDate',
-                                          'endDate',
-                                      ]
-                                    : id === 'backproducts'
-                                    ? [
-                                          'id',
-                                          'clientName',
-                                          'startDate',
-                                          'endDate',
-                                      ]
-                                    : [
-                                          'id',
-                                          'clientName',
-                                          'startDate',
-                                          'endDate',
-                                      ]
+                                        ? ['total', 'id', 'startDate', 'endDate']
+                                        : id === 'expenses'
+                                            ? ['startDate', 'endDate']
+                                            : id === 'payments'
+                                                ? [
+                                                    'id',
+                                                    'clientName',
+                                                    'startDate',
+                                                    'endDate',
+                                                ]
+                                                : id === 'backproducts'
+                                                    ? [
+                                                        'id',
+                                                        'clientName',
+                                                        'startDate',
+                                                        'endDate',
+                                                    ]
+                                                    : [
+                                                        'id',
+                                                        'clientName',
+                                                        'startDate',
+                                                        'endDate',
+                                                    ]
                             }
                             filterById={searchId}
                             // filterByClientPhoneNumber={
@@ -1307,14 +1307,14 @@ const ReportPage = ({accessToSaller}) => {
                                     id === 'income'
                                         ? 'Sof foyda'
                                         : id === 'expenses'
-                                        ? 'Xarajatlar'
-                                        : id === 'payments'
-                                        ? 'Tushumlar'
-                                        : id === 'backproducts'
-                                        ? 'Qaytarilganlar'
-                                        : id === 'discounts'
-                                        ? 'Chegirmalar'
-                                        : 'Qarzlar'
+                                            ? 'Xarajatlar'
+                                            : id === 'payments'
+                                                ? 'Tushumlar'
+                                                : id === 'backproducts'
+                                                    ? 'Qaytarilganlar'
+                                                    : id === 'discounts'
+                                                        ? 'Chegirmalar'
+                                                        : 'Qarzlar'
                                 }
                             />
                             <span className={'btn-icon bg-white-900 p-[8px]'}>
@@ -1344,40 +1344,40 @@ const ReportPage = ({accessToSaller}) => {
                                 filterBy={
                                     id === 'debts'
                                         ? [
-                                              'startDate',
-                                              'endDate',
-                                              'id',
-                                              'clientName',
-                                          ]
+                                            'startDate',
+                                            'endDate',
+                                            'id',
+                                            'clientName',
+                                        ]
                                         : id === 'income'
-                                        ? [
-                                              'id',
-                                              'client',
-                                              'startDate',
-                                              'endDate',
-                                          ]
-                                        : id === 'expenses'
-                                        ? ['startDate', 'endDate']
-                                        : id === 'payments'
-                                        ? [
-                                              'id',
-                                              'clientName',
-                                              'startDate',
-                                              'endDate',
-                                          ]
-                                        : id === 'backproducts'
-                                        ? [
-                                              'id',
-                                              'clientName',
-                                              'startDate',
-                                              'endDate',
-                                          ]
-                                        : [
-                                              'id',
-                                              'clientName',
-                                              'startDate',
-                                              'endDate',
-                                          ]
+                                            ? [
+                                                'id',
+                                                'client',
+                                                'startDate',
+                                                'endDate',
+                                            ]
+                                            : id === 'expenses'
+                                                ? ['startDate', 'endDate']
+                                                : id === 'payments'
+                                                    ? [
+                                                        'id',
+                                                        'clientName',
+                                                        'startDate',
+                                                        'endDate',
+                                                    ]
+                                                    : id === 'backproducts'
+                                                        ? [
+                                                            'id',
+                                                            'clientName',
+                                                            'startDate',
+                                                            'endDate',
+                                                        ]
+                                                        : [
+                                                            'id',
+                                                            'clientName',
+                                                            'startDate',
+                                                            'endDate',
+                                                        ]
                                 }
                                 filterById={searchId}
                                 filterByClientName={searchClientName}
@@ -1438,6 +1438,7 @@ const ReportPage = ({accessToSaller}) => {
                         />
                     ))}
                 <div className='flex justify-center mt-3'>
+
                     {id !== 'debts' && (
                         <Pagination
                             countPage={countPage}
@@ -1466,6 +1467,7 @@ const ReportPage = ({accessToSaller}) => {
                         </li>
                     </ul>
                 )} */}
+
                 {id === 'payments' && totalpayment?.payment?.cash && (
                     <div className='flex items-center justify-between gap-10 mt-6 bg-white py-6 md:py-0 flex-col md:flex-row'>
                         <div className='flex flex-col items-start gap-2'>
@@ -1477,11 +1479,11 @@ const ReportPage = ({accessToSaller}) => {
                                 <div>
                                     {currencyType === 'USD'
                                         ? roundUsd(
-                                              totalpayment.payment.cash
-                                          ).toLocaleString('ru-RU')
+                                            totalpayment.payment.cash
+                                        ).toLocaleString('ru-RU')
                                         : roundUzs(
-                                              totalpayment.payment.cashuzs
-                                          ).toLocaleString('ru-RU')}{' '}
+                                            totalpayment.payment.cashuzs
+                                        ).toLocaleString('ru-RU')}{' '}
                                     {currencyType}
                                 </div>
                             </div>
@@ -1490,11 +1492,11 @@ const ReportPage = ({accessToSaller}) => {
                                 <div>
                                     {currencyType === 'USD'
                                         ? roundUsd(
-                                              totalpayment.payment.card
-                                          ).toLocaleString('ru-RU')
+                                            totalpayment.payment.card
+                                        ).toLocaleString('ru-RU')
                                         : roundUzs(
-                                              totalpayment.payment.carduzs
-                                          ).toLocaleString('ru-RU')}{' '}
+                                            totalpayment.payment.carduzs
+                                        ).toLocaleString('ru-RU')}{' '}
                                     {currencyType}
                                 </div>
                             </div>
@@ -1503,26 +1505,26 @@ const ReportPage = ({accessToSaller}) => {
                                 <div>
                                     {currencyType === 'USD'
                                         ? roundUsd(
-                                              totalpayment.payment.transfer
-                                          ).toLocaleString('ru-RU')
+                                            totalpayment.payment.transfer
+                                        ).toLocaleString('ru-RU')
                                         : roundUzs(
-                                              totalpayment.payment.transferuzs
-                                          ).toLocaleString('ru-RU')}{' '}
+                                            totalpayment.payment.transferuzs
+                                        ).toLocaleString('ru-RU')}{' '}
                                     {currencyType}
                                 </div>
                             </div>
                             <div className='text-[18px] font-semibold w-full text-end'>
                                 {currencyType === 'USD'
                                     ? roundUsd(
-                                          totalpayment.payment.cash +
-                                              totalpayment.payment.card +
-                                              totalpayment.payment.transfer
-                                      ).toLocaleString('ru-RU')
+                                        totalpayment.payment.cash +
+                                        totalpayment.payment.card +
+                                        totalpayment.payment.transfer
+                                    ).toLocaleString('ru-RU')
                                     : roundUzs(
-                                          totalpayment.payment.cashuzs +
-                                              totalpayment.payment.carduzs +
-                                              totalpayment.payment.transferuzs
-                                      ).toLocaleString('ru-RU')}{' '}
+                                        totalpayment.payment.cashuzs +
+                                        totalpayment.payment.carduzs +
+                                        totalpayment.payment.transferuzs
+                                    ).toLocaleString('ru-RU')}{' '}
                                 {currencyType}
                             </div>
                         </div>
@@ -1535,11 +1537,11 @@ const ReportPage = ({accessToSaller}) => {
                                 <span>
                                     {currencyType === 'USD'
                                         ? roundUsd(
-                                              totalpayment?.agentProfit?.cash
-                                          ).toLocaleString('ru-RU')
+                                            totalpayment?.agentProfit?.cash
+                                        ).toLocaleString('ru-RU')
                                         : roundUzs(
-                                              totalpayment?.agentProfit?.cashuzs
-                                          ).toLocaleString('ru-RU')}{' '}
+                                            totalpayment?.agentProfit?.cashuzs
+                                        ).toLocaleString('ru-RU')}{' '}
                                     {currencyType}
                                 </span>
                             </div>
@@ -1548,11 +1550,11 @@ const ReportPage = ({accessToSaller}) => {
                                 <span>
                                     {currencyType === 'USD'
                                         ? roundUsd(
-                                              totalpayment?.agentProfit?.card
-                                          ).toLocaleString('ru-RU')
+                                            totalpayment?.agentProfit?.card
+                                        ).toLocaleString('ru-RU')
                                         : roundUzs(
-                                              totalpayment?.agentProfit?.carduzs
-                                          ).toLocaleString('ru-RU')}{' '}
+                                            totalpayment?.agentProfit?.carduzs
+                                        ).toLocaleString('ru-RU')}{' '}
                                     {currencyType}
                                 </span>
                             </div>
@@ -1561,31 +1563,31 @@ const ReportPage = ({accessToSaller}) => {
                                 <span>
                                     {currencyType === 'USD'
                                         ? roundUsd(
-                                              totalpayment?.agentProfit
-                                                  ?.transfer
-                                          ).toLocaleString('ru-RU')
+                                            totalpayment?.agentProfit
+                                                ?.transfer
+                                        ).toLocaleString('ru-RU')
                                         : roundUzs(
-                                              totalpayment?.agentProfit
-                                                  ?.transferuzs
-                                          ).toLocaleString('ru-RU')}{' '}
+                                            totalpayment?.agentProfit
+                                                ?.transferuzs
+                                        ).toLocaleString('ru-RU')}{' '}
                                     {currencyType}
                                 </span>
                             </div>
                             <div className='text-[18px] font-semibold w-full text-end'>
                                 {currencyType === 'USD'
                                     ? roundUsd(
-                                          totalpayment?.agentProfit?.cash +
-                                              totalpayment?.agentProfit?.card +
-                                              totalpayment?.agentProfit
-                                                  ?.transfer
-                                      ).toLocaleString('ru-RU')
+                                        totalpayment?.agentProfit?.cash +
+                                        totalpayment?.agentProfit?.card +
+                                        totalpayment?.agentProfit
+                                            ?.transfer
+                                    ).toLocaleString('ru-RU')
                                     : roundUzs(
-                                          totalpayment?.agentProfit?.cashuzs +
-                                              totalpayment?.agentProfit
-                                                  ?.carduzs +
-                                              totalpayment?.agentProfit
-                                                  ?.transferuzs
-                                      ).toLocaleString('ru-RU')}{' '}
+                                        totalpayment?.agentProfit?.cashuzs +
+                                        totalpayment?.agentProfit
+                                            ?.carduzs +
+                                        totalpayment?.agentProfit
+                                            ?.transferuzs
+                                    ).toLocaleString('ru-RU')}{' '}
                                 {currencyType}
                             </div>
                         </div>
@@ -1598,11 +1600,11 @@ const ReportPage = ({accessToSaller}) => {
                                 <span>
                                     {currencyType === 'USD'
                                         ? roundUsd(
-                                              totalpayment.back.cash
-                                          ).toLocaleString('ru-RU')
+                                            totalpayment.back.cash
+                                        ).toLocaleString('ru-RU')
                                         : roundUzs(
-                                              totalpayment.back.cashuzs
-                                          ).toLocaleString('ru-RU')}{' '}
+                                            totalpayment.back.cashuzs
+                                        ).toLocaleString('ru-RU')}{' '}
                                     {currencyType}
                                 </span>
                             </div>
@@ -1611,11 +1613,11 @@ const ReportPage = ({accessToSaller}) => {
                                 <span>
                                     {currencyType === 'USD'
                                         ? roundUsd(
-                                              totalpayment.back.card
-                                          ).toLocaleString('ru-RU')
+                                            totalpayment.back.card
+                                        ).toLocaleString('ru-RU')
                                         : roundUzs(
-                                              totalpayment.back.carduzs
-                                          ).toLocaleString('ru-RU')}{' '}
+                                            totalpayment.back.carduzs
+                                        ).toLocaleString('ru-RU')}{' '}
                                     {currencyType}
                                 </span>
                             </div>
@@ -1624,26 +1626,26 @@ const ReportPage = ({accessToSaller}) => {
                                 <span>
                                     {currencyType === 'USD'
                                         ? roundUsd(
-                                              totalpayment.back.transfer
-                                          ).toLocaleString('ru-RU')
+                                            totalpayment.back.transfer
+                                        ).toLocaleString('ru-RU')
                                         : roundUzs(
-                                              totalpayment.back.transferuzs
-                                          ).toLocaleString('ru-RU')}{' '}
+                                            totalpayment.back.transferuzs
+                                        ).toLocaleString('ru-RU')}{' '}
                                     {currencyType}
                                 </span>
                             </div>
                             <div className='text-[18px] font-semibold w-full text-end'>
                                 {currencyType === 'USD'
                                     ? roundUsd(
-                                          totalpayment.back.cash +
-                                              totalpayment.back.card +
-                                              totalpayment.back.transfer
-                                      ).toLocaleString('ru-RU')
+                                        totalpayment.back.cash +
+                                        totalpayment.back.card +
+                                        totalpayment.back.transfer
+                                    ).toLocaleString('ru-RU')
                                     : roundUzs(
-                                          totalpayment.back.cashuzs +
-                                              totalpayment.back.carduzs +
-                                              totalpayment.back.transferuzs
-                                      ).toLocaleString('ru-RU')}{' '}
+                                        totalpayment.back.cashuzs +
+                                        totalpayment.back.carduzs +
+                                        totalpayment.back.transferuzs
+                                    ).toLocaleString('ru-RU')}{' '}
                                 {currencyType}
                             </div>
                         </div>
@@ -1658,11 +1660,11 @@ const ReportPage = ({accessToSaller}) => {
                                         -
                                         {currencyType === 'USD'
                                             ? roundUsd(
-                                                  memoizedExpenses.cash.usd
-                                              ).toLocaleString('ru-RU')
+                                                memoizedExpenses.cash.usd
+                                            ).toLocaleString('ru-RU')
                                             : roundUzs(
-                                                  memoizedExpenses.cash.uzs
-                                              ).toLocaleString('ru-RU')}{' '}
+                                                memoizedExpenses.cash.uzs
+                                            ).toLocaleString('ru-RU')}{' '}
                                         {currencyType}
                                     </span>
                                 </div>
@@ -1672,11 +1674,11 @@ const ReportPage = ({accessToSaller}) => {
                                         -
                                         {currencyType === 'USD'
                                             ? roundUsd(
-                                                  memoizedExpenses.card.usd
-                                              ).toLocaleString('ru-RU')
+                                                memoizedExpenses.card.usd
+                                            ).toLocaleString('ru-RU')
                                             : roundUzs(
-                                                  memoizedExpenses.card.uzs
-                                              ).toLocaleString('ru-RU')}{' '}
+                                                memoizedExpenses.card.uzs
+                                            ).toLocaleString('ru-RU')}{' '}
                                         {currencyType}
                                     </span>
                                 </div>
@@ -1686,11 +1688,11 @@ const ReportPage = ({accessToSaller}) => {
                                         -
                                         {currencyType === 'USD'
                                             ? roundUsd(
-                                                  memoizedExpenses.transfer.usd
-                                              ).toLocaleString('ru-RU')
+                                                memoizedExpenses.transfer.usd
+                                            ).toLocaleString('ru-RU')
                                             : roundUzs(
-                                                  memoizedExpenses.transfer.uzs
-                                              ).toLocaleString('ru-RU')}{' '}
+                                                memoizedExpenses.transfer.uzs
+                                            ).toLocaleString('ru-RU')}{' '}
                                         {currencyType}
                                     </span>
                                 </div>
@@ -1698,15 +1700,15 @@ const ReportPage = ({accessToSaller}) => {
                                     -
                                     {currencyType === 'USD'
                                         ? roundUsd(
-                                              memoizedExpenses.cash.usd +
-                                                  memoizedExpenses.card.usd +
-                                                  memoizedExpenses.transfer.usd
-                                          ).toLocaleString('ru-RU')
+                                            memoizedExpenses.cash.usd +
+                                            memoizedExpenses.card.usd +
+                                            memoizedExpenses.transfer.usd
+                                        ).toLocaleString('ru-RU')
                                         : roundUzs(
-                                              memoizedExpenses.cash.uzs +
-                                                  memoizedExpenses.card.uzs +
-                                                  memoizedExpenses.transfer.uzs
-                                          ).toLocaleString('ru-RU')}{' '}
+                                            memoizedExpenses.cash.uzs +
+                                            memoizedExpenses.card.uzs +
+                                            memoizedExpenses.transfer.uzs
+                                        ).toLocaleString('ru-RU')}{' '}
                                     {currencyType}
                                 </div>
                             </div>
@@ -1720,15 +1722,15 @@ const ReportPage = ({accessToSaller}) => {
                                 <span>
                                     {currencyType === 'USD'
                                         ? roundUsd(
-                                              totalpayment.result.cash -
-                                                  memoizedExpenses.cash.usd
-                                          ).toLocaleString('ru-RU')
+                                            totalpayment.result.cash -
+                                            memoizedExpenses.cash.usd
+                                        ).toLocaleString('ru-RU')
                                         : roundUzs(
-                                              totalpayment.result.cashuzs -
-                                                  memoizedExpenses.cash.uzs -
-                                                  totalpayment.agentProfit
-                                                      .cashuzs
-                                          ).toLocaleString('ru-RU')}{' '}
+                                            totalpayment.result.cashuzs -
+                                            memoizedExpenses.cash.uzs -
+                                            totalpayment.agentProfit
+                                                .cashuzs
+                                        ).toLocaleString('ru-RU')}{' '}
                                     {currencyType}
                                 </span>
                             </div>
@@ -1737,16 +1739,16 @@ const ReportPage = ({accessToSaller}) => {
                                 <span>
                                     {currencyType === 'USD'
                                         ? roundUsd(
-                                              totalpayment.result.card -
-                                                  memoizedExpenses.card.usd -
-                                                  totalpayment.agentProfit.card
-                                          ).toLocaleString('ru-RU')
+                                            totalpayment.result.card -
+                                            memoizedExpenses.card.usd -
+                                            totalpayment.agentProfit.card
+                                        ).toLocaleString('ru-RU')
                                         : roundUzs(
-                                              totalpayment.result.carduzs -
-                                                  memoizedExpenses.card.uzs -
-                                                  totalpayment.agentProfit
-                                                      .carduzs
-                                          ).toLocaleString('ru-RU')}{' '}
+                                            totalpayment.result.carduzs -
+                                            memoizedExpenses.card.uzs -
+                                            totalpayment.agentProfit
+                                                .carduzs
+                                        ).toLocaleString('ru-RU')}{' '}
                                     {currencyType}
                                 </span>
                             </div>
@@ -1755,16 +1757,16 @@ const ReportPage = ({accessToSaller}) => {
                                 <span>
                                     {currencyType === 'USD'
                                         ? roundUsd(
-                                              totalpayment.result.transfer -
-                                                  memoizedExpenses.transfer.usd
-                                          ).toLocaleString('ru-RU')
+                                            totalpayment.result.transfer -
+                                            memoizedExpenses.transfer.usd
+                                        ).toLocaleString('ru-RU')
                                         : roundUzs(
-                                              totalpayment.result.transferuzs -
-                                                  memoizedExpenses.transfer
-                                                      .uzs -
-                                                  totalpayment.agentProfit
-                                                      .transferuzs
-                                          ).toLocaleString('ru-RU')}{' '}
+                                            totalpayment.result.transferuzs -
+                                            memoizedExpenses.transfer
+                                                .uzs -
+                                            totalpayment.agentProfit
+                                                .transferuzs
+                                        ).toLocaleString('ru-RU')}{' '}
                                     {currencyType}
                                 </span>
                             </div>
@@ -1787,13 +1789,21 @@ const ReportPage = ({accessToSaller}) => {
                 )}
             </div>
             <div>
+                {id === 'debts' && <div className="p-2">
+                    <button onClick={() => setCurrentPage(prev => prev === 0 ? 0 : prev - 1)} style={{ color: "white" }} class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        Ortga
+                    </button>
+                    <button onClick={() => setCurrentPage(prev => prev + 1)} style={{ color: "white" }} class="ml-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        Keyingi
+                    </button>
+                </div>}
                 {/* {(filteredDataTotal !== 0 || totalSearched !== 0) && ( */}
-                <Pagination
+                {id !== 'debts' && <Pagination
                     countPage={Number(countPage)}
                     totalDatas={totalPage}
                     setCurrentPage={setCurrentPage}
                     currentPage={currentPage}
-                />
+                />}
                 {/* )} */}
             </div>
             <div>
@@ -1817,8 +1827,8 @@ const ReportPage = ({accessToSaller}) => {
                                 ? paymentDiscount
                                 : paymentDiscountPercent
                             : discountSelectOption.value === 'UZS'
-                            ? paymentDiscountUzs
-                            : paymentDiscountPercent
+                                ? paymentDiscountUzs
+                                : paymentDiscountPercent
                     }
                     handleChangeDiscount={handleChangeDiscount}
                     hasDiscount={hasDiscount}
@@ -1874,12 +1884,12 @@ const ReportPage = ({accessToSaller}) => {
                     modalBody === 'sell'
                         ? toggleModal
                         : modalBody === 'complete'
-                        ? handleClosePay
-                        : modalBody === 'allChecks'
-                        ? toggleSaleCheck
-                        : modalBody === 'debtcomment'
-                        ? toggleDebtCommentModal
-                        : toggleCheckModal
+                            ? handleClosePay
+                            : modalBody === 'allChecks'
+                                ? toggleSaleCheck
+                                : modalBody === 'debtcomment'
+                                    ? toggleDebtCommentModal
+                                    : toggleCheckModal
                 }
                 approveFunction={handleApprovePay}
                 isOpen={modalVisible}

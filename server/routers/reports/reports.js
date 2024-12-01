@@ -745,7 +745,11 @@ module.exports.getPayment = async (req, res) => {
 // aslo to this but bro dont change my other codes only add pagination
 module.exports.getDebtsReport = async (req, res) => {
   try {
-    const { market, startDate, endDate } = req.body;
+    const { market, startDate, endDate, currentPage, countPage } = req.body;
+
+    const page = currentPage ? parseInt(currentPage) : 1; // Default to page 1
+    const limit = countPage ? parseInt(countPage) : 10; // Default to 10 items per page
+    const skip = (page - 1) * limit; // Calculate the number of documents to skip
 
     const marketData = await Market.findById(market);
     const reduce = (arr, el) =>
@@ -757,82 +761,113 @@ module.exports.getDebtsReport = async (req, res) => {
         .json({ message: `Diqqat! Do'kon haqida malumotlar topilmadi!` });
     }
 
-    const saleconnectors = await SaleConnector.find({
-      market,
-      createdAt: { $gte: startDate, $lte: endDate },
+    const clients = await Client.find({
+      market
     })
       .select("-isArchive -updatedAt -__v")
-      .populate(
-        "payments",
-        "cash cashuzs card carduzs transfer transferuzs payment paymentuzs totalprice totalpriceuzs"
-      )
-      .populate({
-        path: "products",
-        select:
-          "totalprice unitprice totalpriceuzs unitpriceuzs pieces createdAt discount saleproducts product",
-        options: { sort: { createdAt: -1 } },
-        populate: [
-          {
-            path: "product",
-            select: "productdata",
-            populate: { path: "productdata", select: "name code" },
-          },
-          { path: "user", select: "firstname lastname" },
-        ],
+      .skip(currentPage * countPage) // Skip documents for pagination
+      .limit(countPage); // Limit the number of documents per page
+    console.log('fewfe');
+    const debtsreport = []
+    for (const client of clients) {
+      const saleconnectors = await SaleConnector.find({
+        client: client._id
       })
-      .populate("client", "name phoneNumber")
-      .populate("debts", "comment pay_end_date")
-      .populate(
-        "discounts",
-        "discount discountuzs procient products totalprice totalpriceuzs"
-      )
-      .populate("user", "firstname lastname")
-      .populate("dailyconnectors", "comment debt")
-      .populate("packman", "name")
-      .lean();
+        .select("-isArchive -updatedAt -__v")
+        .populate("payments", "paymentuzs")
+        .populate("products", "totalpriceuzs")
+        .populate("discounts", "discountuzs")
+        .lean()
 
-    const debtsreport = saleconnectors
-      .map((sale) => {
-        const discount = reduce(sale.discounts, "discount");
-        const discountuzs = reduce(sale.discounts, "discountuzs");
-        const payment = reduce(sale.payments, "payment");
-        const paymentuzs = reduce(sale.payments, "paymentuzs");
-        const totalprice = reduce(sale.products, "totalprice");
-        const totalpriceuzs = reduce(sale.products, "totalpriceuzs");
+      let totalpriceuzs = 0
+      let paymentuzs = 0
+      let discountuzs = 0
 
-        const debtComment =
-          sale.debts.length > 0
-            ? sale.debts[sale.debts.length - 1].comment
-            : "";
-        const debtId =
-          sale.debts.length > 0 ? sale.debts[sale.debts.length - 1]._id : "";
-        const payEndDate =
-          sale.debts.length > 0
-            ? sale.debts[sale.debts.length - 1].pay_end_date
-            : "";
-        const returnObj = {
-          _id: sale._id,
-          id: sale.id,
-          createdAt: sale.createdAt,
-          client: sale.client,
-          totalprice,
-          totalpriceuzs,
-          debt: Math.round((totalprice - payment - discount) * 1000) / 1000,
-          debtuzs:
-            Math.round((totalpriceuzs - paymentuzs - discountuzs) * 1) / 1,
-          pay_end_date: payEndDate,
-          comment: debtComment,
-          packman: sale.packman ? sale.packman.name : "",
-          saleconnector: { ...sale },
-          totaldebtuzs: Math.round(totalpriceuzs - paymentuzs - discountuzs),
-          debts: [debtId],
-          debtid: debtId,
-          saleconnectors: [],
-        };
-        return { ...returnObj, saleconnectors: [returnObj] };
-      })
-      .filter((sale) => sale.debtuzs > 0);
+      for (const sale of saleconnectors) {
+        totalpriceuzs += sale.products.reduce((prev, product) => prev + product.totalpriceuzs, 0)
+        paymentuzs += sale.payments.reduce((prev, payment) => prev + payment.paymentuzs, 0)
+        discountuzs += sale.discounts.reduce((prev, discount) => prev + discount.discountuzs, 0)
+      }
 
+      if ((Math.round((totalpriceuzs - paymentuzs - discountuzs) * 1) / 1) > 0) {
+        const sales = await SaleConnector.find({
+          client: client._id
+        })
+          .select("-isArchive -updatedAt -__v")
+          .populate(
+            "payments",
+            "cash cashuzs card carduzs transfer transferuzs payment paymentuzs totalprice totalpriceuzs"
+          )
+          .populate({
+            path: "products",
+            select:
+              "totalprice unitprice totalpriceuzs unitpriceuzs pieces createdAt discount saleproducts product",
+            options: { sort: { createdAt: -1 } },
+            populate: [
+              {
+                path: "product",
+                select: "productdata",
+                populate: { path: "productdata", select: "name code" },
+              },
+              { path: "user", select: "firstname lastname" },
+            ],
+          })
+          .populate("client", "name phoneNumber")
+          .populate("debts", "comment pay_end_date")
+          .populate(
+            "discounts",
+            "discount discountuzs procient products totalprice totalpriceuzs"
+          )
+          .populate("user", "firstname lastname")
+          .populate("dailyconnectors", "comment debt")
+          .populate("packman", "name")
+          .lean();
+        const reports = sales.map((sale) => {
+          const discount = reduce(sale.discounts, "discount");
+          const discountuzs = reduce(sale.discounts, "discountuzs");
+          const payment = reduce(sale.payments, "payment");
+          const paymentuzs = reduce(sale.payments, "paymentuzs");
+          const totalprice = reduce(sale.products, "totalprice");
+          const totalpriceuzs = reduce(sale.products, "totalpriceuzs");
+
+          const debtComment =
+            sale.debts.length > 0
+              ? sale.debts[sale.debts.length - 1].comment
+              : "";
+          const debtId =
+            sale.debts.length > 0 ? sale.debts[sale.debts.length - 1]._id : "";
+          const payEndDate =
+            sale.debts.length > 0
+              ? sale.debts[sale.debts.length - 1].pay_end_date
+              : "";
+          const returnObj = {
+            _id: sale._id,
+            id: sale.id,
+            createdAt: sale.createdAt,
+            client: sale.client,
+            totalprice,
+            totalpriceuzs,
+            debt: Math.round((totalprice - payment - discount) * 1000) / 1000,
+            debtuzs:
+              Math.round((totalpriceuzs - paymentuzs - discountuzs) * 1) / 1,
+            pay_end_date: payEndDate,
+            comment: debtComment,
+            packman: sale.packman ? sale.packman.name : "",
+            saleconnector: { ...sale },
+            totaldebtuzs: Math.round(totalpriceuzs - paymentuzs - discountuzs),
+            debts: [debtId],
+            debtid: debtId,
+            saleconnectors: [],
+          };
+          return { ...returnObj, saleconnectors: [returnObj] };
+        })
+        debtsreport.push(...reports)
+        console.log(debtsreport.length);
+      } else {
+        continue
+      }
+
+    }
     let clientDebtMap = new Map();
 
     debtsreport.forEach((sale) => {
@@ -889,7 +924,8 @@ module.exports.getDebtsReport = async (req, res) => {
     });
 
     res.status(201).json({
-      data: filteredDebtsReport.filter((sale) => sale.debtuzs > 0),
+      count: filteredDebtsReport.length,
+      data: filteredDebtsReport
     });
   } catch (error) {
     console.error(error);

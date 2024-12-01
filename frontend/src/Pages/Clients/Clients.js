@@ -1,16 +1,16 @@
-import React, {useEffect, useState} from 'react'
+import React, { useEffect, useState } from 'react'
 import FieldContainer from '../../Components/FieldContainer/FieldContainer'
 import Button from '../../Components/Buttons/BtnAddRemove'
 import Pagination from '../../Components/Pagination/Pagination'
 import Table from '../../Components/Table/Table'
 import TableMobile from '../../Components/Table/TableMobile'
-import {useDispatch, useSelector} from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import Spinner from '../../Components/Spinner/SmallLoader.js'
 import NotFind from '../../Components/NotFind/NotFind.js'
 import SearchForm from '../../Components/SearchForm/SearchForm'
 import UniversalModal from '../../Components/Modal/UniversalModal.js'
-import {motion} from 'framer-motion'
-import {filter, map} from 'lodash'
+import { motion } from 'framer-motion'
+import { filter, map } from 'lodash'
 import {
     successAddClientMessage,
     successDeleteClientMessage,
@@ -26,39 +26,39 @@ import {
     getClientsByFilter,
     updateClients,
 } from './clientsSlice'
-import {checkEmptyString} from '../../App/globalFunctions.js'
-import {useTranslation} from 'react-i18next'
-import {VscChromeClose} from 'react-icons/vsc'
-import {FaFilter} from 'react-icons/fa'
+import { checkEmptyString } from '../../App/globalFunctions.js'
+import { useTranslation } from 'react-i18next'
+import { VscChromeClose } from 'react-icons/vsc'
+import { FaFilter } from 'react-icons/fa'
 import SelectForm from '../../Components/Select/SelectForm.js'
 
 const ClientsPage = () => {
-    const {t} = useTranslation(['common'])
+    const { t } = useTranslation(['common'])
     const dispatch = useDispatch()
 
-    const {packmans, clients, loading, searchedClients, total, totalSearched} =
+    const { packmans, clients, loading, searchedClients, total, totalSearched } =
         useSelector((state) => state.clients)
 
-    const {user} = useSelector((state) => state.login)
+    const { user } = useSelector((state) => state.login)
 
     const headers =
         user.type === 'Director'
             ? [
-                {title: '№', styles: 'w-[8%] text-left'},
-                {title: t('Agent'), styles: 'w-[41%] text-left'},
-                {title: t('Mijoz'), styles: 'w-[41%] text-left'},
-                {title: t('Telefon'), styles: 'w-[41%] text-left'},
-                {title: t('Savdo'), styles: 'w-[41%] text-left'},
-                {title: t('Sof foyda'), styles: 'w-[41%] text-left'},
-                {title: '', styles: 'w-[8%] text-left'},
+                { title: '№', styles: 'w-[8%] text-left' },
+                { title: t('Agent'), styles: 'w-[41%] text-left' },
+                { title: t('Mijoz'), styles: 'w-[41%] text-left' },
+                { title: t('Telefon'), styles: 'w-[41%] text-left' },
+                { title: t('Savdo'), styles: 'w-[41%] text-left' },
+                { title: t('Sof foyda'), styles: 'w-[41%] text-left' },
+                { title: '', styles: 'w-[8%] text-left' },
             ]
             : [
-                {title: '№', styles: 'w-[8%] text-left'},
-                {title: t('Agent'), styles: 'w-[41%] text-left'},
-                {title: t('Mijoz'), styles: 'w-[41%] text-left'},
-                {title: t('Telefon'), styles: 'w-[41%] text-left'},
-                {title: t('Savdo'), styles: 'w-[41%] text-left'},
-                {title: '', styles: 'w-[8%] text-left'},
+                { title: '№', styles: 'w-[8%] text-left' },
+                { title: t('Agent'), styles: 'w-[41%] text-left' },
+                { title: t('Mijoz'), styles: 'w-[41%] text-left' },
+                { title: t('Telefon'), styles: 'w-[41%] text-left' },
+                { title: t('Savdo'), styles: 'w-[41%] text-left' },
+                { title: '', styles: 'w-[8%] text-left' },
             ]
 
     const [startDate, setStartDate] = useState(
@@ -124,7 +124,7 @@ const ClientsPage = () => {
     const handleEditClients = (client) => {
         setPackman(
             client.packman
-                ? {label: client.packman.name, value: client.packman._id}
+                ? { label: client.packman.name, value: client.packman._id }
                 : ''
         )
         setClientName(client.name || '')
@@ -156,7 +156,7 @@ const ClientsPage = () => {
                 client: searchByName.replace(/\s+/g, ' ').trim(),
             },
         }
-        dispatch(deleteClients(body)).then(({error}) => {
+        dispatch(deleteClients(body)).then(({ error }) => {
             if (!error) {
                 clearForm()
                 successDeleteClientMessage()
@@ -167,7 +167,7 @@ const ClientsPage = () => {
     // handle submit of inputs
     const addNewClients = (e) => {
         e.preventDefault()
-        const {failed, message} = checkEmptyString([
+        const { failed, message } = checkEmptyString([
             {
                 value: clientName,
                 message: t('Mijoz ismi'),
@@ -186,7 +186,7 @@ const ClientsPage = () => {
                     client: searchByName.replace(/\s+/g, ' ').trim(),
                 },
             }
-            dispatch(addClients(body)).then(({error}) => {
+            dispatch(addClients(body)).then(({ error }) => {
                 if (!error) {
                     clearForm()
                     successAddClientMessage()
@@ -197,7 +197,7 @@ const ClientsPage = () => {
 
     const handleEdit = (e) => {
         e.preventDefault()
-        const {failed, message} = checkEmptyString([
+        const { failed, message } = checkEmptyString([
             {
                 value: clientName,
                 message: t('Mijoz ismi'),
@@ -221,7 +221,7 @@ const ClientsPage = () => {
                     client: searchByName.replace(/\s+/g, ' ').trim(),
                 },
             }
-            dispatch(updateClients(body)).then(({error}) => {
+            dispatch(updateClients(body)).then(({ error }) => {
                 if (!error) {
                     clearForm()
                     successUpdateClientMessage()
@@ -239,12 +239,12 @@ const ClientsPage = () => {
     }
 
     // filter by packman
-    const filterByPackman = ({value}) => {
+    const filterByPackman = ({ value }) => {
         setPackmanId(value)
     }
 
     // filter by total
-    const filterByTotal = ({value}) => {
+    const filterByTotal = ({ value }) => {
         setShowByTotal(value)
         setCurrentPage(0)
     }
@@ -297,6 +297,18 @@ const ClientsPage = () => {
             dispatch(getClientsByFilter(body))
         }
     }
+    const filterByPhoneWhenPressEnter = (e) => {
+        if (e.key === 'Enter') {
+            const body = {
+                currentPage,
+                countPage: showByTotal,
+                search: {
+                    phone: searchPhoneNumber.replace(/\s+/g, ' ').trim(),
+                },
+            }
+            dispatch(getClientsByFilter(body))
+        }
+    }
 
     const handleChangeOptions = (e) => {
         setPackman(e)
@@ -308,13 +320,14 @@ const ClientsPage = () => {
 
     useEffect(() => {
         const body = {
-            // currentPage,
-            // countPage: showByTotal,
-            // startDate,
-            // endDate,
+            currentPage,
+            countPage: showByTotal,
+            startDate,
+            endDate,
             search: {
                 client: searchByName.replace(/\s+/g, ' ').trim(),
                 packman: packmanId,
+                phone: phoneNumber
             },
         }
         dispatch(getClients(body))
@@ -331,7 +344,7 @@ const ClientsPage = () => {
     }, [searchedClients])
     useEffect(() => {
         const options = map(packmans, (packman) => {
-            return {label: packman.name, value: packman._id}
+            return { label: packman.name, value: packman._id }
         })
         setPackmanOptions(options)
     }, [packmans])
@@ -343,10 +356,10 @@ const ClientsPage = () => {
             animate='open'
             exit='collapsed'
             variants={{
-                open: {opacity: 1, height: 'auto'},
-                collapsed: {opacity: 0, height: 0},
+                open: { opacity: 1, height: 'auto' },
+                collapsed: { opacity: 0, height: 0 },
             }}
-            transition={{duration: 0.8, ease: [0.04, 0.62, 0.23, 0.98]}}
+            transition={{ duration: 0.8, ease: [0.04, 0.62, 0.23, 0.98] }}
         >
             <UniversalModal
                 headerText={`${deletedCLients && deletedCLients.name} ${t(
@@ -360,9 +373,8 @@ const ClientsPage = () => {
                 printedSelling={printedSelling}
             />
             <form
-                className={`flex ps-[20px] mt-[40px] gap-[1.25rem] bg-background flex-col mainPadding transition ease-linear duration-200 ${
-                    stickyForm && 'stickyForm'
-                }`}
+                className={`flex ps-[20px] mt-[40px] gap-[1.25rem] bg-background flex-col mainPadding transition ease-linear duration-200 ${stickyForm && 'stickyForm'
+                    }`}
             >
                 <div className='supplier-style'>
                     <FieldContainer
@@ -395,7 +407,7 @@ const ClientsPage = () => {
                             }
                             onClick={stickyForm ? handleEdit : addNewClients}
                         />
-                        <Button onClick={clearForm} text={t('Tozalash')}/>
+                        <Button onClick={clearForm} text={t('Tozalash')} />
                     </div>
                 </div>
 
@@ -417,7 +429,7 @@ const ClientsPage = () => {
                         }}
                         className='d-block  hover:bg-blue-200  bg-blue-400   focus-visible:outline-none w-[150px] h-[40px] createElement '
                     >
-                        <FaFilter/> {t('izlash')}
+                        <FaFilter /> {t('izlash')}
                     </button>
                 </div>
             )}
@@ -440,6 +452,7 @@ const ClientsPage = () => {
                         filterByDelivererNameWhenPressEnter={
                             filterByNameWhenPressEnter
                         }
+                        filterByClientPhoneNumberWithEnter={filterByPhoneWhenPressEnter}
                         searchByClientName={searchByName}
                         filterByClientName={filterByClientName}
                         startDate={startDate}
@@ -503,7 +516,7 @@ const ClientsPage = () => {
                                 }}
                                 className='d-block  hover:bg-blue-200  bg-blue-400   focus-visible:outline-none w-[150px] h-[40px] createElement '
                             >
-                                <FaFilter/> {t('izlash')}
+                                <FaFilter /> {t('izlash')}
                             </button>
                         </div>
                     </div>
@@ -512,9 +525,9 @@ const ClientsPage = () => {
 
             <div className='lg:tableContainerPadding'>
                 {loading ? (
-                    <Spinner/>
+                    <Spinner />
                 ) : data.length === 0 && searchedData.length === 0 ? (
-                    <NotFind text={t('Mijozlar mavjud emas')}/>
+                    <NotFind text={t('Mijozlar mavjud emas')} />
                 ) : !isMobile ? (
                     <Table
                         data={searchedData.length > 0 ? searchedData : data}
@@ -541,7 +554,7 @@ const ClientsPage = () => {
                     />
                 )}
             </div>
-            {/* <div className='pagination-supplier flex justify-center mt-[30px] mb-[30px] '>
+            <div className='pagination-supplier flex justify-center mt-[30px] mb-[30px] '>
                 {(filteredDataTotal !== 0 || totalSearched !== 0) && (
                     <Pagination
                         countPage={Number(showByTotal)}
@@ -550,7 +563,7 @@ const ClientsPage = () => {
                         setCurrentPage={setCurrentPage}
                     />
                 )}
-            </div> */}
+            </div>
         </motion.section>
     )
 }
