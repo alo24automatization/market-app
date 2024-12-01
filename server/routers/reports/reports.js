@@ -836,7 +836,7 @@ module.exports.getDebtsReport = async (req, res) => {
     //   })
     // .filter((sale) => sale.debtuzs > 0);
 
-    const debtsreport = []
+    const dreports = []
     for (const sale of saleconnectors) {
       const totalpriceuzs = reduce(sale.products, "totalpriceuzs");
       const paymentuzs = reduce(sale.payments, "paymentuzs");
@@ -874,11 +874,29 @@ module.exports.getDebtsReport = async (req, res) => {
           debtid: debtId,
           saleconnectors: [],
         };
-        debtsreport.push({ ...returnObj, saleconnectors: [returnObj] })
+        dreports.push({ ...returnObj, saleconnectors: [returnObj] })
       } else {
         continue
       }
     }
+    const uniqueClientDebts = new Set();
+    const filteredDebtsReport = dreports.filter((sale) => {
+      if (sale.client && sale.client._id) {
+        if (uniqueClientDebts.has(sale.client._id)) {
+          return false;
+        } else {
+          uniqueClientDebts.add(sale.client._id);
+          return true;
+        }
+      } else {
+        // Handle the case where sale.client is undefined or doesn't have an _id
+        return false;
+      }
+    });
+    const count = filteredDebtsReport.length
+    console.log(count);
+    const debtsreport = filteredDebtsReport.splice(currentPage * countPage, countPage)
+    console.log(debtsreport.length);
 
     let clientDebtMap = new Map();
 
@@ -920,24 +938,10 @@ module.exports.getDebtsReport = async (req, res) => {
       }
     });
 
-    const uniqueClientDebts = new Set();
-    const filteredDebtsReport = debtsreport.filter((sale) => {
-      if (sale.client && sale.client._id) {
-        if (uniqueClientDebts.has(sale.client._id)) {
-          return false;
-        } else {
-          uniqueClientDebts.add(sale.client._id);
-          return true;
-        }
-      } else {
-        // Handle the case where sale.client is undefined or doesn't have an _id
-        return false;
-      }
-    });
 
     res.status(201).json({
-      count: filteredDebtsReport.length,
-      data: filteredDebtsReport.splice(currentPage * countPage, countPage),
+      count: count,
+      data: debtsreport,
     });
   } catch (error) {
     console.error(error);
