@@ -1,16 +1,19 @@
-import React, {useEffect, useState} from 'react'
+import React, { useEffect, useState } from 'react'
 import TableBtn from '../../Buttons/TableBtn'
-import {map, uniqueId} from 'lodash'
-import {t} from 'i18next'
+import { map, uniqueId } from 'lodash'
+import { t } from 'i18next'
+import { useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 
 export const ClientSaleTable = ({
-                                    data,
-                                    currentPage,
-                                    countPage,
-                                    currency,
-                                    Print,
-                                    handlePayDebt,
-                                }) => {
+    data,
+    currentPage,
+    countPage,
+    currency,
+    Print,
+    handlePayDebt,
+}) => {
+    const { user } = useSelector((state) => state.login)
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
     const [totalDebtPayment, setTotalDebtPayment] = useState(0)
     const [totalDiscount, setTotalDiscount] = useState(0)
@@ -27,6 +30,14 @@ export const ClientSaleTable = ({
             window.removeEventListener('resize', handleResize)
         }
     }, [])
+
+    const navigate = useNavigate()
+    const linkToSale = (saleconnector, returnProducts) => {
+        navigate(`${user?.type === 'Seller' ? '/' : '/sotuv/sotish'}`, {
+            replace: true,
+            state: { saleconnector, returnProducts },
+        })
+    }
 
     const result = (prev, usd, uzs) => {
         return currency === 'USD' ? prev + usd : prev + uzs
@@ -48,12 +59,12 @@ export const ClientSaleTable = ({
                         sum +
                         Number(
                             payment[
-                                currency === 'USD' ? 'payment' : 'paymentuzs'
-                                ]
+                            currency === 'USD' ? 'payment' : 'paymentuzs'
+                            ]
                         )
                     )
                 }, 0)
-            }).reduce((prev,item)=>prev+item,0)
+            }).reduce((prev, item) => prev + item, 0)
         )
         setTotalDiscount(
             data?.reduce((sum, el) => {
@@ -62,8 +73,8 @@ export const ClientSaleTable = ({
                     Number(
                         (el?.discount &&
                             el?.discount[
-                                currency === 'USD' ? 'discount' : 'discountuzs'
-                                ]) ||
+                            currency === 'USD' ? 'discount' : 'discountuzs'
+                            ]) ||
                         0
                     )
                 )
@@ -199,10 +210,10 @@ export const ClientSaleTable = ({
                                     (payment) => {
                                         totalSum +=
                                             payment[
-                                                currency === 'USD'
-                                                    ? 'payment'
-                                                    : 'paymentuzs'
-                                                ]
+                                            currency === 'USD'
+                                                ? 'payment'
+                                                : 'paymentuzs'
+                                            ]
                                     }
                                 )}
                                 <li className='flex justify-between'>
@@ -227,6 +238,18 @@ export const ClientSaleTable = ({
                         </td>
                         <td className='py-[0.375rem] td border-r-0'>
                             <div className='flex items-center justify-center gap-[0.625rem]'>
+                                <TableBtn
+                                    type={'return'}
+                                    bgcolor={'bg-error-500'}
+                                    onClick={() => {
+                                        console.log(saleconnector)
+                                        linkToSale(
+                                            saleconnector.saleconnector,
+                                            true
+                                        )
+                                    }
+                                    }
+                                />
                                 <TableBtn
                                     type={'print'}
                                     bgcolor={'bg-blue-600'}

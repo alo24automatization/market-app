@@ -363,22 +363,20 @@ module.exports.getClients = async (req, res) => {
         .json({ message: "Diqqat! Do'kon malumotlari topilmadi." });
     }
 
-    const name = regExpression(search ? search.client : "");
-    const phone = regExpression(search ? search.phone : "");
+    const name = search?.client ? regExpression(search.client) : "";
+    const phone = search?.phone ? regExpression(search.phone) : "";
     const packman = search.packman;
 
     let clientsCount = [];
     let clients = [];
-    if (packman) {
+    if (packman && !name && !phone) {
       clientsCount = await Client.find({
         market,
-        name,
         packman,
       }).count();
 
       clients = await Client.find({
         market,
-        name: name,
         packman,
       })
         .sort({ _id: -1 })
@@ -386,8 +384,7 @@ module.exports.getClients = async (req, res) => {
         .populate("packman", "name")
         .skip(currentPage * countPage)
         .limit(countPage);
-    }
-    if (phone) {
+    } else if (!packman && !name && phone) {
       clientsCount = await Client.find({
         market,
         phoneNumber: phone,
@@ -402,15 +399,79 @@ module.exports.getClients = async (req, res) => {
         .populate("packman", "name")
         .skip(currentPage * countPage)
         .limit(countPage);
-    } else {
+    } else if (!packman && name && !phone) {
+      clientsCount = await Client.find({
+        market,
+        name
+      }).count();
+
+      clients = await Client.find({
+        market,
+        name
+      })
+        .sort({ _id: -1 })
+        .select("name market phoneNumber packman")
+        .populate("packman", "name")
+        .skip(currentPage * countPage)
+        .limit(countPage);
+    } else if (packman && name && !phone) {
+      clientsCount = await Client.find({
+        market,
+        name,
+        packman
+      }).count();
+
+      clients = await Client.find({
+        market,
+        name,
+        packman
+      })
+        .sort({ _id: -1 })
+        .select("name market phoneNumber packman")
+        .populate("packman", "name")
+        .skip(currentPage * countPage)
+        .limit(countPage);
+    } else if (packman && !name && phone) {
+      clientsCount = await Client.find({
+        market,
+        phoneNumber: phone,
+        packman
+      }).count();
+
+      clients = await Client.find({
+        market,
+        phoneNumber: phone,
+        packman
+      })
+        .sort({ _id: -1 })
+        .select("name market phoneNumber packman")
+        .populate("packman", "name")
+        .skip(currentPage * countPage)
+        .limit(countPage);
+    } else if (!packman && name && phone) {
       clientsCount = await Client.find({
         market,
         name: name,
+        phoneNumber: phone,
       }).count();
 
       clients = await Client.find({
         market,
         name: name,
+        phoneNumber: phone,
+      })
+        .sort({ _id: -1 })
+        .select("name market phoneNumber packman")
+        .populate("packman", "name")
+        .skip(currentPage * countPage)
+        .limit(countPage);
+    } else {
+      clientsCount = await Client.find({
+        market
+      }).count();
+
+      clients = await Client.find({
+        market
       })
         .sort({ _id: -1 })
         .select("name market phoneNumber packman")
@@ -571,6 +632,7 @@ module.exports.getClientsSales = async (req, res) => {
 
     const allpayments = await DailySaleConnector.find({
       market,
+      client: clientId
     })
       .select("-isArchive -updatedAt -market -__v")
       .populate({
@@ -593,7 +655,7 @@ module.exports.getClientsSales = async (req, res) => {
       .populate({
         path: "client",
         select: "name",
-        match: { _id: clientId },
+        // match: { _id: clientId },
       })
       .populate("packman", "name")
       .populate("user", "firstname lastname")
@@ -601,7 +663,17 @@ module.exports.getClientsSales = async (req, res) => {
         path: "saleconnector",
         populate: [
           { path: "payments" }, // Populate payments in saleconnector
-          { path: "products" }, // Populate products in saleconnector
+          {
+            path: "products",
+            populate: {
+              path: "product",
+              select: 'category productdata',
+              populate: {
+                path: "productdata",
+                select: "name code"
+              }
+            }
+          }, // Populate products in saleconnector
           { path: "discounts" }, // Populate discounts in saleconnector
         ],
       })

@@ -52,6 +52,9 @@ function Sellers() {
         { title: t('Sotuvlar') },
         { title: t('Summa') },
         { title: t('Sof foyda') },
+        { title: t('Naqt') },
+        { title: t('Plastik') },
+        { title: t("O'tkazma") },
         { title: '', styles: 'w-[8%]' },
     ]
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);

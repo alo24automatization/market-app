@@ -1,13 +1,13 @@
-import React, {useEffect, useMemo, useState} from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import ExportBtn from '../../../Components/Buttons/ExportBtn.js'
 import Pagination from '../../../Components/Pagination/Pagination.js'
 import Table from '../../../Components/Table/Table.js'
 import SearchForm from '../../../Components/SearchForm/SearchForm.js'
-import {useDispatch, useSelector} from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import Spinner from '../../../Components/Spinner/SmallLoader.js'
 import NotFind from '../../../Components/NotFind/NotFind.js'
-import {motion} from 'framer-motion'
-import {VscChromeClose} from 'react-icons/vsc'
+import { motion } from 'framer-motion'
+import { VscChromeClose } from 'react-icons/vsc'
 
 import {
     addClient,
@@ -17,16 +17,16 @@ import {
     getSellings,
     getSellingsByFilter,
 } from '../Slices/sellingsSlice.js'
-import {regexForTypeNumber} from '../../../Components/RegularExpressions/RegularExpressions.js'
+import { regexForTypeNumber } from '../../../Components/RegularExpressions/RegularExpressions.js'
 import UniversalModal from '../../../Components/Modal/UniversalModal.js'
-import {useTranslation} from 'react-i18next'
-import {filter, map} from 'lodash'
-import {exportExcel, universalSort} from './../../../App/globalFunctions'
-import {universalToast} from '../../../Components/ToastMessages/ToastMessages.js'
+import { useTranslation } from 'react-i18next'
+import { filter, map } from 'lodash'
+import { exportExcel, universalSort } from './../../../App/globalFunctions'
+import { universalToast } from '../../../Components/ToastMessages/ToastMessages.js'
 import socket from '../../../Config/socket.js'
-import {setAllProductsBySocket} from '../Slices/registerSellingSlice.js'
+import { setAllProductsBySocket } from '../Slices/registerSellingSlice.js'
 import SelectForm from '../../../Components/Select/SelectForm.js'
-import {FaFilter} from 'react-icons/fa'
+import { FaFilter } from 'react-icons/fa'
 import TableMobile from '../../../Components/Table/TableMobile.js'
 import {
     getReportsForTotal,
@@ -34,11 +34,11 @@ import {
     getExpensesReport,
     getPaymentReport,
 } from '../../Reports/reportsSlice.js'
-import {getProducts} from '../../Incomings/incomingSlice.js'
+import { getProducts } from '../../Incomings/incomingSlice.js'
 import SessionBtn from '../../../Components/Buttons/SessionBtn.js'
 
 const Sellings = ({ id }) => {
-    const {t} = useTranslation(['common'])
+    const { t } = useTranslation(['common'])
     const headers = [
         {
             title: '№',
@@ -72,9 +72,9 @@ const Sellings = ({ id }) => {
         },
     ]
     const dispatch = useDispatch()
-    const {currencyType} = useSelector((state) => state.currency)
-    const {user, market} = useSelector((state) => state.login)
-    const {totalpayment} = useSelector((state) => state.reports)
+    const { currencyType } = useSelector((state) => state.currency)
+    const { user, market } = useSelector((state) => state.login)
+    const { totalpayment } = useSelector((state) => state.reports)
     const [FilterModal, setFilterModal] = useState(false)
     const {
         sellings,
@@ -83,21 +83,21 @@ const Sellings = ({ id }) => {
         total,
         totalSearched,
     } = useSelector((state) => state.sellings)
-    const {expenses} = useSelector((state) => state.expense)
+    const { expenses } = useSelector((state) => state.expense)
     const [chooseBody, setChooseBody] = useState('')
     const [data, setData] = useState(sellings)
     const [storeData, setStoreData] = useState(sellings)
     const [filteredDataTotal, setFilteredDataTotal] = useState(total)
     const [searchedData, setSearchedData] = useState(searchedSellings)
     // need be 50
-    const [showByTotal, setShowByTotal] = useState(2)
+    const [showByTotal, setShowByTotal] = useState(50)
     const [currentPage, setCurrentPage] = useState(0)
-    const [searchingStatus,setSearchingStatus]=useState(false)
+    const [searchingStatus, setSearchingStatus] = useState(false)
     const [search, setSearch] = useState({
         id: '',
         client: '',
         product: '',
-        phoneNumber:''
+        phoneNumber: ''
     })
     const [sorItem, setSorItem] = useState({
         filter: '',
@@ -120,7 +120,7 @@ const Sellings = ({ id }) => {
     const [selectedProduct, setSelectedProduct] = useState('')
     const [deletingProduct, setDeleteProduct] = useState(null)
     // filter by total
-    const filterByTotal = ({value}) => {
+    const filterByTotal = ({ value }) => {
         setShowByTotal(value)
         setCurrentPage(0)
     }
@@ -132,36 +132,36 @@ const Sellings = ({ id }) => {
             cash: {
                 uzs: expenses
                     .filter((item) => item.type === 'cash')
-                    .reduce((prev, {sumuzs}) => {
+                    .reduce((prev, { sumuzs }) => {
                         return prev + sumuzs
                     }, 0),
                 usd: expenses
                     .filter((item) => item.type === 'cash')
-                    .reduce((prev, {sum}) => {
+                    .reduce((prev, { sum }) => {
                         return prev + sum
                     }, 0),
             },
             card: {
                 uzs: expenses
                     .filter((item) => item.type === 'card')
-                    .reduce((prev, {sumuzs}) => {
+                    .reduce((prev, { sumuzs }) => {
                         return prev + sumuzs
                     }, 0),
                 usd: expenses
                     .filter((item) => item.type === 'card')
-                    .reduce((prev, {sum}) => {
+                    .reduce((prev, { sum }) => {
                         return prev + sum
                     }, 0),
             },
             transfer: {
                 uzs: expenses
                     .filter((item) => item.type === 'transfer')
-                    .reduce((prev, {sumuzs}) => {
+                    .reduce((prev, { sumuzs }) => {
                         return prev + sumuzs
                     }, 0),
                 usd: expenses
                     .filter((item) => item.type === 'transfer')
-                    .reduce((prev, {sum}) => {
+                    .reduce((prev, { sum }) => {
                         return prev + sum
                     }, 0),
             },
@@ -185,9 +185,9 @@ const Sellings = ({ id }) => {
             }
 
             const [
-                {saleconnectors},
-                {income, debts, discounts},
-                {totalpieces},
+                { saleconnectors },
+                { income, debts, discounts },
+                { totalpieces },
                 {
                     totalpieces: numberOfRemaningProducts,
                     totalprice,
@@ -307,9 +307,9 @@ const Sellings = ({ id }) => {
     const handleChangeId = (e) => {
         const val = e.target.value
         const valForSearch = val.replace(/\s+/g, ' ').trim()
-        regexForTypeNumber.test(val) && setSearch({...search, id: val})
-        ;(searchedData.length > 0 || totalSearched > 0) &&
-            dispatch(clearSearchedSellings())
+        regexForTypeNumber.test(val) && setSearch({ ...search, id: val })
+            ; (searchedData.length > 0 || totalSearched > 0) &&
+                dispatch(clearSearchedSellings())
         if (valForSearch === '') {
             setData(sellings)
             setFilteredDataTotal(total)
@@ -325,9 +325,9 @@ const Sellings = ({ id }) => {
         const val = e.target.value;
         setSearchingStatus(true)
         const valForSearch = val.toLowerCase().replace(/\s+/g, ' ').trim()
-        setSearch({...search, client: val})
-        ;(searchedData.length > 0 || totalSearched > 0) &&
-            dispatch(clearSearchedSellings())
+        setSearch({ ...search, client: val })
+            ; (searchedData.length > 0 || totalSearched > 0) &&
+                dispatch(clearSearchedSellings())
         if (valForSearch === '') {
             setData(sellings)
             setSearchedData([])
@@ -350,9 +350,9 @@ const Sellings = ({ id }) => {
         const val = e.target.value;
         setSearchingStatus(true)
         const valForSearch = val.toLowerCase().replace(/\s+/g, ' ').trim()
-        setSearch({...search, phoneNumber: val})
-        ;(searchedData.length > 0 || totalSearched > 0) &&
-            dispatch(clearSearchedSellings())
+        setSearch({ ...search, phoneNumber: val })
+            ; (searchedData.length > 0 || totalSearched > 0) &&
+                dispatch(clearSearchedSellings())
         if (valForSearch === '') {
             setData(sellings)
             setSearchedData([])
@@ -362,7 +362,7 @@ const Sellings = ({ id }) => {
             const filteredProducts = filter(sellings, (selling) => {
                 return (
                     selling?.client?.phoneNumber?.toLowerCase()
-                        .includes(valForSearch) 
+                        .includes(valForSearch)
                 )
             })
             setSearchedData(filteredProducts);
@@ -431,32 +431,32 @@ const Sellings = ({ id }) => {
                 discount:
                     item.discounts.length > 0
                         ? item.discounts.map((discount) => {
-                              return discount
-                          })
+                            return discount
+                        })
                         : 0,
                 discountusd:
                     item.discounts.length > 0
                         ? item.discounts.map((discount) => {
-                              return discount
-                          })
+                            return discount
+                        })
                         : 0,
                 debd:
                     item?.products[0]?.totalpriceuzs -
                         item?.payments[0]?.paymentuzs -
                         item?.discounts.length >
-                    0
+                        0
                         ? item.discounts.map((discount) => {
-                              return discount.discount
-                          })
+                            return discount.discount
+                        })
                         : 0,
                 debdusd:
                     item.products[0].totalprice -
                         item.payments[0].payment -
                         item.discounts.length >
-                    0
+                        0
                         ? item.discounts.map((discount) => {
-                              return discount.discount
-                          })
+                            return discount.discount
+                        })
                         : 0,
             }))
             exportExcel(SellingData, fileName, sellingHeaders)
@@ -505,7 +505,7 @@ const Sellings = ({ id }) => {
     }
     const handleClickApproveToDelete = async () => {
         try {
-            await dispatch(deleteSaleConnector({saleconnectorId: deletingProduct._id}))
+            await dispatch(deleteSaleConnector({ saleconnectorId: deletingProduct._id }))
             await fetchSellings()
             handleClickCancelToDelete()
         } catch (error) {
@@ -622,7 +622,7 @@ const Sellings = ({ id }) => {
                 market: market._id,
             })
         market &&
-            socket.on('getProductsOfCount', ({id, products}) => {
+            socket.on('getProductsOfCount', ({ id, products }) => {
                 if (id === market._id) {
                     productsForSearch = [
                         ...productsForSearch,
@@ -637,7 +637,7 @@ const Sellings = ({ id }) => {
                 }
             })
         market &&
-            socket.on('error', ({id, message}) => {
+            socket.on('error', ({ id, message }) => {
                 id === market._id && universalToast(message, 'error')
             })
 
@@ -661,10 +661,10 @@ const Sellings = ({ id }) => {
         dispatch(getSellingsByFilter(body))
     }
     const options = [
-        {value: 50, label: 50},
-        {value: 100, label: 100},
-        {value: 150, label: 150},
-        {value: 100000, label: t('Barchasi')}
+        { value: 50, label: 50 },
+        { value: 100, label: 100 },
+        { value: 150, label: 150 },
+        { value: 100000, label: t('Barchasi') }
     ]
     return (
         <motion.section
@@ -673,10 +673,10 @@ const Sellings = ({ id }) => {
             animate='open'
             exit='collapsed'
             variants={{
-                open: {opacity: 1, height: 'auto'},
-                collapsed: {opacity: 0, height: 0},
+                open: { opacity: 1, height: 'auto' },
+                collapsed: { opacity: 0, height: 0 },
             }}
-            transition={{duration: 0.8, ease: [0.04, 0.62, 0.23, 0.98]}}
+            transition={{ duration: 0.8, ease: [0.04, 0.62, 0.23, 0.98] }}
         >
             <UniversalModal
                 printedSelling={printedSelling}
@@ -711,16 +711,16 @@ const Sellings = ({ id }) => {
             </div>
             {!isMobile ? (
                 <div className='mt-2 flex items-center'>
-                     <div className={'mt-6'}>
-                            <SelectForm
+                    <div className={'mt-6'}>
+                        <SelectForm
                             otherOptions={options}
-                                key={'total_1'}
-                                onSelect={filterByTotal}
-                            />
-                        </div>
+                            key={'total_1'}
+                            onSelect={filterByTotal}
+                        />
+                    </div>
                     <SearchForm
                         filterBy={[
-                            'page_changer' ,
+                            'page_changer',
                             'total',
                             'startDate',
                             'endDate',
@@ -813,7 +813,7 @@ const Sellings = ({ id }) => {
                     <NotFind text={`${t("Ro'yxat mavjud emas")}`} />
                 ) : !isMobile ? (
                     <Table
-                        data={searchingStatus?searchedData:data}
+                        data={searchingStatus ? searchedData : data}
                         currentPage={currentPage}
                         currency={currencyType}
                         countPage={showByTotal}

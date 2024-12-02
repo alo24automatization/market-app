@@ -881,8 +881,8 @@ const ReportPage = ({ accessToSaller }) => {
     }
     const [typingTimeout, setTypingTimeout] = useState(null)
     const [isSearch, setIsSearch] = useState(false)
-    const searchClientName = (value) => {
-        const target = value.toLowerCase()
+    const searchClientName = (e) => {
+        const target = e.target.value.toLowerCase()
         setCurrentData([
             ...filter(
                 [...storageData],
@@ -926,8 +926,8 @@ const ReportPage = ({ accessToSaller }) => {
     const [clientPhoneNumber, setClinetPhoneNumber] = useState('')
     const [typingTimeout2, setTypingTimeout2] = useState(null)
 
-    const handleChangeClientPhoneNumber = (value) => {
-        const target = value.toLowerCase()
+    const handleChangeClientPhoneNumber = (e) => {
+        const target = e.target.value.toLowerCase()
 
         setClinetPhoneNumber(target)
         setCurrentData([
@@ -971,13 +971,31 @@ const ReportPage = ({ accessToSaller }) => {
         // setTypingTimeout2(newTypingTimeout)
     }
     const onKeySearch = (e) => {
-        if (e.key === 'Enter' || e.key === 'Backspace') {
-            searchClientName(e.target.value)
+        if (e.key === 'Enter') {
+            let debtBody = {
+                startDate: beginDay,
+                endDate: endDay,
+                currentPage,
+                countPage,
+                clientName: localSearch.client,
+                phoneNumber: localSearch.phoneNumber,
+            }
+            dispatch(getDebts(debtBody))
         }
     }
     const onKeySearchClientPhoneNumber = (e) => {
-        if (e.key === 'Enter' || e.key === 'Backspace') {
-            handleChangeClientPhoneNumber(e.target.value)
+        if (e.key === 'Enter') {
+            if (e.key === 'Enter') {
+                let debtBody = {
+                    startDate: beginDay,
+                    endDate: endDay,
+                    currentPage,
+                    countPage,
+                    clientName: localSearch.client,
+                    phoneNumber: localSearch.phoneNumber,
+                }
+                dispatch(getDebts(debtBody))
+            }
         }
     }
 
@@ -1291,6 +1309,8 @@ const ReportPage = ({ accessToSaller }) => {
                             // filterByClientName={searchClientName}
                             filterByIdWhenPressEnter={onKeySearch}
                             filterByClientNameWhenPressEnter={onKeySearch}
+                            filterByClientName={searchClientName}
+                            filterByClientPhoneNumber={handleChangeClientPhoneNumber}
                             startDate={beginDay}
                             endDate={endDay}
                             setStartDate={handleBeginDay}

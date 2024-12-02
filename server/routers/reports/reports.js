@@ -15,6 +15,7 @@ const {
 const { Client } = require("../../models/Sales/Client");
 const { Packman } = require("../../models/Sales/Packman.js");
 const { AgentPayment } = require("../../models/Sales/AgentPayment.js");
+const { regExpression } = require("../globalFunctions");
 require("../../models/Users");
 
 const reduce = (arr, el) =>
@@ -745,11 +746,15 @@ module.exports.getPayment = async (req, res) => {
 // aslo to this but bro dont change my other codes only add pagination
 module.exports.getDebtsReport = async (req, res) => {
   try {
-    const { market, startDate, endDate, currentPage, countPage } = req.body;
+    const { market, clientName, phoneNumber,
+      currentPage, countPage } = req.body;
 
     const page = currentPage ? parseInt(currentPage) : 1; // Default to page 1
     const limit = countPage ? parseInt(countPage) : 10; // Default to 10 items per page
     const skip = (page - 1) * limit; // Calculate the number of documents to skip
+
+    const name = clientName ? regExpression(clientName) : ""
+    const phone = phoneNumber ? regExpression(phoneNumber) : ""
 
     const marketData = await Market.findById(market);
     const reduce = (arr, el) =>
@@ -761,13 +766,43 @@ module.exports.getDebtsReport = async (req, res) => {
         .json({ message: `Diqqat! Do'kon haqida malumotlar topilmadi!` });
     }
 
-    const clients = await Client.find({
-      market
-    })
-      .select("-isArchive -updatedAt -__v")
-      .skip(currentPage * countPage) // Skip documents for pagination
-      .limit(countPage); // Limit the number of documents per page
-    console.log('fewfe');
+    let clients = []
+    if (name && !phone) {
+      console.log('name');
+      clients = await Client.find({
+        market,
+        name: name
+      })
+        .select("-isArchive -updatedAt -__v")
+    } else if (!name && phone) {
+      console.log('phone');
+      clients = await Client.find({
+        market,
+        phoneNumber: phone
+      })
+        .select("-isArchive -updatedAt -__v")
+    } else if (name && phone) {
+      console.log(name);
+      console.log(phone);
+      console.log('name && phone');
+      clients = await Client.find({
+        market,
+        name: name,
+        phoneNumber: phone
+      })
+        .select("-isArchive -updatedAt -__v")
+    } else {
+      console.log('notttt');
+      clients = await Client.find({
+        market,
+      })
+        .select("-isArchive -updatedAt -__v")
+        .skip(currentPage * countPage) // Skip documents for pagination
+        .limit(countPage); // Limit the number of documents per page
+    }
+
+    // console.log(clients);
+
     const debtsreport = []
     for (const client of clients) {
       const saleconnectors = await SaleConnector.find({
