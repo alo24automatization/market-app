@@ -857,51 +857,57 @@ module.exports.getDebtsReport = async (req, res) => {
           .populate("dailyconnectors", "comment debt")
           .populate("packman", "name")
           .lean();
-        const reports = sales.map((sale) => {
+
+        const reports = []
+
+        for (const sale of sales) {
           const discount = reduce(sale.discounts, "discount");
           const discountuzs = reduce(sale.discounts, "discountuzs");
           const payment = reduce(sale.payments, "payment");
           const paymentuzs = reduce(sale.payments, "paymentuzs");
           const totalprice = reduce(sale.products, "totalprice");
           const totalpriceuzs = reduce(sale.products, "totalpriceuzs");
+          if ((Math.round((totalpriceuzs - paymentuzs - discountuzs) * 1) / 1) > 0) {
 
-          const debtComment =
-            sale.debts.length > 0
-              ? sale.debts[sale.debts.length - 1].comment
-              : "";
-          const debtId =
-            sale.debts.length > 0 ? sale.debts[sale.debts.length - 1]._id : "";
-          const payEndDate =
-            sale.debts.length > 0
-              ? sale.debts[sale.debts.length - 1].pay_end_date
-              : "";
-          const returnObj = {
-            _id: sale._id,
-            id: sale.id,
-            createdAt: sale.createdAt,
-            client: sale.client,
-            totalprice,
-            totalpriceuzs,
-            debt: Math.round((totalprice - payment - discount) * 1000) / 1000,
-            debtuzs:
-              Math.round((totalpriceuzs - paymentuzs - discountuzs) * 1) / 1,
-            pay_end_date: payEndDate,
-            comment: debtComment,
-            packman: sale.packman ? sale.packman.name : "",
-            saleconnector: { ...sale },
-            totaldebtuzs: Math.round(totalpriceuzs - paymentuzs - discountuzs),
-            debts: [debtId],
-            debtid: debtId,
-            saleconnectors: [],
-          };
-          return { ...returnObj, saleconnectors: [returnObj] };
-        })
+            const debtComment =
+              sale.debts.length > 0
+                ? sale.debts[sale.debts.length - 1].comment
+                : "";
+            const debtId =
+              sale.debts.length > 0 ? sale.debts[sale.debts.length - 1]._id : "";
+            const payEndDate =
+              sale.debts.length > 0
+                ? sale.debts[sale.debts.length - 1].pay_end_date
+                : "";
+            const returnObj = {
+              _id: sale._id,
+              id: sale.id,
+              createdAt: sale.createdAt,
+              client: sale.client,
+              totalprice,
+              totalpriceuzs,
+              debt: Math.round((totalprice - payment - discount) * 1000) / 1000,
+              debtuzs:
+                Math.round((totalpriceuzs - paymentuzs - discountuzs) * 1) / 1,
+              pay_end_date: payEndDate,
+              comment: debtComment,
+              packman: sale.packman ? sale.packman.name : "",
+              saleconnector: { ...sale },
+              totaldebtuzs: Math.round(totalpriceuzs - paymentuzs - discountuzs),
+              debts: [debtId],
+              debtid: debtId,
+              saleconnectors: [],
+            };
+            reports.push({ ...returnObj, saleconnectors: [returnObj] })
+          } else {
+            continue
+          }
+        }
         debtsreport.push(...reports)
         console.log(debtsreport.length);
       } else {
         continue
       }
-
     }
     let clientDebtMap = new Map();
 

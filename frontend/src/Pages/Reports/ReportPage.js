@@ -131,7 +131,11 @@ const ReportPage = ({ accessToSaller }) => {
         usd: 0,
         uzs: 0,
     })
-    const [beginDay, setBeginDay] = useState(null)
+    const [beginDay, setBeginDay] = useState(new Date(
+        new Date().getFullYear(),
+        new Date().getMonth(),
+        new Date().getDate()
+    ))
     const [endDay, setEndDay] = useState(new Date())
     const [customLoading, setCustomLoading] = useState(false)
     const [printBody, setPrintBody] = useState({})
