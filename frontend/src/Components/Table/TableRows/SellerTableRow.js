@@ -12,6 +12,7 @@ export const SellerTableRow = ({
     linkToSellerReports,
     currency,
     modalOpen1,
+    getTotalDayReport
 }) => {
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
     useEffect(() => {
@@ -87,6 +88,13 @@ export const SellerTableRow = ({
                         </td>
                         <td className='border-r-0 td py-[0.375rem]'>
                             <div className='flex items-center justify-center gap-[0.625rem]'>
+                                <TableBtn
+                                    type={'print'}
+                                    bgcolor={'bg-blue-600'}
+                                    onClick={() =>
+                                        getTotalDayReport(seller._id)
+                                    }
+                                />
                                 <TableBtn
                                     type={'edit'}
                                     bgcolor={'bg-warning-500'}

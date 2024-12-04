@@ -529,7 +529,7 @@ module.exports.getsellers = async (req, res) => {
             "payment",
             "cash cashuzs card carduzs transfer transferuzs payment paymentuzs totalprice totalpriceuzs"
           )
-          .populate("saleconnector", "id")
+          .populate("saleconnector", "id totalOfBackAndDebt")
           .populate("client", "name")
           .populate({
             path: "products",
@@ -624,6 +624,8 @@ module.exports.getsellers = async (req, res) => {
         });
         seller.profit = profit;
         seller.profituzs = profituzs;
+
+        // seller.debt =
       }
     }
     res.status(201).send(sellers);

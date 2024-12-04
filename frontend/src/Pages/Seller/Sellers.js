@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import FieldContainer from './../../Components/FieldContainer/FieldContainer'
 import Button from './../../Components/Buttons/BtnAddRemove'
 import Table from './../../Components/Table/Table'
@@ -26,6 +26,9 @@ import {
 import { useNavigate } from 'react-router-dom'
 import SearchForm from '../../Components/SearchForm/SearchForm'
 import { VscChromeClose } from 'react-icons/vsc'
+import Api from '../../Config/Api'
+import { useReactToPrint } from 'react-to-print'
+import { SellerSmallCheck } from '../../Components/Modal/ModalBodys/SellerSmallCheck'
 
 function Sellers() {
     const { t } = useTranslation(['common'])
@@ -224,6 +227,37 @@ function Sellers() {
     const linkToSellerReports = (id) => {
         navigate(`/hamkorlar/sotuvchilar/${id}`)
     }
+
+    ////////////////////////////////////////////////////
+    const sellerSmallCheckRef = useRef(null)
+
+    const handlePrint = useReactToPrint({
+        content: () => sellerSmallCheckRef.current,
+    })
+
+    const [totalDayReport, setTotalDayReport] = useState({})
+
+    const getTotalDayReport = async (sellerId) => {
+        try {
+            const body = {
+                startDate: new Date(new Date().setHours(0, 0, 0, 0)).toISOString(),
+                endDate: new Date(new Date().setHours(23, 59, 59, 59)).toISOString(),
+                sellerId: sellerId,
+            }
+            const { data } = await Api.post('/sales/sellers/get_day_total_report', body)
+            setTotalDayReport(data)
+
+            // return data
+        } catch (error) {
+            return universalToast(error, 'error')
+        }
+    }
+
+    useEffect(() => {
+        if (Object.keys(totalDayReport).length > 0) {
+            handlePrint()
+        }
+    }, [totalDayReport])
 
     useEffect(() => {
         if (errorSellings) {
@@ -525,8 +559,12 @@ function Sellers() {
                             Edit={handleEditSeller}
                             linkToSellerReports={linkToSellerReports}
                             currency={currencyType}
+                            getTotalDayReport={getTotalDayReport}
                         />
                 )}
+                <div className='hidden'>
+                    <SellerSmallCheck ref={sellerSmallCheckRef} seller={totalDayReport} />
+                </div>
             </div>
         </motion.section>
     )
