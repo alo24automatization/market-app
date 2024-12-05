@@ -139,10 +139,10 @@ const sellerSlice = createSlice({
         },
         [getSellerReports.fulfilled]: (
             state,
-            { payload: { saleconnectors, count } }
+            { payload: { data, count } }
         ) => {
             state.loading = false
-            state.sellersreport = saleconnectors
+            state.sellersreport = data
             state.count = count
         },
     },

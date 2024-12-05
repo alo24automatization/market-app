@@ -1,7 +1,9 @@
 const { Market } = require('../../models/MarketAndBranch/Market');
 const { DailySaleConnector } = require('../../models/Sales/DailySaleConnector');
+const { Payment } = require('../../models/Sales/Payment');
 const { SaleConnector } = require('../../models/Sales/SaleConnector');
 const { User } = require('../../models/Users');
+const { AgentPayment } = require("../../models/Sales/AgentPayment.js");
 require('../../models/Sales/SaleProduct');
 require('../../models/Sales/Discount');
 require('../../models/Sales/Payment');
@@ -14,75 +16,230 @@ require('../../models/Products/Productdata');
 
 module.exports.getSellersReport = async (req, res) => {
   try {
-    const {
-      market,
-      countPage,
-      currentPage,
-      startDate,
-      endDate,
-      search,
-      seller,
-    } = req.body;
+    const { market, currentPage, countPage, startDate, endDate, search, seller, type } =
+      req.body;
+
+    const id = new RegExp(".*" + search ? search.id : "" + ".*", "i");
+    const client = new RegExp(".*" + search ? search.client : "" + ".*", "i");
+
     const marke = await Market.findById(market);
     if (!marke) {
-      return res.status(400).json({
-        message: `Diqqat! Do'kon haqida malumotlar topilmadi!`,
-      });
+      return res
+        .status(401)
+        .json({ message: `Diqqat! Do'kon haqida malumotlar topilmadi!` });
     }
 
-    const id = new RegExp('.*' + search ? search.id : '' + '.*', 'i');
+    //========================================
 
-    const name = new RegExp('.*' + search ? search.client : '' + '.*', 'i');
-
-    const saleconnectors = await DailySaleConnector.find({
+    const allpayments = await Payment.find({
+      // [type]: { $ne: 0 },
       market,
       user: seller,
       createdAt: {
         $gte: startDate,
-        $lt: endDate,
+        $lte: endDate,
       },
     })
-      .select("-isArchive -market -__v")
+      .sort({ createdAt: -1 })
+      .select(`-isArchive -user -updatedAt -__v -products`)
       .populate({
-        path: "products",
-        select:
-          "totalprice unitprice totalpriceuzs unitpriceuzs pieces fromFilial createdAt",
+        path: "saleconnector",
+        select: "id client products payments user dailyconnectors",
+        match: { id: id },
         populate: {
-          path: "product",
-          select: "productdata total",
+          path: "client",
+          select: "name phoneNumber",
+          match: { name: client },
+        },
+      })
+      .populate({
+        path: "saleconnector",
+        select: "id client createdAt products payments user dailyconnectors",
+        populate: {
+          path: "user",
+          select: "firstname lastname",
+        },
+      })
+      .populate({
+        path: "saleconnector",
+        select: "id client createdAt products payments user dailyconnectors",
+        populate: {
+          path: "payments",
+          select:
+            "cash cashuzs card carduzs transfer transferuzs payment paymentuzs totalprice totalpriceuzs",
+        },
+      })
+      .populate({
+        path: "saleconnector",
+        select: "id client createdAt products payments user dailyconnectors",
+        populate: {
+          path: "products",
+          select:
+            "totalprice totalpriceuzs pieces price unitprice unitpriceuzs product createdAt user",
           populate: {
-            path: "productdata",
-            select: "code name",
-            options: { sort: { code: 1 } },
+            path: "product",
+            select: "productdata",
+            populate: {
+              path: "productdata",
+              select: "name code",
+            },
           },
         },
       })
-      .populate("payment", "payment paymentuzs totalprice totalpriceuzs")
-      .populate("discount", "discount discountuzs")
-      .populate("debt", "debt debtuzs")
-      .populate({
-        path: "client",
-        select: "name",
-      })
-      .populate("packman", "name")
-      .populate("user", "firstname lastname")
       .populate({
         path: "saleconnector",
-        select: "id",
-        match: { id: id }
+        select: "id client createdAt products payments user dailyconnectors",
+        populate: {
+          path: "products",
+          select:
+            "totalprice totalpriceuzs pieces price unitprice unitpriceuzs product createdAt user",
+          populate: {
+            path: "user",
+            select: "firstname lastname",
+          },
+        },
       })
+      .populate({
+        path: "saleconnector",
+        select: "id client createdAt products payments user dailyconnectors",
+        populate: {
+          path: "dailyconnectors",
+          select: "payment",
+        },
+      })
+      .populate({
+        path: "saleconnector",
+        populate: {
+          path: "packman",
+        },
+      })
+      .lean()
+      .then((connectors) =>
+        connectors.filter((connector) =>
+          search.client && search.id
+            ? connector.saleconnector.client &&
+            connector.saleconnector.id === search.id
+            : search.id && !search.client
+              ? connector.saleconnector.id === search.id
+              : search.client && !search.id
+                ? connector.saleconnector.client
+                : connector
+        )
+      );
 
-    const filter = saleconnectors.filter((item) => {
-      return item.saleconnector !== null
+    const respayments = [];
+
+    const total = {
+      payment: {
+        cash: 0,
+        cashuzs: 0,
+        card: 0,
+        carduzs: 0,
+        transfer: 0,
+        transferuzs: 0,
+      },
+      back: {
+        cash: 0,
+        cashuzs: 0,
+        card: 0,
+        carduzs: 0,
+        transfer: 0,
+        transferuzs: 0,
+      },
+      result: {
+        cash: 0,
+        cashuzs: 0,
+        card: 0,
+        carduzs: 0,
+        transfer: 0,
+        transferuzs: 0,
+      },
+      agentProfit: {
+        cash: 0,
+        cashuzs: 0,
+        card: 0,
+        carduzs: 0,
+        transfer: 0,
+        transferuzs: 0,
+      },
+    };
+    for (const payment of allpayments) {
+      respayments.push({
+        id: payment.saleconnector && payment.saleconnector.id,
+        saleconnector: payment.saleconnector,
+        createdAt: payment.createdAt,
+        client:
+          payment.saleconnector &&
+          payment.saleconnector.client &&
+          payment.saleconnector.client,
+        cash: payment.cash,
+        cashuzs: payment.cashuzs,
+        card: payment.card,
+        carduzs: payment.carduzs,
+        transfer: payment.transfer,
+        transferuzs: payment.transferuzs,
+        totalprice: (payment.totalprice && payment.totalprice) || 0,
+        totalpriceuzs: (payment.totalpriceuzs && payment.totalpriceuzs) || 0,
+      });
+
+      if (payment.cash < 0 || payment.card < 0 || payment.transfer < 0) {
+        total.back.cash += payment.cash;
+        total.back.cashuzs += payment.cashuzs;
+        total.back.card += payment.card;
+        total.back.carduzs += payment.carduzs;
+        total.back.transfer += payment.transfer;
+        total.back.transferuzs += payment.transferuzs;
+      } else {
+        total.payment.cash += payment.cash;
+        total.payment.cashuzs += payment.cashuzs;
+        total.payment.card += payment.card;
+        total.payment.carduzs += payment.carduzs;
+        total.payment.transfer += payment.transfer;
+        total.payment.transferuzs += payment.transferuzs;
+      }
+    }
+    total.result.cash = total.payment.cash + total.back.cash;
+    total.result.cashuzs = total.payment.cashuzs + total.back.cashuzs;
+    total.result.card = total.payment.card + total.back.card;
+    total.result.carduzs = total.payment.carduzs + total.back.carduzs;
+    total.result.transfer = total.payment.transfer + total.back.transfer;
+    total.result.transferuzs =
+      total.payment.transferuzs + total.back.transferuzs;
+    const allAgentPayments = await AgentPayment.find({
+      market,
+      createdAt: {
+        $gte: startDate,
+        $lte: endDate,
+      },
+    }).populate({
+      path: "packman",
+      populate: "payments",
     });
-    const count = filter.length;
-    res.status(200).json({
-      saleconnectors: filter.splice(countPage * currentPage, countPage),
-      count,
-    });
+    let totalSum = 0;
+    for (const payment of allAgentPayments) {
+      totalSum =
+        payment?.packman?.payments.reduce(
+          (prev, item) => prev + item.paymentuzs,
+          0
+        ) || 0;
+      let agentProfit = totalSum;
+      if (payment.type === "mixed") {
+        total.agentProfit.cashuzs += payment.cashuzs;
+        total.agentProfit.carduzs += payment.carduzs;
+        total.agentProfit.transferuzs += payment.transferuzs;
+      } else {
+        total.agentProfit[payment.type + "uzs"] += agentProfit;
+      }
+    }
+    const response = respayments.filter(
+      (product) => product.saleconnector !== null
+    );
+    const count = response.length;
+    let paymentsreport = response.splice(currentPage * countPage, countPage);
+    res.status(201).json({ data: paymentsreport, count, total });
   } catch (error) {
-    console.log(error);
-    res.status(400).json({ error: 'Serverda xatolik yuz berdi...' });
+    console.log(error.message);
+    res.status(400).json({ error: "Serverda xatolik yuz berdi..." });
   }
 };
 

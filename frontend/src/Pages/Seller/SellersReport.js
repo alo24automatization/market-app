@@ -1,15 +1,15 @@
-import React, {useEffect, useState} from 'react'
-import {useDispatch, useSelector} from 'react-redux'
-import {useParams} from 'react-router-dom'
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { useParams } from 'react-router-dom'
 import LinkToBack from '../../Components/LinkToBack/LinkToBack'
 import Pagination from '../../Components/Pagination/Pagination'
 import SearchForm from '../../Components/SearchForm/SearchForm'
 import Table from '../../Components/Table/Table'
 import TableMobile from '../../Components/Table/TableMobile'
-import {getSellerReports} from './sellerSlice'
-import {filter, reduce} from 'lodash'
+import { getSellerReports } from './sellerSlice'
+import { filter, reduce } from 'lodash'
 import UniversalModal from '../../Components/Modal/UniversalModal.js'
-import {t} from 'i18next'
+import { t } from 'i18next'
 
 const SellersReport = () => {
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
@@ -24,38 +24,45 @@ const SellersReport = () => {
             window.removeEventListener('resize', handleResize);
         };
     }, []);
-    const {id} = useParams()
+    const { id } = useParams()
 
     const dispatch = useDispatch()
 
     const headers = [
         {
-            title: '№'
+            title: '№',
         },
         {
             title: t('Sana'),
-            filter: 'createdAt'
-        },
-
-        {
-            title: t('Mijoz')
+            filter: 'createdAt',
         },
         {
-            title: t('Jami')
+            title: t('ID'),
+            filter: 'saleconnector.id',
         },
         {
-            title: t('Chegirma')
+            title: t('Mijoz'),
         },
         {
-            title: t('Qarz')
+            title: t('Naqt'),
+        },
+        {
+            title: t('Plastik'),
+        },
+        {
+            title: t("O'tkazma"),
+        },
+        {
+            title: t("Qarz"),
         },
         {
             title: t("Qarzdan to'lov"),
-            styles: 'w-[7rem]'
+        },
+        {
+            title: t('Qaytarilgan'),
         },
         {
             title: '',
-            styles: 'w-[7rem]'
         }
     ]
 
@@ -71,8 +78,8 @@ const SellersReport = () => {
         },
     ]
 
-    const {currencyType} = useSelector((state) => state.currency)
-    const {sellersreport, count} = useSelector((state) => state.sellers)
+    const { currencyType } = useSelector((state) => state.currency)
+    const { sellersreport, count } = useSelector((state) => state.sellers)
 
     const [data, setData] = useState([])
     const [currentPage, setCurrentPage] = useState(0)
@@ -160,44 +167,45 @@ const SellersReport = () => {
     ])
 
     useEffect(() => {
+        console.log(sellersreport);
         setData(sellersreport)
-        if (sellersreport.length > 0) {
-            const totalprice = reduce(
-                sellersreport,
-                (summ, sale) =>
-                    summ +
-                    reduce(
-                        sale.payments,
-                        (summ, payment) => summ + payment.payment,
-                        0
-                    ),
-                0
-            )
-            const totalpriceuzs = reduce(
-                sellersreport,
-                (summ, sale) =>
-                    summ +
-                    reduce(
-                        sale.payments,
-                        (summ, payment) => summ + payment.paymentuzs,
-                        0
-                    ),
-                0
-            )
+        // if (sellersreport.length > 0) {
+        //     const totalprice = reduce(
+        //         sellersreport,
+        //         (summ, sale) =>
+        //             summ +
+        //             reduce(
+        //                 sale.payments,
+        //                 (summ, payment) => summ + payment.payment,
+        //                 0
+        //             ),
+        //         0
+        //     )
+        //     const totalpriceuzs = reduce(
+        //         sellersreport,
+        //         (summ, sale) =>
+        //             summ +
+        //             reduce(
+        //                 sale.payments,
+        //                 (summ, payment) => summ + payment.paymentuzs,
+        //                 0
+        //             ),
+        //         0
+        //     )
 
-            const saleProducts = reduce(
-                sellersreport,
-                (summ, sale) => summ + sale.products.length,
-                0
-            )
+        //     const saleProducts = reduce(
+        //         sellersreport,
+        //         (summ, sale) => summ + sale.products.length,
+        //         0
+        //     )
 
-            setGeneralreport({
-                salesCount: sellersreport.length,
-                totalprice,
-                totalpriceuzs,
-                saleProducts,
-            })
-        }
+        //     setGeneralreport({
+        //         salesCount: sellersreport.length,
+        //         totalprice,
+        //         totalpriceuzs,
+        //         saleProducts,
+        //     })
+        // }
     }, [sellersreport])
     return (
         <div className='w-full'>
@@ -211,7 +219,7 @@ const SellersReport = () => {
             <div className='flex items-center justify-between '>
                 <LinkToBack link={'/hamkorlar/sotuvchilar'} />
             </div>
-            
+
             <div className='flex w-full'>
                 <SearchForm
                     filterBy={[
@@ -240,58 +248,58 @@ const SellersReport = () => {
             </div>
             {data.length > 0 && (
                 <>
-                    <div className='lg:tableContainerPadding'>
+                    {/* <div className='lg:tableContainerPadding'>
                         {
-                            isMobile?
-                            <TableMobile
-                            data={generalReport}
-                            currency={currencyType}
-                            page={'generalreport'}
-                            headers={headersInfo}
-                        />
-                        :<Table
-                        data={generalReport}
-                        currency={currencyType}
-                        page={'generalreport'}
-                        headers={headersInfo}
-                    />
+                            isMobile ?
+                                <TableMobile
+                                    data={generalReport}
+                                    currency={currencyType}
+                                    page={'generalreport'}
+                                    headers={headersInfo}
+                                />
+                                : <Table
+                                    data={generalReport}
+                                    currency={currencyType}
+                                    page={'generalreport'}
+                                    headers={headersInfo}
+                                />
                         }
-                    </div>
+                    </div> */}
                     <div className='lg:tableContainerPadding mt-4'>
                         {
-                            isMobile?
-                            <TableMobile
-                            data={data}
-                            currentPage={currentPage}
-                            currency={currencyType}
-                            countPage={countPage}
-                            page={'saleslist'}
-                            headers={headers}
-                            sellers={true}
-                            Print={handleClickPrint}
-                        />:
-                        <Table
-                            data={data}
-                            currentPage={currentPage}
-                            currency={currencyType}
-                            countPage={countPage}
-                            page={'clientssales'}
-                            headers={headers}
-                            sellers={true}
-                            Print={handleClickPrint}
-                        />
+                            isMobile ?
+                                <TableMobile
+                                    data={data}
+                                    currentPage={currentPage}
+                                    currency={currencyType}
+                                    countPage={countPage}
+                                    page={'saleslist'}
+                                    headers={headers}
+                                    sellers={true}
+                                    Print={handleClickPrint}
+                                /> :
+                                <Table
+                                    data={data}
+                                    currentPage={currentPage}
+                                    currency={currencyType}
+                                    countPage={countPage}
+                                    page={'clientssales'}
+                                    headers={headers}
+                                    sellers={true}
+                                    Print={handleClickPrint}
+                                />
                         }
                     </div>
                     <div className='flex justify-center mt-[30px] mb-[30px]'>
-                <Pagination
-                    countPage={countPage}
-                    totalDatas={count || 1}
-                    currentPage={currentPage}
-                    setCurrentPage={setCurrentPage}
-                />
-            </div>
+                        <Pagination
+                            countPage={countPage}
+                            totalDatas={count || 1}
+                            currentPage={currentPage}
+                            setCurrentPage={setCurrentPage}
+                        />
+                    </div>
                 </>
-                
+
             )}
         </div>
     )

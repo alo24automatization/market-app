@@ -56,7 +56,7 @@ export const SellerTableRow = ({
                                 )}{' '}
                             {currency}
                         </td>
-                        <td className='text-left td'>
+                        {/* <td className='text-left td'>
                             {currency === 'USD'
                                 ? roundUsd(seller?.cash).toLocaleString(
                                     'ru-RU'
@@ -85,7 +85,7 @@ export const SellerTableRow = ({
                                     'ru-RU'
                                 )}{' '}
                             {currency}
-                        </td>
+                        </td> */}
                         <td className='border-r-0 td py-[0.375rem]'>
                             <div className='flex items-center justify-center gap-[0.625rem]'>
                                 <TableBtn

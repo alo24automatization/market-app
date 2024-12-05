@@ -55,9 +55,9 @@ function Sellers() {
         { title: t('Sotuvlar') },
         { title: t('Summa') },
         { title: t('Sof foyda') },
-        { title: t('Naqt') },
-        { title: t('Plastik') },
-        { title: t("O'tkazma") },
+        // { title: t('Naqt') },
+        // { title: t('Plastik') },
+        // { title: t("O'tkazma") },
         { title: '', styles: 'w-[8%]' },
     ]
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
@@ -86,7 +86,11 @@ function Sellers() {
     const [isIncomePage, setIsIncomePage] = useState(false)
 
     const [startDate, setStartDate] = useState(
-        new Date(new Date().setDate(new Date().getDate() - 10))
+        new Date(
+            new Date().getFullYear(),
+            new Date().getMonth(),
+            new Date().getDate()
+        )
     )
     const [endDate, setEndDate] = useState(new Date())
 
