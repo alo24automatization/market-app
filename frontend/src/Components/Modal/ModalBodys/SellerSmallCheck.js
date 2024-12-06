@@ -57,7 +57,7 @@ export const SellerSmallCheck = forwardRef((props, ref) => {
                             {currencyType}
                         </span>
                     </h3>
-                    <h3
+                    {/* <h3
                         style={{ fontWeight: 'bolder' }}
                         className='text-black-900 text-[12px] font-bold pt-4'
                     >
@@ -66,7 +66,7 @@ export const SellerSmallCheck = forwardRef((props, ref) => {
                             {(currencyType === 'USD' ? seller?.paydebt : seller?.paydebtuzs).toLocaleString('ru-Ru')}{' '}
                             {currencyType}
                         </span>
-                    </h3>
+                    </h3> */}
                     {/* <h3
                         style={{ fontWeight: 'bolder' }}
                         className='text-black-900 text-[12px] font-bold pt-4'

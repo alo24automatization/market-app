@@ -38,7 +38,7 @@ export const SellerTableRow = ({
                         <td className='text-left td'>{seller.lastname}</td>
                         <td className='text-left td'>{seller.phone}</td>
                         <td className='text-left td'>{seller?.sales || 0}</td>
-                        <td className='text-left td'>
+                        {/* <td className='text-left td'>
                             {currency === 'USD'
                                 ? seller?.totalsales?.toLocaleString('ru-RU')
                                 : seller?.totalsalesuzs?.toLocaleString(
@@ -55,7 +55,7 @@ export const SellerTableRow = ({
                                     'ru-RU'
                                 )}{' '}
                             {currency}
-                        </td>
+                        </td> */}
                         {/* <td className='text-left td'>
                             {currency === 'USD'
                                 ? roundUsd(seller?.cash).toLocaleString(

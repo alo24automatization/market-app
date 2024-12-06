@@ -326,8 +326,8 @@ module.exports.getDayTotalReport = async (req, res) => {
       seller.paydebtuzs = allpayments.reduce((prev, el) => prev + !el.totalpriceuzs ? (el.cashuzs + el.carduzs + el.transferuzs) : 0, 0)
 
       seller.sales = sales.length;
-      seller.totalsales = seller.cash + seller.card + seller.transfer + seller.paydebt;
-      seller.totalsalesuzs = seller.cashuzs + seller.carduzs + seller.transferuzs + seller.paydebtuzs;
+      seller.totalsales = seller.cash + seller.card + seller.transfer
+      seller.totalsalesuzs = seller.cashuzs + seller.carduzs + seller.transferuzs
 
       // seller.totalsales = allpayments.reduce((prev, payment) => {
       //   return prev + (payment.totalprice || 0);
