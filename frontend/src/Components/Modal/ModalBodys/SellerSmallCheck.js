@@ -61,12 +61,22 @@ export const SellerSmallCheck = forwardRef((props, ref) => {
                         style={{ fontWeight: 'bolder' }}
                         className='text-black-900 text-[12px] font-bold pt-4'
                     >
+                        {t("Qarzdan to'lov")} :{' '}
+                        <span style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold'>
+                            {(currencyType === 'USD' ? seller?.paydebt : seller?.paydebtuzs).toLocaleString('ru-Ru')}{' '}
+                            {currencyType}
+                        </span>
+                    </h3>
+                    {/* <h3
+                        style={{ fontWeight: 'bolder' }}
+                        className='text-black-900 text-[12px] font-bold pt-4'
+                    >
                         {t('Sof foyda')} :{' '}
                         <span style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold'>
                             {(currencyType === 'USD' ? seller?.profit : seller?.profituzs).toLocaleString('ru-Ru')}{' '}
                             {currencyType}
                         </span>
-                    </h3>
+                    </h3> */}
                     <h3
                         style={{ fontWeight: 'bolder' }}
                         className='text-black-900 text-[12px] font-bold pt-4'

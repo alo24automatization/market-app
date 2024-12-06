@@ -86,13 +86,11 @@ function Sellers() {
     const [isIncomePage, setIsIncomePage] = useState(false)
 
     const [startDate, setStartDate] = useState(
-        new Date(
-            new Date().getFullYear(),
-            new Date().getMonth(),
-            new Date().getDate()
-        )
+        new Date(new Date().setHours(0, 0, 0, 0))
     )
-    const [endDate, setEndDate] = useState(new Date())
+    const [endDate, setEndDate] = useState(
+        new Date(new Date().setHours(23, 59, 59, 59))
+    )
 
     // handle Changed inputs
     const addNewSeller = (e) => {
@@ -228,8 +226,8 @@ function Sellers() {
         setIsIncomePage(seller.isIncomePage)
     }
 
-    const linkToSellerReports = (id) => {
-        navigate(`/hamkorlar/sotuvchilar/${id}`)
+    const linkToSellerReports = (seller) => {
+        navigate(`/hamkorlar/sotuvchilar/${seller._id}`, { state: seller })
     }
 
     ////////////////////////////////////////////////////
@@ -244,8 +242,8 @@ function Sellers() {
     const getTotalDayReport = async (sellerId) => {
         try {
             const body = {
-                startDate: new Date(new Date().setHours(0, 0, 0, 0)).toISOString(),
-                endDate: new Date(new Date().setHours(23, 59, 59, 59)).toISOString(),
+                startDate,
+                endDate,
                 sellerId: sellerId,
             }
             const { data } = await Api.post('/sales/sellers/get_day_total_report', body)

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useParams } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 import LinkToBack from '../../Components/LinkToBack/LinkToBack'
 import Pagination from '../../Components/Pagination/Pagination'
 import SearchForm from '../../Components/SearchForm/SearchForm'
@@ -10,6 +10,7 @@ import { getSellerReports } from './sellerSlice'
 import { filter, reduce } from 'lodash'
 import UniversalModal from '../../Components/Modal/UniversalModal.js'
 import { t } from 'i18next'
+import SelectForm from '../../Components/Select/SelectForm'
 
 const SellersReport = () => {
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
@@ -24,6 +25,10 @@ const SellersReport = () => {
             window.removeEventListener('resize', handleResize);
         };
     }, []);
+
+    const location = useLocation()
+    console.log(location);
+
     const { id } = useParams()
 
     const dispatch = useDispatch()
@@ -83,7 +88,7 @@ const SellersReport = () => {
 
     const [data, setData] = useState([])
     const [currentPage, setCurrentPage] = useState(0)
-    const [countPage, setCountPage] = useState(10)
+    const [countPage, setCountPage] = useState(100)
     const [search, setSearch] = useState({
         id: '',
         client: '',
@@ -96,13 +101,11 @@ const SellersReport = () => {
     const [modalVisible, setModalVisible] = useState(false)
     const [generalReport, setGeneralreport] = useState({})
     const [startDate, setStartDate] = useState(
-        new Date(
-            new Date().getFullYear(),
-            new Date().getMonth(),
-            new Date().getDate()
-        )
+        new Date(new Date().setHours(0, 0, 0, 0))
     )
-    const [endDate, setEndDate] = useState(new Date())
+    const [endDate, setEndDate] = useState(
+        new Date(new Date().setHours(23, 59, 59, 59))
+    )
 
     const toggleModal = () => {
         setModalVisible(!modalVisible)
@@ -113,6 +116,12 @@ const SellersReport = () => {
         setPrintedSelling(selling)
         setModalVisible(true)
     }
+
+    const filterByTotal = ({ value }) => {
+        setCountPage(Number(value))
+        setCurrentPage(0)
+    }
+
     // handle change client and id
     const handleChangeId = (e) => {
         const val = e.target.value
@@ -220,7 +229,13 @@ const SellersReport = () => {
                 <LinkToBack link={'/hamkorlar/sotuvchilar'} />
             </div>
 
-            <div className='flex w-full'>
+            <div className='flex justify-between items-center gap-4 w-full '>
+                <div className={'mt-6'}>
+                    <SelectForm
+                        key={'total_1'}
+                        onSelect={filterByTotal}
+                    />
+                </div>
                 <SearchForm
                     filterBy={[
                         'total',
@@ -283,7 +298,7 @@ const SellersReport = () => {
                                     currentPage={currentPage}
                                     currency={currencyType}
                                     countPage={countPage}
-                                    page={'clientssales'}
+                                    page={'seller_payments'}
                                     headers={headers}
                                     sellers={true}
                                     Print={handleClickPrint}

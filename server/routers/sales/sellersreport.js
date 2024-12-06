@@ -263,7 +263,7 @@ module.exports.getDayTotalReport = async (req, res) => {
         user: seller._id,
         createdAt: {
           $gte: startDate,
-          $lt: endDate,
+          $lte: endDate,
         },
       })
         .select("user payment")
@@ -297,62 +297,92 @@ module.exports.getDayTotalReport = async (req, res) => {
         .populate(
           "discount",
           "discount discountuzs totalprice totalpriceuzs procient"
-        );
+        )
+        .lean()
+
+      const allpayments = await Payment.find({
+        user: seller._id,
+        // market,
+        createdAt: {
+          $gte: startDate,
+          $lte: endDate,
+        },
+      })
+        .select(`-isArchive -updatedAt -__v -products`)
+        .lean()
+
+
+      for (const payment of allpayments) {
+        console.log(payment);
+      }
+
+      seller.cash = allpayments.reduce((prev, el) => prev + (el.cash || 0), 0)
+      seller.cashuzs = allpayments.reduce((prev, el) => prev + (el.cashuzs || 0), 0)
+      seller.card = allpayments.reduce((prev, el) => prev + (el.card || 0), 0)
+      seller.carduzs = allpayments.reduce((prev, el) => prev + (el.carduzs || 0), 0)
+      seller.transfer = allpayments.reduce((prev, el) => prev + (el.transfer || 0), 0)
+      seller.transferuzs = allpayments.reduce((prev, el) => prev + (el.transferuzs || 0), 0)
+      seller.paydebt = allpayments.reduce((prev, el) => prev + !el.totalprice ? (el.cash + el.card + el.transfer) : 0, 0)
+      seller.paydebtuzs = allpayments.reduce((prev, el) => prev + !el.totalpriceuzs ? (el.cashuzs + el.carduzs + el.transferuzs) : 0, 0)
 
       seller.sales = sales.length;
-      seller.totalsales = sales.reduce((prev, sale) => {
-        return prev + ((sale.payment && sale.payment.totalprice) || 0);
-      }, 0);
-      seller.totalsalesuzs = sales.reduce((prev, sale) => {
-        return prev + ((sale.payment && sale.payment.totalpriceuzs) || 0);
-      }, 0);
+      seller.totalsales = seller.cash + seller.card + seller.transfer + seller.paydebt;
+      seller.totalsalesuzs = seller.cashuzs + seller.carduzs + seller.transferuzs + seller.paydebtuzs;
 
-      seller.cash = sales.reduce((prev, sale) => {
-        return prev + ((sale.payment && sale.payment.cash) || 0);
-      }, 0);
-      seller.cashuzs = sales.reduce((prev, sale) => {
-        return prev + ((sale.payment && sale.payment.cashuzs) || 0);
-      }, 0);
-
-      seller.card = sales.reduce((prev, sale) => {
-        return prev + ((sale.payment && sale.payment.card) || 0);
-      }, 0);
-      seller.carduzs = sales.reduce((prev, sale) => {
-        return prev + ((sale.payment && sale.payment.carduzs) || 0);
-      }, 0);
-
-      seller.transfer = sales.reduce((prev, sale) => {
-        return prev + ((sale.payment && sale.payment.transfer) || 0);
-      }, 0);
-      seller.transferuzs = sales.reduce((prev, sale) => {
-        return prev + ((sale.payment && sale.payment.transferuzs) || 0);
-      }, 0);
+      // seller.totalsales = allpayments.reduce((prev, payment) => {
+      //   return prev + (payment.totalprice || 0);
+      // }, 0);
+      // seller.totalsalesuzs = allpayments.reduce((prev, payment) => {
+      //   return prev + (payment.totalpriceuzs || 0);
+      // }, 0);
 
 
-      let profit = 0;
-      let profituzs = 0;
+      // seller.cash = sales.reduce((prev, sale) => {
+      //   return prev + ((sale.payment && sale.payment.cash) || 0);
+      // }, 0);
+      // seller.cashuzs = sales.reduce((prev, sale) => {
+      //   return prev + ((sale.payment && sale.payment.cashuzs) || 0);
+      // }, 0);
+
+      // seller.card = sales.reduce((prev, sale) => {
+      //   return prev + ((sale.payment && sale.payment.card) || 0);
+      // }, 0);
+      // seller.carduzs = sales.reduce((prev, sale) => {
+      //   return prev + ((sale.payment && sale.payment.carduzs) || 0);
+      // }, 0);
+
+      // seller.transfer = sales.reduce((prev, sale) => {
+      //   return prev + ((sale.payment && sale.payment.transfer) || 0);
+      // }, 0);
+      // seller.transferuzs = sales.reduce((prev, sale) => {
+      //   return prev + ((sale.payment && sale.payment.transferuzs) || 0);
+      // }, 0);
+
+
+      // let profit = 0;
+      // let profituzs = 0;
       let debt = 0
       let debtuzs = 0
 
       const profitData = sales.map((sale) => {
-        const totalincomingprice = sale.products.reduce(
-          (prev, item) =>
-            prev +
-            item.pieces *
-            ((item.price && item.price.incomingprice) ||
-              (item.product && item.product.price.incomingprice) ||
-              0),
-          0
-        );
-        const totalincomingpriceuzs = sale.products.reduce(
-          (prev, item) =>
-            prev +
-            item.pieces *
-            ((item.price && item.price.incomingpriceuzs) ||
-              (item.product && item.product.price.incomingpriceuzs) ||
-              0),
-          0
-        );
+        // const totalincomingprice = sale.products.reduce(
+        //   (prev, item) =>
+        //     prev +
+        //     item.pieces *
+        //     ((item.price && item.price.incomingprice) ||
+        //       (item.product && item.product.price.incomingprice) ||
+        //       0),
+        //   0
+        // );
+        // const totalincomingpriceuzs = sale.products.reduce(
+        //   (prev, item) =>
+        //     prev +
+        //     item.pieces *
+        //     ((item.price && item.price.incomingpriceuzs) ||
+        //       (item.product && item.product.price.incomingpriceuzs) ||
+        //       0),
+        //   0
+        // );
         const totalprice = sale.products.reduce(
           (summ, product) => summ + (product.totalprice || 0),
           0
@@ -368,11 +398,11 @@ module.exports.getDayTotalReport = async (req, res) => {
         debt += (Math.round((totalprice - sale.payment.payment - discount) * 1000) / 1000)
         debtuzs += (Math.round((totalpriceuzs - sale.payment.paymentuzs - discountuzs) * 1) / 1)
 
-        profit += totalprice - totalincomingprice - discount;
-        profituzs += totalpriceuzs - totalincomingpriceuzs - discountuzs;
+        // profit += totalprice - totalincomingprice - discount;
+        // profituzs += totalpriceuzs - totalincomingpriceuzs - discountuzs;
       });
-      seller.profit = profit;
-      seller.profituzs = profituzs;
+      // seller.profit = profit;
+      // seller.profituzs = profituzs;
       seller.debt = debt;
       seller.debtuzs = debtuzs;
 

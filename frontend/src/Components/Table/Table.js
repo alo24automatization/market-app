@@ -44,6 +44,7 @@ import { ReceiveOrderProductsTableRow } from './TableRows/ReceiveOrderProductsTa
 import { LabelsIncome } from './TableRows/LabelsIncome'
 import { ClientSaleTable } from './TableRows/ClientSaleTable'
 import PackmanProfitClientsTableRow from './TableRows/PackmanProfitClientsTableRow.js'
+import { SellerPayments } from './TableRows/SellerPayments'
 
 function Table({
     showClients,
@@ -123,6 +124,21 @@ function Table({
             case 'clientssales':
                 return (
                     <ClientSaleTable
+                        data={data}
+                        currency={currency}
+                        currentPage={currentPage}
+                        countPage={countPage}
+                        Print={Print}
+                        ReturnPayment={ReturnPayment}
+                        sellers={sellers}
+                        addPlus={addPlus}
+                        editComment={editComment}
+                        handlePayDebt={Pay}
+                    />
+                )
+            case 'seller_payments':
+                return (
+                    <SellerPayments
                         data={data}
                         currency={currency}
                         currentPage={currentPage}

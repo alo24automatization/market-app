@@ -104,7 +104,7 @@ export const SellerTableRow = ({
                                     type={'info'}
                                     bgcolor={'bg-blue-600'}
                                     onClick={() =>
-                                        linkToSellerReports(seller._id)
+                                        linkToSellerReports(seller)
                                     }
                                 />
                             </div>
