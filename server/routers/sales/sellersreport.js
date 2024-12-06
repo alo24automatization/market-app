@@ -395,8 +395,8 @@ module.exports.getDayTotalReport = async (req, res) => {
         const discount = (sale.discount && sale.discount.discount) || 0;
         const discountuzs = (sale.discount && sale.discount.discountuzs) || 0;
 
-        debt += (Math.round((totalprice - sale.payment.payment - discount) * 1000) / 1000)
-        debtuzs += (Math.round((totalpriceuzs - sale.payment.paymentuzs - discountuzs) * 1) / 1)
+        debt += (Math.round((totalprice - (sale?.payment?.payment || 0) - discount) * 1000) / 1000)
+        debtuzs += (Math.round((totalpriceuzs - (sale?.payment?.paymentuzs || 0) - discountuzs) * 1) / 1)
 
         // profit += totalprice - totalincomingprice - discount;
         // profituzs += totalpriceuzs - totalincomingpriceuzs - discountuzs;
