@@ -42,6 +42,7 @@ function SearchForm({
     date,
     setDate,
     filterByClientPhoneNumber,
+    filterByClientPhoneNumberWithEnter,
     phoneNumber,
     clickConfirmBtn,
     barcode,
@@ -188,8 +189,9 @@ function SearchForm({
                         key={'client_phoneNumber_1'}
                         placeholder={t('Telefon raqam')}
                         someClasses={'grow basis-1/6'}
-                        value={phoneNumber}
+                        // value={phoneNumber}
                         onChange={filterByClientPhoneNumber}
+                        onKeyUp={filterByClientPhoneNumberWithEnter}
                     />
                 )
             case 'sellerName':

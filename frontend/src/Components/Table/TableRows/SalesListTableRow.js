@@ -46,6 +46,7 @@ export const SalesListTableRow = ({
 
     const navigate = useNavigate()
     const linkToSale = (saleconnector, returnProducts) => {
+        console.log(saleconnector);
         navigate(`${sellers ? '/' : '/sotuv/sotish'}`, {
             replace: true,
             state: { saleconnector, returnProducts },

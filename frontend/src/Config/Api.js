@@ -2,7 +2,7 @@ import axios from 'axios'
 import Store from '../App/store'
 import { logOut } from '../Pages/Login/loginSlice'
 
-const baseURL = process.env.REACT_APP_API_ENDPOINT
+export const baseURL = process.env.REACT_APP_API_ENDPOINT
 // const baseURL =  'http://185.241.61.68/api'
 
 const instance = axios.create({

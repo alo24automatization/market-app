@@ -761,9 +761,9 @@ body {
 .loginPage {
     height: 100vh;
     background: radial-gradient(
-            100% 316.36% at 0% 50%,
-            #0090a3 0%,
-            rgba(36, 86, 50, 0.9) 100%
+        100% 316.36% at 0% 50%,
+        #0090a3 0%,
+        rgba(36, 86, 50, 0.9) 100%
     );
 }
 
@@ -989,4 +989,14 @@ input[type='checkbox']:checked::before {
 .sale-toggle-container input[type='checkbox']:checked::before {
     left: 20px;
     background: #4175dc;
+}
+.error-log {
+    color: red;
+    font-size: 17px;
+    padding: 2.5px;
+}
+.success-log {
+    color: #149414;
+    padding: 2.5px;
+    font-size: 17px;
 }

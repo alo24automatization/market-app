@@ -146,6 +146,10 @@ router.post('/sellers/getreports', auth, (req, res) => {
   require('./sellersreport').getSellersReport(req, res);
 });
 
+router.post('/sellers/get_day_total_report', auth, (req, res) => {
+  require('./sellersreport').getDayTotalReport(req, res);
+});
+
 router.post('/comment/update', auth, (req, res) => {
   require('./saleproduct').chnageComment(req, res);
 })

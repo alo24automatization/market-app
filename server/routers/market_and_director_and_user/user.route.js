@@ -529,7 +529,7 @@ module.exports.getsellers = async (req, res) => {
             "payment",
             "cash cashuzs card carduzs transfer transferuzs payment paymentuzs totalprice totalpriceuzs"
           )
-          .populate("saleconnector", "id")
+          .populate("saleconnector", "id totalOfBackAndDebt")
           .populate("client", "name")
           .populate({
             path: "products",
@@ -564,6 +564,28 @@ module.exports.getsellers = async (req, res) => {
         seller.totalsalesuzs = sales.reduce((prev, sale) => {
           return prev + ((sale.payment && sale.payment.totalpriceuzs) || 0);
         }, 0);
+
+        seller.cash = sales.reduce((prev, sale) => {
+          return prev + ((sale.payment && sale.payment.cash) || 0);
+        }, 0);
+        seller.cashuzs = sales.reduce((prev, sale) => {
+          return prev + ((sale.payment && sale.payment.cashuzs) || 0);
+        }, 0);
+
+        seller.card = sales.reduce((prev, sale) => {
+          return prev + ((sale.payment && sale.payment.card) || 0);
+        }, 0);
+        seller.carduzs = sales.reduce((prev, sale) => {
+          return prev + ((sale.payment && sale.payment.carduzs) || 0);
+        }, 0);
+
+        seller.transfer = sales.reduce((prev, sale) => {
+          return prev + ((sale.payment && sale.payment.transfer) || 0);
+        }, 0);
+        seller.transferuzs = sales.reduce((prev, sale) => {
+          return prev + ((sale.payment && sale.payment.transferuzs) || 0);
+        }, 0);
+
 
         let profit = 0;
         let profituzs = 0;
@@ -602,6 +624,8 @@ module.exports.getsellers = async (req, res) => {
         });
         seller.profit = profit;
         seller.profituzs = profituzs;
+
+        // seller.debt =
       }
     }
     res.status(201).send(sellers);

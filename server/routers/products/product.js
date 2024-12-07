@@ -665,7 +665,6 @@ module.exports.update = async (req, res) => {
 
     if (!marke.mainmarket) {
       for (const filialId of marke.filials) {
-        console.log(filialId);
         const filialCategory = await Category.findOne({
           market: filialId,
           code: categoryData.code
@@ -677,7 +676,6 @@ module.exports.update = async (req, res) => {
           category: filialCategory
         });
 
-        console.log(filialproductData);
 
         const filialproduct = await Product.findOne({
           productdata: filialproductData && filialproductData._id,

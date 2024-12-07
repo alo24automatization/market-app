@@ -57,6 +57,7 @@ function Navbar() {
     const { currency, currencyType, currencyError, getCurrencyLoading } =
         useSelector((state) => state.currency)
 useEffect(()=>{
+    if(user.type.toLowerCase()!=="admin")
     dispatch(changeCurrencyType({ currency: "UZS" }))
 },[])
     const changeCurrency = () => {

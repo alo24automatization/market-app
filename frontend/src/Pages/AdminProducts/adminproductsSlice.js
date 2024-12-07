@@ -78,7 +78,6 @@ export const createMarket = createAsyncThunk(
         }
     }
 )
-
 export const createDirector = createAsyncThunk(
     'adminproducts/createDirector',
     async (body, {rejectWithValue}) => {

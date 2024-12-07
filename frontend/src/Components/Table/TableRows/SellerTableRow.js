@@ -1,8 +1,8 @@
-import React, {useEffect, useState} from 'react'
+import React, { useEffect, useState } from 'react'
 import TableBtn from '../../Buttons/TableBtn'
-import {map, uniqueId} from 'lodash'
-import {roundUsd, roundUzs} from '../../../App/globalFunctions'
-import {t} from 'i18next'
+import { map, uniqueId } from 'lodash'
+import { roundUsd, roundUzs } from '../../../App/globalFunctions'
+import { t } from 'i18next'
 
 export const SellerTableRow = ({
     data,
@@ -12,6 +12,7 @@ export const SellerTableRow = ({
     linkToSellerReports,
     currency,
     modalOpen1,
+    getTotalDayReport
 }) => {
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
     useEffect(() => {
@@ -37,26 +38,63 @@ export const SellerTableRow = ({
                         <td className='text-left td'>{seller.lastname}</td>
                         <td className='text-left td'>{seller.phone}</td>
                         <td className='text-left td'>{seller?.sales || 0}</td>
-                        <td className='text-left td'>
+                        {/* <td className='text-left td'>
                             {currency === 'USD'
                                 ? seller?.totalsales?.toLocaleString('ru-RU')
                                 : seller?.totalsalesuzs?.toLocaleString(
-                                      'ru-RU'
-                                  )}{' '}
+                                    'ru-RU'
+                                )}{' '}
                             {currency}
                         </td>
                         <td className='text-left td'>
                             {currency === 'USD'
                                 ? roundUsd(seller?.profit).toLocaleString(
-                                      'ru-RU'
-                                  )
+                                    'ru-RU'
+                                )
                                 : roundUzs(seller?.profituzs).toLocaleString(
-                                      'ru-RU'
-                                  )}{' '}
+                                    'ru-RU'
+                                )}{' '}
+                            {currency}
+                        </td> */}
+                        {/* <td className='text-left td'>
+                            {currency === 'USD'
+                                ? roundUsd(seller?.cash).toLocaleString(
+                                    'ru-RU'
+                                )
+                                : roundUzs(seller?.cashuzs).toLocaleString(
+                                    'ru-RU'
+                                )}{' '}
                             {currency}
                         </td>
+                        <td className='text-left td'>
+                            {currency === 'USD'
+                                ? roundUsd(seller?.card).toLocaleString(
+                                    'ru-RU'
+                                )
+                                : roundUzs(seller?.carduzs).toLocaleString(
+                                    'ru-RU'
+                                )}{' '}
+                            {currency}
+                        </td>
+                        <td className='text-left td'>
+                            {currency === 'USD'
+                                ? roundUsd(seller?.transfer).toLocaleString(
+                                    'ru-RU'
+                                )
+                                : roundUzs(seller?.transferuzs).toLocaleString(
+                                    'ru-RU'
+                                )}{' '}
+                            {currency}
+                        </td> */}
                         <td className='border-r-0 td py-[0.375rem]'>
                             <div className='flex items-center justify-center gap-[0.625rem]'>
+                                <TableBtn
+                                    type={'print'}
+                                    bgcolor={'bg-blue-600'}
+                                    onClick={() =>
+                                        getTotalDayReport(seller._id)
+                                    }
+                                />
                                 <TableBtn
                                     type={'edit'}
                                     bgcolor={'bg-warning-500'}
@@ -66,7 +104,7 @@ export const SellerTableRow = ({
                                     type={'info'}
                                     bgcolor={'bg-blue-600'}
                                     onClick={() =>
-                                        linkToSellerReports(seller._id)
+                                        linkToSellerReports(seller)
                                     }
                                 />
                             </div>
@@ -90,11 +128,11 @@ export const SellerTableRow = ({
                                 {': '}
                                 {currency === 'USD'
                                     ? seller?.totalsales?.toLocaleString(
-                                          'ru-RU'
-                                      )
+                                        'ru-RU'
+                                    )
                                     : seller?.totalsalesuzs?.toLocaleString(
-                                          'ru-RU'
-                                      )}{' '}
+                                        'ru-RU'
+                                    )}{' '}
                                 {currency}
                             </p>
                         </li>
@@ -104,11 +142,11 @@ export const SellerTableRow = ({
                                 {': '}
                                 {currency === 'USD'
                                     ? roundUsd(seller?.profit).toLocaleString(
-                                          'ru-RU'
-                                      )
+                                        'ru-RU'
+                                    )
                                     : roundUzs(
-                                          seller?.profituzs
-                                      ).toLocaleString('ru-RU')}{' '}
+                                        seller?.profituzs
+                                    ).toLocaleString('ru-RU')}{' '}
                                 {currency}
                             </p>
                         </li>
