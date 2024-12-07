@@ -191,102 +191,189 @@ const sendMessage = async () => {
     console.error("Failed to send message:", error.message);
   }
 };
+// const sendMessageFromMorning = async (_, res) => {
+//   console.log("Morning message sending process has been started.");
+
+//   const formatMessage = (name, debt, market_name) => {
+//     return `Xurmatli ${name} sizning ${market_name} дан ${debt} uzs miqtorda qarzingiz mavjud. Iltimos to'lovni o'z vaqtida amalga oshiring!`;
+//   };
+
+//   let count = 1;
+//   let currentClient = { phone: "", fullname: "" };
+
+//   try {
+//     const now = moment();
+//     const reduce = (arr, el) =>
+//       arr?.reduce((prev, item) => prev + (item[el] || 0), 0);
+
+//     const saleconnectors = await SaleConnector.find()
+//       .select("-isArchive -updatedAt -__v")
+//       .populate("payments", "payment paymentuzs")
+//       .populate({
+//         path: "products",
+//         select: "totalprice totalpriceuzs",
+//         populate: { path: "product", select: "productdata" },
+//       })
+//       .populate("client", "name phoneNumber")
+//       .populate("debts", "pay_end_date")
+//       .populate("discounts", "discountuzs")
+//       .lean();
+
+//     const debtsreport = saleconnectors
+//       .map((sale) => {
+//         const paymentuzs = reduce(sale.payments, "paymentuzs");
+//         const totalpriceuzs = reduce(sale.products, "totalpriceuzs");
+//         const discountuzs = reduce(sale.discounts, "discountuzs");
+
+//         return {
+//           client: sale.client,
+//           totalpriceuzs,
+//           debtuzs: Math.round(totalpriceuzs - paymentuzs - discountuzs),
+//           pay_end_date: sale.debts?.[0]?.pay_end_date || null,
+//         };
+//       })
+//       .filter((sale) => sale.debtuzs > 0);
+
+//     const uniqueClientDebts = new Set();
+
+//     const filteredDebtsReport = debtsreport.filter((sale) => {
+//       if (sale.client?._id) {
+//         if (uniqueClientDebts.has(sale.client._id)) {
+//           return false;
+//         } else {
+//           uniqueClientDebts.add(sale.client._id);
+//           return true;
+//         }
+//       }
+//       return false;
+//     });
+
+//     for (const debt of filteredDebtsReport) {
+//       if (global.isStoppedSendMorningMessage) break;
+
+//       const client = await Client.findById(debt.client).populate({
+//         path: "market",
+//         populate: "director",
+//       });
+
+//       if (!client || !client.market) continue;
+
+//       const { market } = client;
+//       const SMS_API_KEY = market.SMS_API_KEY;
+//       const validPhoneNumber = client.phoneNumber.startsWith("+998")
+//         ? client.phoneNumber.slice(4)
+//         : client.phoneNumber;
+
+//       currentClient.fullname = client.name;
+//       currentClient.phone = client.phoneNumber;
+
+//       if (SMS_API_KEY) {
+//         try {
+//           const message = formatMessage(client.name, debt.debtuzs, market.name);
+//           const response = await axios.get(
+//             `https://smsapp.uz/new/services/send.php?key=${SMS_API_KEY}&number=${validPhoneNumber}&message=${message}`
+//           );
+
+//           console.log(`[${count}] The SMS message has been sent. success:
+//             ${response.data.success}
+//             - client phoneNumber: ${
+//               currentClient.phone + "  client name:" + currentClient.fullname
+//             }
+//             `);
+//           count++;
+//         } catch (error) {
+//           console.error("Failed to send message:", error.message);
+//         }
+//       }
+//     }
+//     res?.status(200)?.json({ data: filteredDebtsReport.length });
+//   } catch (error) {
+//     console.error("SMS-APP Failed to send message:", error.message);
+//     res?.status(500)?.json({ error: error.message });
+//   }
+
+//   console.log("------ The morning message sending process has ended. ------");
+// };
+
 const sendMessageFromMorning = async (_, res) => {
   console.log("Morning message sending process has been started.");
 
   const formatMessage = (name, debt, market_name) => {
-    return `Xurmatli ${name} sizning ${market_name} дан ${debt} uzs miqtorda qarzingiz mavjud. Iltimos to'lovni o'z vaqtida amalga oshiring!`;
+    return `Xurmatli ${name}, sizning ${market_name} дан ${debt} uzs miqdorida umumiy qarzingiz mavjud. Iltimos, to'lovni o'z vaqtida amalga oshiring!`;
   };
 
   let count = 1;
   let currentClient = { phone: "", fullname: "" };
 
   try {
-    const now = moment();
-    const reduce = (arr, el) =>
-      arr?.reduce((prev, item) => prev + (item[el] || 0), 0);
-
-    const saleconnectors = await SaleConnector.find()
-      .select("-isArchive -updatedAt -__v")
-      .populate("payments", "payment paymentuzs")
+    // Fetch all clients
+    const clients = await Client.find()
+      .select("name phoneNumber market")
       .populate({
-        path: "products",
-        select: "totalprice totalpriceuzs",
-        populate: { path: "product", select: "productdata" },
-      })
-      .populate("client", "name phoneNumber")
-      .populate("debts", "pay_end_date")
-      .populate("discounts", "discountuzs")
-      .lean();
-
-    const debtsreport = saleconnectors
-      .map((sale) => {
-        const paymentuzs = reduce(sale.payments, "paymentuzs");
-        const totalpriceuzs = reduce(sale.products, "totalpriceuzs");
-        const discountuzs = reduce(sale.discounts, "discountuzs");
-
-        return {
-          client: sale.client,
-          totalpriceuzs,
-          debtuzs: Math.round(totalpriceuzs - paymentuzs - discountuzs),
-          pay_end_date: sale.debts?.[0]?.pay_end_date || null,
-        };
-      })
-      .filter((sale) => sale.debtuzs > 0);
-
-    const uniqueClientDebts = new Set();
-
-    const filteredDebtsReport = debtsreport.filter((sale) => {
-      if (sale.client?._id) {
-        if (uniqueClientDebts.has(sale.client._id)) {
-          return false;
-        } else {
-          uniqueClientDebts.add(sale.client._id);
-          return true;
-        }
-      }
-      return false;
-    });
-
-    for (const debt of filteredDebtsReport) {
-      if (global.isStoppedSendMorningMessage) break;
-
-      const client = await Client.findById(debt.client).populate({
         path: "market",
         populate: "director",
-      });
+      })
+      .lean();
+
+    for (const client of clients) {
+      if (global.isStoppedSendMorningMessage) break;
 
       if (!client || !client.market) continue;
 
-      const { market } = client;
-      const SMS_API_KEY = market.SMS_API_KEY;
-      const validPhoneNumber = client.phoneNumber.startsWith("+998")
-        ? client.phoneNumber.slice(4)
-        : client.phoneNumber;
+      const saleConnectors = await SaleConnector.find({ client: client._id })
+        .select("-isArchive -updatedAt -__v")
+        .populate("payments", "payment paymentuzs")
+        .populate({
+          path: "products",
+          select: "totalprice totalpriceuzs",
+          populate: { path: "product", select: "productdata" },
+        })
+        .populate("debts", "pay_end_date")
+        .populate("discounts", "discountuzs")
+        .lean();
 
-      currentClient.fullname = client.name;
-      currentClient.phone = client.phoneNumber;
+      const reduce = (arr, el) =>
+        arr?.reduce((prev, item) => prev + (item[el] || 0), 0);
 
-      if (SMS_API_KEY) {
-        try {
-          const message = formatMessage(client.name, debt.debtuzs, market.name);
-          const response = await axios.get(
-            `https://smsapp.uz/new/services/send.php?key=${SMS_API_KEY}&number=${validPhoneNumber}&message=${message}`
-          );
+      // Calculate total debt for the client
+      const totalDebt = saleConnectors.reduce((acc, sale) => {
+        const paymentuzs = reduce(sale.payments, "paymentuzs");
+        const totalpriceuzs = reduce(sale.products, "totalpriceuzs");
+        const discountuzs = reduce(sale.discounts, "discountuzs");
+        const debt = Math.round(totalpriceuzs - paymentuzs - discountuzs);
+        return acc + (debt > 0 ? debt : 0);
+      }, 0);
 
-          console.log(`[${count}] The SMS message has been sent. success:
-            ${response.data.success}
-            - client phoneNumber: ${
-              currentClient.phone + "  client name:" + currentClient.fullname
-            }
-            `);
-          count++;
-        } catch (error) {
-          console.error("Failed to send message:", error.message);
+      if (totalDebt > 0) {
+        const SMS_API_KEY = client.market.SMS_API_KEY ;
+        const validPhoneNumber = client.phoneNumber.startsWith("+998")
+          ? client.phoneNumber.slice(4)
+          : client.phoneNumber;
+
+        currentClient.fullname = client.name;
+        currentClient.phone = client.phoneNumber;
+
+        if (SMS_API_KEY) {
+          try {
+            const message = formatMessage(
+              client.name,
+              totalDebt,
+              client.market.name
+            );
+            const response = await axios.get(
+              `https://smsapp.uz/new/services/send.php?key=${SMS_API_KEY}&number=${validPhoneNumber}&message=${message}`
+            );
+
+            console.log(`[${count}] -> ${message}`);
+            count++;
+          } catch (error) {
+            console.error("Failed to send message:", error.message);
+          }
         }
       }
     }
-    res?.status(200)?.json({ data: filteredDebtsReport.length });
+
+    res?.status(200)?.json({ data: count - 1 });
   } catch (error) {
     console.error("SMS-APP Failed to send message:", error.message);
     res?.status(500)?.json({ error: error.message });
@@ -294,7 +381,6 @@ const sendMessageFromMorning = async (_, res) => {
 
   console.log("------ The morning message sending process has ended. ------");
 };
-
 const displayCountdown = async (seconds) => {
   return new Promise((resolve) => {
     let currentSecond = 0;
