@@ -91,6 +91,7 @@ const sellingsSlice = createSlice({
         excelAllData: [],
         sellings: [],
         sellers: [],
+        result: {},
         total: 0,
         totalSearched: 0,
         searchedSellings: [],
@@ -125,9 +126,10 @@ const sellingsSlice = createSlice({
         },
         [getSellings.fulfilled]: (
             state,
-            { payload: { saleconnectors, count } }
+            { payload: { saleconnectors, count, result } }
         ) => {
             state.getSellingsLoading = false
+            state.result = result
             state.searchedSellings.length
                 ? (state.searchedSellings = saleconnectors)
                 : (state.sellings = saleconnectors)

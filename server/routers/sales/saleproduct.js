@@ -953,6 +953,7 @@ module.exports.getsaleconnectors = async (req, res) => {
             });
         }
 
+
         const id = new RegExp(".*" + search ? search.id : "" + ".*", "i");
 
         const name = new RegExp(".*" + search ? search.client : "" + ".*", "i");
@@ -1138,6 +1139,18 @@ module.exports.getsaleconnectors = async (req, res) => {
         let totaldebtusd = 0;
         let totaldebtuzs = 0;
         let filteredProductsSale = [];
+
+        const result = {
+            totalsalesprice: 0,
+            totalsalespriceuzs: 0,
+            debts: 0,
+            debtsuzs: 0,
+            discounts: 0,
+            discountsuzs: 0,
+            payments: 0,
+            paymentsuzs: 0,
+        }
+
         for (const connector of saleconnectors) {
             const filterProducts = connector.products.filter((product) => {
                 return (
@@ -1215,7 +1228,17 @@ module.exports.getsaleconnectors = async (req, res) => {
                 totaldebtusd: totaldebtusd,
                 totaldebtuzs: totaldebtuzs,
             });
+            result.totalsalesprice += filterProducts.reduce((prev, el) => prev + el.totalprice, 0)
+            result.totalsalespriceuzs += filterProducts.reduce((prev, el) => prev + el.totalpriceuzs, 0)
+            result.discounts += filterDiscount.reduce((prev, el) => prev + el.discount, 0)
+            result.discountsuzs += filterDiscount.reduce((prev, el) => prev + el.discountuzs, 0)
+            result.payments += filterPayment.reduce((prev, el) => prev + el.payment, 0)
+            result.paymentsuzs += filterPayment.reduce((prev, el) => prev + el.paymentuzs, 0)
         }
+
+        result.debts = result.totalsalesprice - result.payments - result.discounts
+        result.debtsuzs = result.totalsalespriceuzs - result.paymentsuzs - result.discountsuzs
+
         let clientDebtMap = new Map();
 
         // Step 1: Sum the totaldebtuzs for each client
@@ -1232,14 +1255,18 @@ module.exports.getsaleconnectors = async (req, res) => {
             if (sale && sale.client && sale.client._id) {
                 const clientId = sale.client._id;
                 sale.totaldebtuzs = clientDebtMap.get(clientId);
+
+
             }
         });
+
 
         // send response
         const count = filteredProductsSale.length;
         res.status(200).json({
             saleconnectors: filteredProductsSale,
             count,
+            result
         });
     } catch (error) {
         console.log(error.message);

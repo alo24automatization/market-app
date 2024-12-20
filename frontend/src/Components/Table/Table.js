@@ -73,6 +73,7 @@ function Table({
     changeNumberHandler,
     sortItem,
     ReturnPayment,
+    result,
     Save,
     onKeyUp,
     currencyType,
@@ -325,6 +326,7 @@ function Table({
                         Print={Print}
                         ReturnPayment={ReturnPayment}
                         sellers={sellers}
+                        resultTotal={result}
                         addPlus={addPlus}
                         handleDelete={handleDelete}
                         editComment={editComment}

@@ -88,7 +88,8 @@ const Sellings = ({ id }) => {
         getSellingsLoading,
         total,
         totalSearched,
-        sellers
+        sellers,
+        result
     } = useSelector((state) => state.sellings)
     const { expenses } = useSelector((state) => state.expense)
     const [chooseBody, setChooseBody] = useState('')
@@ -855,6 +856,7 @@ const Sellings = ({ id }) => {
                         sellers={user?.type === 'Seller' ? true : false}
                         editComment={editComment}
                         handleDelete={handleDeleteProduct}
+                        result={result}
                     />
                 ) : (
                     <TableMobile
