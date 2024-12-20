@@ -69,6 +69,10 @@ router.post('/saleproducts/returnproducts', auth, (req, res) => {
   require('./saleproduct').registeredit(req, res);
 });
 
+router.post('/saleproducts/getsellers', auth, (req, res) => {
+  require('./saleproduct').getSellers(req, res);
+});
+
 router.post('/saleproducts/addproducts', auth, (req, res) => {
   require('./saleproduct').addproducts(req, res);
 });

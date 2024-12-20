@@ -265,6 +265,7 @@ export const SalesListTableRow = ({
                                 </span>
                             </div>
                         </td>
+                        <td className='text-left td'>{saleconnector?.user?.firstname} {saleconnector?.user?.lastname}</td>
                         <td className='text-left td'>{saleconnector?.id}</td>
                         <td className='text-left td'>
                             {saleconnector?.client?.name ? (

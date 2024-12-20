@@ -14,6 +14,7 @@ import {
     clearSearchedSellings,
     deleteSaleConnector,
     excelAllSellings,
+    getSellers,
     getSellings,
     getSellingsByFilter,
 } from '../Slices/sellingsSlice.js'
@@ -36,6 +37,7 @@ import {
 } from '../../Reports/reportsSlice.js'
 import { getProducts } from '../../Incomings/incomingSlice.js'
 import SessionBtn from '../../../Components/Buttons/SessionBtn.js'
+import Select from 'react-select'
 
 const Sellings = ({ id }) => {
     const { t } = useTranslation(['common'])
@@ -45,6 +47,10 @@ const Sellings = ({ id }) => {
         },
         {
             title: t('Sana'),
+            filter: 'createdAt',
+        },
+        {
+            title: t('Sotuvchi'),
             filter: 'createdAt',
         },
         {
@@ -82,6 +88,7 @@ const Sellings = ({ id }) => {
         getSellingsLoading,
         total,
         totalSearched,
+        sellers
     } = useSelector((state) => state.sellings)
     const { expenses } = useSelector((state) => state.expense)
     const [chooseBody, setChooseBody] = useState('')
@@ -513,6 +520,8 @@ const Sellings = ({ id }) => {
         }
     }
 
+    const [seller, setSeller] = useState('')
+
     const fetchSellings = async () => {
         const body = {
             filialId: id,
@@ -523,6 +532,7 @@ const Sellings = ({ id }) => {
             search: {
                 id: '',
                 client: '',
+                seller: seller
             },
         }
         dispatch(getSellings(body))
@@ -537,7 +547,12 @@ const Sellings = ({ id }) => {
 
     useEffect(() => {
         fetchSellings()
-    }, [dispatch, id, currentPage, showByTotal, startDate, endDate, search])
+    }, [dispatch, id, currentPage, showByTotal, startDate, endDate, search, seller])
+
+    useEffect(() => {
+        dispatch(getSellers())
+    }, [dispatch])
+
     const handleAddClient = (client) => {
         dispatch(
             addClient({
@@ -717,6 +732,20 @@ const Sellings = ({ id }) => {
                             key={'total_1'}
                             onSelect={filterByTotal}
                         />
+                    </div>
+                    <div className='pl-2 w-[21.57rem] lg:m-0 mx-auto'>
+                        <label
+                            className={
+                                'w-[90%] text-blue-700 block leading-[1.125rem] mb-[.625rem]'
+                            }
+                        >Sotuvchilar</label>
+                        <Select
+                            onChange={(value) => setSeller(value.value)}
+                            options={[
+                                { label: "Hammasi", value: "" }, // Add this item first
+                                ...sellers.map((item) => ({ label: item.firstname + ' ' + item.lastname, value: item._id })),
+                            ]}
+                            placeholder="Sotuvchilar" />
                     </div>
                     <SearchForm
                         filterBy={[

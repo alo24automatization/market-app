@@ -34,6 +34,10 @@ module.exports.registerAll = async (req, res) => {
       const category = await Category.findOne({
         market: marke._id,
         name,
+        $or: [
+          { isVisible: true }, // Если поле существует и его значение true
+          { isVisible: { $exists: false } }  // Если поле не существует
+        ]
       });
 
       if (category) {
@@ -46,6 +50,10 @@ module.exports.registerAll = async (req, res) => {
         name,
         probirka,
         market: marke._id,
+        $or: [
+          { isVisible: true }, // Если поле существует и его значение true
+          { isVisible: { $exists: false } }  // Если поле не существует
+        ]
       });
       await newCategory.save();
       all.push(newCategory);
@@ -74,6 +82,10 @@ module.exports.register = async (req, res) => {
       market,
       code,
       name,
+      $or: [
+        { isVisible: true }, // Если поле существует и его значение true
+        { isVisible: { $exists: false } }  // Если поле не существует
+      ]
     });
     if (categor) {
       return res.status(400).json({
@@ -93,6 +105,10 @@ module.exports.register = async (req, res) => {
       name,
       market,
       code,
+      $or: [
+        { isVisible: true }, // Если поле существует и его значение true
+        { isVisible: { $exists: false } }  // Если поле не существует
+      ]
     });
     await newCategory.save();
 
@@ -108,12 +124,20 @@ module.exports.register = async (req, res) => {
     const categoryCount = await Category.find({
       market,
       code: categorycode,
+      $or: [
+        { isVisible: true }, // Если поле существует и его значение true
+        { isVisible: { $exists: false } }  // Если поле не существует
+      ]
       // name: categoryname,
     }).count();
 
     const categorys = await Category.find({
       market,
       code: categorycode,
+      $or: [
+        { isVisible: true }, // Если поле существует и его значение true
+        { isVisible: { $exists: false } }  // Если поле не существует
+      ]
       // name: categoryname,
     })
       .sort({ code: 1 })
@@ -178,12 +202,20 @@ module.exports.update = async (req, res) => {
       market,
       code: categorycode,
       // name: categoryname,
+      $or: [
+        { isVisible: true }, // Если поле существует и его значение true
+        { isVisible: { $exists: false } }  // Если поле не существует
+      ]
     }).count();
 
     const categorys = await Category.find({
       market,
       code: categorycode,
       // name: categoryname,
+      $or: [
+        { isVisible: true }, // Если поле существует и его значение true
+        { isVisible: { $exists: false } }  // Если поле не существует
+      ]
     })
       .sort({ code: 1 })
       .select("code market name")
@@ -208,7 +240,12 @@ module.exports.getAll = async (req, res) => {
         .json({ message: "Diqqat! Do'kon ma'lumotlari topilmadi." });
     }
 
-    const categories = await Category.find({ market }).select(
+    const categories = await Category.find({
+      market, $or: [
+        { isVisible: true }, // Если поле существует и его значение true
+        { isVisible: { $exists: false } }  // Если поле не существует
+      ]
+    }).select(
       "code market name products"
     );
     res.status(201).json(categories);
@@ -236,12 +273,20 @@ module.exports.getCategories = async (req, res) => {
     const categoryCount = await Category.find({
       market,
       code,
+      $or: [
+        { isVisible: true }, // Если поле существует и его значение true
+        { isVisible: { $exists: false } }  // Если поле не существует
+      ]
       // name,
     }).count();
 
     const categorys = await Category.find({
       market,
       code,
+      $or: [
+        { isVisible: true }, // Если поле существует и его значение true
+        { isVisible: { $exists: false } }  // Если поле не существует
+      ]
       // name,
     })
       .sort({ code: 1 })
@@ -250,37 +295,37 @@ module.exports.getCategories = async (req, res) => {
       .limit(countPage)
       .lean()
 
-      for (const category of categorys) {
-        
-        const products = await SaleProduct.find({
-          market,
-          createdAt: {
-            $gte: startDate,
-            $lte: endDate
-          }
+    for (const category of categorys) {
+
+      const products = await SaleProduct.find({
+        market,
+        createdAt: {
+          $gte: startDate,
+          $lte: endDate
+        }
+      })
+        .sort({ _id: -1 })
+        .select('-__v -updatedAt -isArchive')
+        .populate({
+          path: "product",
+          select: "category price",
+          match: { category: category }
         })
-          .sort({ _id: -1 })
-          .select('-__v -updatedAt -isArchive')
-          .populate({
-            path: "product",
-            select: "category price",
-            match: {category: category}
-          })
-          .populate({
-            path: "price",
-            select: "incomingprice incomingpriceuzs",
-          })
-          .lean()
-          .then(products => products.filter(product => product.product));
-          
-          category.totalproducts = products.reduce((prev, product) => prev + product.pieces, 0) 
-          category.totalsales = products.reduce((prev, product) => prev + product.totalprice, 0) 
-          category.totalsalesuzs = products.reduce((prev, product) => prev + product.totalpriceuzs, 0) 
-          const income = products.reduce((prev, product) => prev + ((product.price.incomingprice || 0) * product.pieces), 0)
-          const incomeuzs = products.reduce((prev, product) => prev + ((product.price.incomingpriceuzs || 0) * product.pieces), 0)
-          category.profit = products.reduce((prev, product) => prev + product.totalprice, 0) - income
-          category.profituzs = products.reduce((prev, product) => prev + product.totalpriceuzs, 0) - incomeuzs
-      }
+        .populate({
+          path: "price",
+          select: "incomingprice incomingpriceuzs",
+        })
+        .lean()
+        .then(products => products.filter(product => product.product));
+
+      category.totalproducts = products.reduce((prev, product) => prev + product.pieces, 0)
+      category.totalsales = products.reduce((prev, product) => prev + product.totalprice, 0)
+      category.totalsalesuzs = products.reduce((prev, product) => prev + product.totalpriceuzs, 0)
+      const income = products.reduce((prev, product) => prev + ((product.price.incomingprice || 0) * product.pieces), 0)
+      const incomeuzs = products.reduce((prev, product) => prev + ((product.price.incomingpriceuzs || 0) * product.pieces), 0)
+      category.profit = products.reduce((prev, product) => prev + product.totalprice, 0) - income
+      category.profituzs = products.reduce((prev, product) => prev + product.totalpriceuzs, 0) - incomeuzs
+    }
 
     res.status(201).json({ categories: categorys, count: categoryCount });
   } catch (error) {
@@ -303,6 +348,10 @@ module.exports.getCategoriesExcel = async (req, res) => {
     }
     const categorys = await Category.find({
       market,
+      $or: [
+        { isVisible: true }, // Если поле существует и его значение true
+        { isVisible: { $exists: false } }  // Если поле не существует
+      ]
     })
       .sort({ _id: -1 })
       .select("name code market");
@@ -327,6 +376,8 @@ module.exports.delete = async (req, res) => {
     }
 
     const category = await Category.findById(_id);
+    category.isVisible = false
+    await category.save()
 
     // if (category.producttypes && category.producttypes.length > 0) {
     //   return res.status(400).json({
@@ -334,17 +385,17 @@ module.exports.delete = async (req, res) => {
     //       "Diqqat! Ushbu kategoriyada mahsulotlar turlari mavjud bo'lganligi sababli kategoriyani o'chirish mumkin emas.",
     //   });
     // }
-    if (
-      category &&
-      category.products !== null &&
-      category.products.length > 0
-    ) {
-      return res.status(400).json({
-        message:
-          "Diqqat! Ushbu kategoriyada mahsulotlar mavjud bo'lganligi sababli kategoriyani o'chirish mumkin emas.",
-      });
-    }
-    await Category.findByIdAndDelete(_id);
+    // if (
+    //   category &&
+    //   category.products !== null &&
+    //   category.products.length > 0
+    // ) {
+    //   return res.status(400).json({
+    //     message:
+    //       "Diqqat! Ushbu kategoriyada mahsulotlar mavjud bo'lganligi sababli kategoriyani o'chirish mumkin emas.",
+    //   });
+    // }
+    // await Category.findByIdAndDelete(_id);
 
     const categorycode = new RegExp(
       ".*" + (search ? search.code : "") + ".*",
@@ -358,6 +409,10 @@ module.exports.delete = async (req, res) => {
     const categoryCount = await Category.find({
       market,
       code: categorycode,
+      $or: [
+        { isVisible: true }, // Если поле существует и его значение true
+        { isVisible: { $exists: false } }  // Если поле не существует
+      ]
       // name: categoryname,
     }).count();
 
@@ -365,6 +420,10 @@ module.exports.delete = async (req, res) => {
       market,
       code: categorycode,
       // name: categoryname,
+      $or: [
+        { isVisible: true }, // Если поле существует и его значение true
+        { isVisible: { $exists: false } }  // Если поле не существует
+      ]
     })
       .sort({ code: 1 })
       .select("code market name")

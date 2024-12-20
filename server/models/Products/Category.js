@@ -11,6 +11,7 @@ const category = new Schema(
       { type: Schema.Types.ObjectId, ref: "Product" },
     ],
     producttypes: [{ type: Schema.Types.ObjectId, ref: "ProductType" }],
+    isVisible: { type: Boolean, default: true },
     connections: [{ type: Schema.Types.ObjectId, ref: "Market" }],
     isArchive: { type: Boolean, default: false },
   },
