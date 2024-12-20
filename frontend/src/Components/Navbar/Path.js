@@ -13,6 +13,7 @@ import {
 } from 'react-icons/io5'
 import { FaCashRegister, FaHandHoldingUsd, FaSms } from 'react-icons/fa'
 import { t } from 'i18next'
+import { BiMessage } from 'react-icons/bi'
 const navListForDirector = [
     // {
     //     id: 1,
@@ -279,6 +280,13 @@ export const navListForAdmin = [
         label: "Do'konlar",
         icon: <IoBusiness size={'1.5rem'} />,
         path: 'dukonlar',
+        submenu: false,
+    },
+    {
+        id: 4,
+        label: "Xabarlar",
+        icon: <BiMessage size={'1.5rem'} />,
+        path: 'xabarlar',
         submenu: false,
     },
 ]

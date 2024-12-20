@@ -1,9 +1,9 @@
-import React, {forwardRef} from 'react'
-import {map} from 'lodash'
-import {useSelector} from 'react-redux'
-import {t} from 'i18next'
+import React, { forwardRef } from 'react'
+import { map } from 'lodash'
+import { useSelector } from 'react-redux'
+import { t } from 'i18next'
 
-export const SmallCheck =   forwardRef((props, ref) => {
+export const SmallCheck = forwardRef((props, ref) => {
     const {
         selled,
         returned,
@@ -16,6 +16,7 @@ export const SmallCheck =   forwardRef((props, ref) => {
         totalOfBackAndDebt
 
     } = props
+    console.log(selledPayments);
     const { market } = useSelector((state) => state.login)
     const { currencyType } = useSelector((state) => state.currency)
     const calculateAllSum = (data) => {
@@ -51,7 +52,7 @@ export const SmallCheck =   forwardRef((props, ref) => {
     }
     const calculateAllPayments = (data) => {
         return data
-            ? data.filter((item)=>item.totalprice).reduce((acc, pr) => {
+            ? data.filter((item) => item.totalprice).reduce((acc, pr) => {
                 return (
                     acc +
                     pr[currencyType === 'USD' ? 'payment' : 'paymentuzs']
@@ -59,11 +60,12 @@ export const SmallCheck =   forwardRef((props, ref) => {
             }, 0)
             : 0
     }
+
     return (
         <div ref={ref} className={'px-2'}>
             <div className='flex pb-2 flex-col text-center justify-center border-b-[0.8px] border-black-700'>
                 <div className='py-4 object-contain flex items-center justify-center'>
-                    <img src={market?.image} alt='logo' className='w-[170px] mx-auto  object-contain h-full'/>
+                    <img src={market?.image} alt='logo' className='w-[170px] mx-auto  object-contain h-full' />
                 </div>
                 {/* <h2 className='text-[16px] mb-4 font-bold'>{market.name}</h2> */}
                 <div className='flex justify-between items-center py-1 text-[12px] font-bold'>
@@ -194,6 +196,36 @@ export const SmallCheck =   forwardRef((props, ref) => {
                     {currencyType}
                 </span>
             </div>
+            {selledPayments.reduce((prev, el) => prev + el.cashuzs, 0) > 0 ? <div className='text-black-900 border-none check-ul-li-foot'>
+                {' '}
+                {t('Naqt')}:{' '}
+                <span className='text-black-900 text-[12px] font-bold'>
+                    {currencyType === 'USD' ?
+                        selledPayments.reduce((prev, el) => prev + el.cash, 0).toLocaleString('ru-Ru') :
+                        selledPayments.reduce((prev, el) => prev + el.cashuzs, 0).toLocaleString('ru-Ru')}
+                    {currencyType}
+                </span>
+            </div> : ""}
+            {selledPayments.reduce((prev, el) => prev + el.carduzs, 0) > 0 && <div className='text-black-900 border-none check-ul-li-foot'>
+                {' '}
+                {t('Plastik')}:{' '}
+                <span className='text-black-900 text-[12px] font-bold'>
+                    {currencyType === 'USD' ?
+                        selledPayments.reduce((prev, el) => prev + el.card, 0).toLocaleString('ru-Ru') :
+                        selledPayments.reduce((prev, el) => prev + el.carduzs, 0).toLocaleString('ru-Ru')}
+                    {currencyType}
+                </span>
+            </div>}
+            {selledPayments.reduce((prev, el) => prev + el.transferuzs, 0) > 0 && <div className='text-black-900 border-none check-ul-li-foot'>
+                {' '}
+                {t("O'tkazma")}:{' '}
+                <span className='text-black-900 text-[12px] font-bold'>
+                    {currencyType === 'USD' ?
+                        selledPayments.reduce((prev, el) => prev + el.transfer, 0).toLocaleString('ru-Ru') :
+                        selledPayments.reduce((prev, el) => prev + el.transferuzs, 0).toLocaleString('ru-Ru')}
+                    {currencyType}
+                </span>
+            </div>}
             <div className='text-black-900 border-none check-ul-li-foot'>
                 {' '}
                 {t('Qarz')}:{' '}
@@ -213,7 +245,7 @@ export const SmallCheck =   forwardRef((props, ref) => {
                 {' '}
                 {t('Qarzdan qaytarilganlar')}:{' '}
                 <span className='text-black-900 text-[12px] font-bold'>
-                {totalOfBackAndDebt?.toLocaleString('ru-Ru')}{' '}
+                    {totalOfBackAndDebt?.toLocaleString('ru-Ru')}{' '}
                     {currencyType}
                 </span>
             </div>

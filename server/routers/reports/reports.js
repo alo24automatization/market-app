@@ -15,6 +15,7 @@ const {
 const { Client } = require("../../models/Sales/Client");
 const { Packman } = require("../../models/Sales/Packman.js");
 const { AgentPayment } = require("../../models/Sales/AgentPayment.js");
+const { regExpression } = require("../globalFunctions");
 require("../../models/Users");
 
 const reduce = (arr, el) =>
@@ -216,13 +217,13 @@ module.exports.getReport = async (req, res) => {
 
     reports.income.income = roundUsd(
       Number(reports.sale.sale) -
-        Number(incomingprice) -
-        Number(reports.discounts.discounts)
+      Number(incomingprice) -
+      Number(reports.discounts.discounts)
     );
     reports.income.incomeuzs = roundUzs(
       Number(reports.sale.saleuzs) -
-        Number(incomingpriceuzs) -
-        Number(reports.discounts.discountsuzs)
+      Number(incomingpriceuzs) -
+      Number(reports.discounts.discountsuzs)
     );
 
     // Get debts report functions  START
@@ -458,18 +459,18 @@ module.exports.getProfitData = async (req, res) => {
           (prev, item) =>
             prev +
             item.pieces *
-              ((item.price && item.price.incomingprice) ||
-                (item.product && item.product.price.incomingprice) ||
-                0),
+            ((item.price && item.price.incomingprice) ||
+              (item.product && item.product.price.incomingprice) ||
+              0),
           0
         );
         const totalincomingpriceuzs = sale.products.reduce(
           (prev, item) =>
             prev +
             item.pieces *
-              ((item.price && item.price.incomingpriceuzs) ||
-                (item.product && item.product.price.incomingpriceuzs) ||
-                0),
+            ((item.price && item.price.incomingpriceuzs) ||
+              (item.product && item.product.price.incomingpriceuzs) ||
+              0),
           0
         );
         const totalprice = sale.products.reduce(
@@ -617,12 +618,12 @@ module.exports.getPayment = async (req, res) => {
         connectors.filter((connector) =>
           search.client && search.id
             ? connector.saleconnector.client &&
-              connector.saleconnector.id === search.id
+            connector.saleconnector.id === search.id
             : search.id && !search.client
-            ? connector.saleconnector.id === search.id
-            : search.client && !search.id
-            ? connector.saleconnector.client
-            : connector
+              ? connector.saleconnector.id === search.id
+              : search.client && !search.id
+                ? connector.saleconnector.client
+                : connector
         )
       );
 
@@ -741,94 +742,173 @@ module.exports.getPayment = async (req, res) => {
     res.status(400).json({ error: "Serverda xatolik yuz berdi..." });
   }
 };
+
+// aslo to this but bro dont change my other codes only add pagination
 module.exports.getDebtsReport = async (req, res) => {
   try {
-    const { market, startDate, endDate } = req.body;
+    const { market, clientName, phoneNumber,
+      currentPage, countPage } = req.body;
+
+    const page = currentPage ? parseInt(currentPage) : 1; // Default to page 1
+    const limit = countPage ? parseInt(countPage) : 10; // Default to 10 items per page
+    const skip = (page - 1) * limit; // Calculate the number of documents to skip
+
+    const name = clientName ? regExpression(clientName) : ""
+    const phone = phoneNumber ? regExpression(phoneNumber) : ""
+
     const marketData = await Market.findById(market);
+    const reduce = (arr, el) =>
+      arr?.reduce((prev, item) => prev + (item[el] || 0), 0);
+
     if (!marketData) {
       return res
         .status(400)
         .json({ message: `Diqqat! Do'kon haqida malumotlar topilmadi!` });
     }
 
-    const saleconnectors = await SaleConnector.find({
-      market,
-      createdAt: { $gte: startDate, $lte: endDate },
-    })
-      .select("-isArchive -updatedAt -__v")
-      .populate(
-        "payments",
-        "cash cashuzs card carduzs transfer transferuzs payment paymentuzs totalprice totalpriceuzs"
-      )
-      .populate({
-        path: "products",
-        select:
-          "totalprice unitprice totalpriceuzs unitpriceuzs pieces createdAt discount saleproducts product",
-        options: { sort: { createdAt: -1 } },
-        populate: [
-          {
-            path: "product",
-            select: "productdata",
-            populate: { path: "productdata", select: "name code" },
-          },
-          { path: "user", select: "firstname lastname" },
-        ],
+    let clients = []
+    if (name && !phone) {
+      console.log('name');
+      clients = await Client.find({
+        market,
+        name: name
       })
-      .populate("client", "name phoneNumber")
-      .populate("debts", "comment pay_end_date")
-      .populate(
-        "discounts",
-        "discount discountuzs procient products totalprice totalpriceuzs"
-      )
-      .populate("user", "firstname lastname")
-      .populate("dailyconnectors", "comment debt")
-      .populate("packman", "name")
-      .lean();
-
-    const debtsreport = saleconnectors
-      .map((sale) => {
-        const reduce = (arr, el) =>
-          arr.reduce((prev, item) => prev + (item[el] || 0), 0);
-        const discount = reduce(sale.discounts, "discount");
-        const discountuzs = reduce(sale.discounts, "discountuzs");
-        const payment = reduce(sale.payments, "payment");
-        const paymentuzs = reduce(sale.payments, "paymentuzs");
-        const totalprice = reduce(sale.products, "totalprice");
-        const totalpriceuzs = reduce(sale.products, "totalpriceuzs");
-
-        const debtComment =
-          sale.debts.length > 0
-            ? sale.debts[sale.debts.length - 1].comment
-            : "";
-        const debtId =
-          sale.debts.length > 0 ? sale.debts[sale.debts.length - 1]._id : "";
-        const payEndDate =
-          sale.debts.length > 0
-            ? sale.debts[sale.debts.length - 1].pay_end_date
-            : "";
-        const returnObj = {
-          _id: sale._id,
-          id: sale.id,
-          createdAt: sale.createdAt,
-          client: sale.client,
-          totalprice,
-          totalpriceuzs,
-          debt: Math.round((totalprice - payment - discount) * 1000) / 1000,
-          debtuzs:
-            Math.round((totalpriceuzs - paymentuzs - discountuzs) * 1) / 1,
-          pay_end_date: payEndDate,
-          comment: debtComment,
-          packman: sale.packman ? sale.packman.name : "",
-          saleconnector: { ...sale },
-          totaldebtuzs: Math.round(totalpriceuzs - paymentuzs - discountuzs),
-          debts: [debtId],
-          debtid: debtId,
-          saleconnectors: [],
-        };
-        return { ...returnObj, saleconnectors: [returnObj] };
+        .select("-isArchive -updatedAt -__v")
+    } else if (!name && phone) {
+      console.log('phone');
+      clients = await Client.find({
+        market,
+        phoneNumber: phone
       })
-      .filter((sale) => sale.debtuzs > 0);
+        .select("-isArchive -updatedAt -__v")
+    } else if (name && phone) {
+      console.log(name);
+      console.log(phone);
+      console.log('name && phone');
+      clients = await Client.find({
+        market,
+        name: name,
+        phoneNumber: phone
+      })
+        .select("-isArchive -updatedAt -__v")
+    } else {
+      console.log('notttt');
+      clients = await Client.find({
+        market,
+      })
+        .select("-isArchive -updatedAt -__v")
+        .skip(currentPage * countPage) // Skip documents for pagination
+        .limit(countPage); // Limit the number of documents per page
+    }
 
+    // console.log(clients);
+
+    const debtsreport = []
+    for (const client of clients) {
+      const saleconnectors = await SaleConnector.find({
+        client: client._id
+      })
+        .select("-isArchive -updatedAt -__v")
+        .populate("payments", "paymentuzs")
+        .populate("products", "totalpriceuzs")
+        .populate("discounts", "discountuzs")
+        .lean()
+
+      let totalpriceuzs = 0
+      let paymentuzs = 0
+      let discountuzs = 0
+
+      for (const sale of saleconnectors) {
+        totalpriceuzs += sale.products.reduce((prev, product) => prev + product.totalpriceuzs, 0)
+        paymentuzs += sale.payments.reduce((prev, payment) => prev + payment.paymentuzs, 0)
+        discountuzs += sale.discounts.reduce((prev, discount) => prev + discount.discountuzs, 0)
+      }
+
+      if ((Math.round((totalpriceuzs - paymentuzs - discountuzs) * 1) / 1) > 0) {
+        const sales = await SaleConnector.find({
+          client: client._id
+        })
+          .select("-isArchive -updatedAt -__v")
+          .populate(
+            "payments",
+            "cash cashuzs card carduzs transfer transferuzs payment paymentuzs totalprice totalpriceuzs"
+          )
+          .populate({
+            path: "products",
+            select:
+              "totalprice unitprice totalpriceuzs unitpriceuzs pieces createdAt discount saleproducts product",
+            options: { sort: { createdAt: -1 } },
+            populate: [
+              {
+                path: "product",
+                select: "productdata",
+                populate: { path: "productdata", select: "name code" },
+              },
+              { path: "user", select: "firstname lastname" },
+            ],
+          })
+          .populate("client", "name phoneNumber")
+          .populate("debts", "comment pay_end_date")
+          .populate(
+            "discounts",
+            "discount discountuzs procient products totalprice totalpriceuzs"
+          )
+          .populate("user", "firstname lastname")
+          .populate("dailyconnectors", "comment debt")
+          .populate("packman", "name")
+          .lean();
+
+        const reports = []
+
+        for (const sale of sales) {
+          const discount = reduce(sale.discounts, "discount");
+          const discountuzs = reduce(sale.discounts, "discountuzs");
+          const payment = reduce(sale.payments, "payment");
+          const paymentuzs = reduce(sale.payments, "paymentuzs");
+          const totalprice = reduce(sale.products, "totalprice");
+          const totalpriceuzs = reduce(sale.products, "totalpriceuzs");
+          if ((Math.round((totalpriceuzs - paymentuzs - discountuzs) * 1) / 1) > 0) {
+
+            const debtComment =
+              sale.debts.length > 0
+                ? sale.debts[sale.debts.length - 1].comment
+                : "";
+            const debtId =
+              sale.debts.length > 0 ? sale.debts[sale.debts.length - 1]._id : "";
+            const payEndDate =
+              sale.debts.length > 0
+                ? sale.debts[sale.debts.length - 1].pay_end_date
+                : "";
+            const returnObj = {
+              _id: sale._id,
+              id: sale.id,
+              createdAt: sale.createdAt,
+              client: sale.client,
+              totalprice,
+              totalpriceuzs,
+              debt: Math.round((totalprice - payment - discount) * 1000) / 1000,
+              debtuzs:
+                Math.round((totalpriceuzs - paymentuzs - discountuzs) * 1) / 1,
+              pay_end_date: payEndDate,
+              comment: debtComment,
+              packman: sale.packman ? sale.packman.name : "",
+              saleconnector: { ...sale },
+              totaldebtuzs: Math.round(totalpriceuzs - paymentuzs - discountuzs),
+              debts: [debtId],
+              debtid: debtId,
+              saleconnectors: [],
+            };
+            reports.push({ ...returnObj, saleconnectors: [returnObj] })
+          } else {
+            continue
+          }
+        }
+        debtsreport.push(...reports)
+        console.log(debtsreport.length);
+      } else {
+        continue
+      }
+    }
     let clientDebtMap = new Map();
 
     debtsreport.forEach((sale) => {
@@ -856,7 +936,6 @@ module.exports.getDebtsReport = async (req, res) => {
       }
     });
 
-    // Update each sale connector with the total debt for its client
     debtsreport.forEach((sale) => {
       if (sale.client && sale.client._id) {
         const clientId = sale.client._id;
@@ -870,7 +949,6 @@ module.exports.getDebtsReport = async (req, res) => {
       }
     });
 
-    // Filter out duplicate client reports
     const uniqueClientDebts = new Set();
     const filteredDebtsReport = debtsreport.filter((sale) => {
       if (sale.client && sale.client._id) {
@@ -882,20 +960,275 @@ module.exports.getDebtsReport = async (req, res) => {
         }
       } else {
         // Handle the case where sale.client is undefined or doesn't have an _id
-        console.warn("Skipping sale with undefined client or client._id", sale);
         return false;
       }
     });
 
-    res
-      .status(201)
-      .json({ data: filteredDebtsReport.filter((sale) => sale.debtuzs > 0) });
+    res.status(201).json({
+      count: filteredDebtsReport.length,
+      data: filteredDebtsReport
+    });
   } catch (error) {
     console.error(error);
     res.status(400).json({ error: "Serverda xatolik yuz berdi..." });
   }
 };
 
+/// chat gpt
+// module.exports.getDebtsReport = async (req, res) => {
+//   try {
+//     const {
+//       market,
+//       startDate,
+//       endDate,
+//       currentPage = 1,
+//       countPage = 10,
+//       clientName,
+//       phoneNumber,
+//     } = req.body;
+
+//     const marketData = await Market.findById(market).lean();
+//     if (!marketData) {
+//       return res.status(400).json({
+//         message: `Diqqat! Do'kon haqida ma'lumotlar topilmadi!`,
+//       });
+//     }
+
+//     // Build query with filters
+//     const filters = { market, createdAt: { $gte: startDate, $lte: endDate } };
+
+//     // Optional client search
+//     if (clientName || phoneNumber) {
+//       filters.client = {};
+//       if (clientName) {
+//         filters.client.name = new RegExp(clientName, "i");
+//       }
+//       if (phoneNumber) {
+//         filters.client.phoneNumber = new RegExp(phoneNumber);
+//       }
+//     }
+
+//     // Fetch data with only necessary fields and pagination
+//     // Pagination logic (skip and limit)
+//     const page = currentPage ? parseInt(currentPage) : 1; // Default to page 1
+//     const limit = countPage ? parseInt(countPage) : 10; // Default to 10 items per page
+//     const skip = (page - 1) * limit; // Calculate skip
+//     // const saleconnectorsCount = await SaleConnector.countDocuments({market, createdAt: { $gte: startDate, $lte: endDate } })
+//     //   .select("_id createdAt client products payments discounts debts")
+//     //   .populate("client", "name phoneNumber")
+//     //   .populate("products", "totalpriceuzs")
+//     //   .populate("payments", "paymentuzs")
+//     //   .populate("discounts", "discountuzs")
+//     //   .populate("debts", "comment pay_end_date")
+//     //   .sort({ createdAt: -1 })
+//     //   .lean();
+
+//     const saleconnectors = await SaleConnector.find(filters)
+//       .select("_id createdAt client products payments discounts debts")
+//       .populate("client", "name phoneNumber")
+//       .populate("products", "totalpriceuzs")
+//       .populate("payments", "paymentuzs")
+//       .populate("discounts", "discountuzs")
+//       .populate("debts", "comment pay_end_date")
+//       .sort({ createdAt: -1 })
+//       // .limit(countPage)
+//       // .skip(skip)
+
+//       .lean();
+
+//     // Process debts
+//     const debtsreport = saleconnectors.map((sale) => {
+//       const totalpriceuzs = sale.products.reduce(
+//         (sum, item) => sum + (item.totalpriceuzs || 0),
+//         0
+//       );
+//       const paymentuzs = sale.payments.reduce(
+//         (sum, payment) => sum + (payment.paymentuzs || 0),
+//         0
+//       );
+//       const discountuzs = sale.discounts.reduce(
+//         (sum, discount) => sum + (discount.discountuzs || 0),
+//         0
+//       );
+
+//       const debtuzs = totalpriceuzs - paymentuzs - discountuzs;
+//       return {
+//         _id: sale._id,
+//         createdAt: sale.createdAt,
+//         client: sale.client,
+//         debtuzs,
+//         totalpriceuzs,
+//         pay_end_date:
+//           sale.debts.length > 0 ? sale.debts[sale.debts.length - 1].pay_end_date : null,
+//         comment: sale.debts.length > 0 ? sale.debts[sale.debts.length - 1].comment : "",
+//       };
+//     });
+
+//     // Filter only items with debts
+//     const validDebts = debtsreport.filter((sale) => sale.debtuzs > 0);
+//     const paginatedReport = validDebts?.slice(skip, skip + limit);
+//     // Total count and pagination
+//     const totalDebtsCount = await SaleConnector.countDocuments(filters);
+
+//     res.status(200).json({
+//       data: paginatedReport,
+//       count: validDebts.length,
+//       notFoundClient: clientName || phoneNumber ? validDebts.length === 0 : false,
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ error: "Serverda xatolik yuz berdi..." });
+//   }
+// };
+// // chat gpt 2
+// module.exports.getDebtsReport = async (req, res) => {
+//   try {
+//     const {
+//       market,
+//       startDate,
+//       endDate,
+//       currentPage = 1,
+//       countPage = 10,
+//       clientName,
+//       phoneNumber,
+//     } = req.body;
+
+//     const marketData = await Market.findById(market).lean();
+//     if (!marketData) {
+//       return res.status(400).json({
+//         message: `Diqqat! Do'kon haqida ma'lumotlar topilmadi!`,
+//       });
+//     }
+
+//     // Build query filters
+//     const filters = { market, createdAt: { $gte: startDate, $lte: endDate } };
+
+//     // Optional client search
+//     if (clientName || phoneNumber) {
+//       filters["client.name"] = clientName ? new RegExp(clientName, "i") : undefined;
+//       filters["client.phoneNumber"] = phoneNumber ? new RegExp(phoneNumber) : undefined;
+//     }
+
+//     // Fetch total count of connectors with debts > 0
+//     const totalDebtsCount = await SaleConnector.aggregate([
+//       { $match: filters },
+//       {
+//         $lookup: {
+//           from: "products", // Ensure correct collection names
+//           localField: "products",
+//           foreignField: "_id",
+//           as: "products",
+//         },
+//       },
+//       {
+//         $lookup: {
+//           from: "payments",
+//           localField: "payments",
+//           foreignField: "_id",
+//           as: "payments",
+//         },
+//       },
+//       {
+//         $lookup: {
+//           from: "discounts",
+//           localField: "discounts",
+//           foreignField: "_id",
+//           as: "discounts",
+//         },
+//       },
+//       {
+//         $addFields: {
+//           totalpriceuzs: { $sum: "$products.totalpriceuzs" },
+//           paymentuzs: { $sum: "$payments.paymentuzs" },
+//           discountuzs: { $sum: "$discounts.discountuzs" },
+//           debtuzs: {
+//             $subtract: [
+//               { $subtract: ["$totalpriceuzs", "$paymentuzs"] },
+//               "$discountuzs",
+//             ],
+//           },
+//         },
+//       },
+//       { $match: { debtuzs: { $gt: 0 } } },
+//       { $count: "total" },
+//     ]);
+
+//     const totalCount = totalDebtsCount.length > 0 ? totalDebtsCount[0].total : 0;
+
+//     // Pagination logic
+//     const page = Math.max(parseInt(currentPage) || 1, 1); // Ensure page is at least 1
+//     const limit = parseInt(countPage) || 10; // Default to 10 items per page
+//     const skip = (page - 1) * limit; // Calculate skip
+
+//     // Fetch paginated data
+//     const saleconnectors = await SaleConnector.aggregate([
+//       { $match: filters },
+//       {
+//         $lookup: {
+//           from: "products",
+//           localField: "products",
+//           foreignField: "_id",
+//           as: "products",
+//         },
+//       },
+//       {
+//         $lookup: {
+//           from: "payments",
+//           localField: "payments",
+//           foreignField: "_id",
+//           as: "payments",
+//         },
+//       },
+//       {
+//         $lookup: {
+//           from: "discounts",
+//           localField: "discounts",
+//           foreignField: "_id",
+//           as: "discounts",
+//         },
+//       },
+//       {
+//         $addFields: {
+//           totalpriceuzs: { $sum: "$products.totalpriceuzs" },
+//           paymentuzs: { $sum: "$payments.paymentuzs" },
+//           discountuzs: { $sum: "$discounts.discountuzs" },
+//           debtuzs: {
+//             $subtract: [
+//               { $subtract: ["$totalpriceuzs", "$paymentuzs"] },
+//               "$discountuzs",
+//             ],
+//           },
+//         },
+//       },
+//       { $match: { debtuzs: { $gt: 0 } } },
+//       {
+//         $project: {
+//           _id: 1,
+//           createdAt: 1,
+//           client: 1,
+//           debtuzs: 1,
+//           totalpriceuzs: 1,
+//           "debts.comment": 1,
+//           "debts.pay_end_date": 1,
+//         },
+//       },
+//       { $sort: { createdAt: -1 } },
+//       { $skip: skip },
+//       { $limit: limit },
+//     ]);
+
+//     res.status(200).json({
+//       data: saleconnectors,
+//       total: totalCount,
+//       notFoundClient: clientName || phoneNumber ? totalCount === 0 : false,
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ error: "Serverda xatolik yuz berdi..." });
+//   }
+// };
+
+// ----
 //
 // module.exports.getDebtsReport = async (req, res) => {
 //     try {

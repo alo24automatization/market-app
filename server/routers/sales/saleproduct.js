@@ -1,25 +1,25 @@
-const {Market} = require("../../models/MarketAndBranch/Market");
-const {User} = require("../../models/Users");
-const {SaleConnector} = require("../../models/Sales/SaleConnector");
-const {Discount} = require("../../models/Sales/Discount");
-const {Debt} = require("../../models/Sales/Debt");
+const { Market } = require("../../models/MarketAndBranch/Market");
+const { User } = require("../../models/Users");
+const { SaleConnector } = require("../../models/Sales/SaleConnector");
+const { Discount } = require("../../models/Sales/Discount");
+const { Debt } = require("../../models/Sales/Debt");
 const {
     validateSaleProduct,
     SaleProduct,
 } = require("../../models/Sales/SaleProduct");
-const {Client} = require("../../models/Sales/Client");
-const {Packman} = require("../../models/Sales/Packman");
-const {Payment} = require("../../models/Sales/Payment");
-const {checkPayments} = require("./saleproduct/checkData");
-const {Product} = require("../../models/Products/Product");
-const {Unit} = require("../../models/Products/Unit.js");
-const {ProductData} = require("../../models/Products/Productdata");
-const {Category} = require("../../models/Products/Category");
-const {DailySaleConnector} = require("../../models/Sales/DailySaleConnector");
+const { Client } = require("../../models/Sales/Client");
+const { Packman } = require("../../models/Sales/Packman");
+const { Payment } = require("../../models/Sales/Payment");
+const { checkPayments } = require("./saleproduct/checkData");
+const { Product } = require("../../models/Products/Product");
+const { Unit } = require("../../models/Products/Unit.js");
+const { ProductData } = require("../../models/Products/Productdata");
+const { Category } = require("../../models/Products/Category");
+const { DailySaleConnector } = require("../../models/Sales/DailySaleConnector");
 const ObjectId = require("mongodb").ObjectId;
 const axios = require("axios");
 const moment = require("moment");
-const {filter} = require("lodash");
+const { filter } = require("lodash");
 const {
     WarhouseProduct,
 } = require("../../models/WarhouseProduct/WarhouseProduct");
@@ -84,7 +84,7 @@ module.exports.register = async (req, res) => {
             });
         }
         let foundedClient = await Client.findById(client._id)
-        if (!foundedClient&&client._id!==null) {
+        if (!foundedClient && client._id !== null) {
             return res.status(400).json({
                 message: `Diqqat! Mijoz haqida malumotlar topilmadi!`,
             });
@@ -130,7 +130,7 @@ module.exports.register = async (req, res) => {
                 lengthAmout,
                 sizePrice,
             } = saleproduct;
-            const {error} = validateSaleProduct({
+            const { error } = validateSaleProduct({
                 totalprice,
                 totalpriceuzs,
                 unitprice,
@@ -191,7 +191,7 @@ module.exports.register = async (req, res) => {
             all.push(newSaleProduct);
 
             if (saleproduct.fromFilial > 0) {
-                productsForTransfer.push({...saleproduct, market});
+                productsForTransfer.push({ ...saleproduct, market });
             }
         }
 
@@ -282,7 +282,7 @@ module.exports.register = async (req, res) => {
             dailysaleconnector.debt = newDebt._id;
             const findedMarket = await Market.findById(market);
             if (!findedMarket) {
-               return res.status(400).json({message: "Market not found!"});
+                return res.status(400).json({ message: "Market not found!" });
             }
             await sendMessageToClientAboutHisDebt(
                 client,
@@ -348,7 +348,7 @@ module.exports.register = async (req, res) => {
             }
         }
 
-        const id = await SaleConnector.find({market}).count();
+        const id = await SaleConnector.find({ market }).count();
         saleconnector.id = 1000000 + id;
         saleconnector.products = [...products];
         await saleconnector.save();
@@ -371,12 +371,12 @@ module.exports.register = async (req, res) => {
                         populate: {
                             path: "productdata",
                             select: "code name",
-                            options: {sort: {code: 1}},
+                            options: { sort: { code: 1 } },
                         },
                     },
                 ],
             })
-            .populate("payment", "payment paymentuzs totalprice totalpriceuzs")
+            .populate("payment", "payment paymentuzs cash cashuzs card carduzs transfer transferuzs totalprice totalpriceuzs")
             .populate("discount", "discount discountuzs")
             .populate("debt", "debt debtuzs pay_end_date")
             .populate("client", "name phoneNumber")
@@ -393,7 +393,7 @@ module.exports.register = async (req, res) => {
             client: client._id,
         })
             .select("-isArchive -market -__v")
-            .sort({updatedAt: -1})
+            .sort({ updatedAt: -1 })
             .populate("debts")
             .populate({
                 path: "products",
@@ -409,14 +409,14 @@ module.exports.register = async (req, res) => {
                 populate: {
                     path: "product",
                     select: "category",
-                    populate: {path: "category", select: "code"},
+                    populate: { path: "category", select: "code" },
                 },
             })
             .populate({
                 path: "products",
                 select:
                     "totalprice  unitprice totalpriceuzs unitpriceuzs pieces createdAt discount saleproducts product fromFilial",
-                options: {sort: {createdAt: -1}},
+                options: { sort: { createdAt: -1 } },
                 populate: {
                     path: "product",
                     select: "productdata",
@@ -430,7 +430,7 @@ module.exports.register = async (req, res) => {
                 path: "products",
                 select:
                     "totalprice  priceFromLengthAmout lengthAmout sizePrice forWhat more_parameters1 more_parameters2 unitprice totalpriceuzs unitpriceuzs pieces createdAt discount saleproducts product fromFilial",
-                options: {sort: {createdAt: -1}},
+                options: { sort: { createdAt: -1 } },
                 populate: {
                     path: "saleproducts",
                     select: "pieces totalprice totalpriceuzs",
@@ -444,7 +444,7 @@ module.exports.register = async (req, res) => {
                 "discounts",
                 "discount discountuzs createdAt procient products totalprice totalpriceuzs"
             )
-            .populate({path: "client", select: "name phoneNumber"})
+            .populate({ path: "client", select: "name phoneNumber" })
             .populate("packman", "name")
             .populate("user", "firstname lastname")
             .populate("dailyconnectors", "comment ")
@@ -488,7 +488,7 @@ module.exports.register = async (req, res) => {
         });
         // console.log('========================');
         // console.log("after new for", (performance.now() - start) / 1000);
- // NEW ======================================
+        // NEW ======================================
 
         totaldebtuzs =
             filteredProductsSale.length > 0
@@ -502,12 +502,12 @@ module.exports.register = async (req, res) => {
         console.log(error.message);
         res
             .status(400)
-            .json({error: "Serverda xatolik yuz berdi...", message: error.message});
+            .json({ error: "Serverda xatolik yuz berdi...", message: error.message });
     }
 };
 module.exports.deleteSale = async (req, res) => {
     try {
-        const {saleconnectorId} = req.body;
+        const { saleconnectorId } = req.body;
 
         // Find the saleconnector and populate necessary fields
         const saleconnector = await SaleConnector.findById(saleconnectorId)
@@ -518,7 +518,7 @@ module.exports.deleteSale = async (req, res) => {
             .populate("products");
 
         if (!saleconnector) {
-            return res.status(404).json({error: "SaleConnector not found"});
+            return res.status(404).json({ error: "SaleConnector not found" });
         }
 
         // Restore product stock
@@ -536,7 +536,7 @@ module.exports.deleteSale = async (req, res) => {
                     await originalProduct.save();
                 }
             } else {
-                return res.status(404).json({error: "Product not found"});
+                return res.status(404).json({ error: "Product not found" });
             }
         }
         // Delete associated records
@@ -565,7 +565,7 @@ module.exports.deleteSale = async (req, res) => {
     } catch (error) {
         res
             .status(400)
-            .json({error: "Serverda xatolik yuz berdi...", message: error.message});
+            .json({ error: "Serverda xatolik yuz berdi...", message: error.message });
     }
 };
 
@@ -639,7 +639,7 @@ module.exports.addproducts = async (req, res) => {
                 lengthAmout,
                 sizePrice,
             } = saleproduct;
-            const {error} = validateSaleProduct({
+            const { error } = validateSaleProduct({
                 totalprice,
                 totalpriceuzs,
                 unitprice,
@@ -769,7 +769,7 @@ module.exports.addproducts = async (req, res) => {
             dailysaleconnector.debt = newDebt._id;
             const findedMarket = await Market.findById(market);
             if (!findedMarket) {
-                res.status(400).json({message: "Market not found!"});
+                res.status(400).json({ message: "Market not found!" });
             }
             await sendMessageToClientAboutHisDebt(
                 client,
@@ -847,11 +847,11 @@ module.exports.addproducts = async (req, res) => {
                 select: `totalprice unitprice totalpriceuzs unitpriceuzs pieces forWhat more_parameters1 more_parameters2  priceFromLengthAmout
         lengthAmout
         sizePrice`,
-                options: {sort: {created_at: -1}},
+                options: { sort: { created_at: -1 } },
                 populate: {
                     path: "product",
                     select: "poductdata total",
-                    populate: {path: "productdata", select: "code name"},
+                    populate: { path: "productdata", select: "code name" },
                 },
             })
             .populate("payment", "payment paymentuzs totalprice totalpriceuzs")
@@ -865,7 +865,7 @@ module.exports.addproducts = async (req, res) => {
     } catch (error) {
         res
             .status(400)
-            .json({error: "Serverda xatolik yuz berdi...", message: error.message});
+            .json({ error: "Serverda xatolik yuz berdi...", message: error.message });
     }
 };
 const sendMessageToClientAboutHisDebt = async (
@@ -894,8 +894,7 @@ const sendMessageToClientAboutHisDebt = async (
                 ? client.phoneNumber.slice(4)
                 : client.phoneNumber;
         const response = await axios.get(
-            `https://smsapp.uz/new/services/send.php?key=${
-                market.SMS_API_KEY
+            `https://smsapp.uz/new/services/send.php?key=${market.SMS_API_KEY
             }&number=${validPhoneNumber}&message=${formatMessage(
                 client.name,
                 debtUzs,
@@ -914,7 +913,7 @@ const sendMessageToClientAboutHisDebt = async (
 
 module.exports.check = async (req, res) => {
     try {
-        const {market, startDate, endDate} = req.body;
+        const { market, startDate, endDate } = req.body;
 
         const marke = await Market.findById(market);
         if (!marke) {
@@ -928,9 +927,9 @@ module.exports.check = async (req, res) => {
                 $lt: endDate,
             },
         }).count();
-        res.status(200).send({count});
+        res.status(200).send({ count });
     } catch (error) {
-        res.status(400).json({error: "Serverda xatolik yuz berdi..."});
+        res.status(400).json({ error: "Serverda xatolik yuz berdi..." });
     }
 };
 
@@ -954,100 +953,204 @@ module.exports.getsaleconnectors = async (req, res) => {
             });
         }
 
+
         const id = new RegExp(".*" + search ? search.id : "" + ".*", "i");
 
         const name = new RegExp(".*" + search ? search.client : "" + ".*", "i");
 
+        const seller = search.seller
         const product = new RegExp(".*" + search ? search.product : "" + ".*", "i");
 
-        const saleconnectors = await SaleConnector.find({
-            market: marketId,
-            id,
-            updatedAt: {
-                $gte: startDate,
-                $lt: endDate,
-            },
-        })
-            .select("-isArchive -market -__v")
-            .sort({updatedAt: -1})
-            .populate("debts")
-            .populate({
-                path: "products",
-                select: "user",
-                populate: {
-                    path: "user",
-                    select: "firstname lastname",
+        let saleconnectors;
+        if (seller) {
+            saleconnectors = await SaleConnector.find({
+                market: marketId,
+                user: seller,
+                id,
+                updatedAt: {
+                    $gte: startDate,
+                    $lt: endDate,
                 },
             })
-            .populate({
-                path: "products",
-                select: "product",
-                populate: {
-                    path: "product",
-                    select: "category",
-                    populate: {path: "category", select: "code"},
-                },
-            })
-            .populate({
-                path: "products",
-                select:
-                    "totalprice  unitprice totalpriceuzs unitpriceuzs pieces createdAt discount saleproducts product fromFilial",
-                options: {sort: {createdAt: -1}},
-                populate: {
-                    path: "product",
-                    select: "productdata",
+                .select("-isArchive -market -__v")
+                .sort({ updatedAt: -1 })
+                .populate("debts")
+                .populate({
+                    path: "products",
+                    select: "user",
                     populate: {
-                        path: "productdata",
-                        select: "name code", // match: {name: product}
+                        path: "user",
+                        select: "firstname lastname",
                     },
-                },
-            })
-            .populate({
-                path: "products",
-                select:
-                    "totalprice  priceFromLengthAmout lengthAmout sizePrice forWhat more_parameters1 more_parameters2 unitprice totalpriceuzs unitpriceuzs pieces createdAt discount saleproducts product fromFilial",
-                options: {sort: {createdAt: -1}},
-                populate: {
-                    path: "saleproducts",
-                    select: "pieces totalprice totalpriceuzs",
-                },
-            })
-            .populate(
-                "payments",
-                "payment paymentuzs comment totalprice totalpriceuzs createdAt cash cashuzs card carduzs transfer transferuzs"
-            )
-            .populate(
-                "discounts",
-                "discount discountuzs createdAt procient products totalprice totalpriceuzs"
-            )
-            .populate({
-                path: "client",
-                match: {name: name},
-                select: "name phoneNumber",
-            })
-            .populate("packman", "name")
-            .populate("user", "firstname lastname")
-            .populate("dailyconnectors", "comment ")
-            .limit(countPage)
-            .lean()
-            .then((connectors) => {
-                return filter(
-                    connectors,
-                    (connector) =>
-                        ((search.client.length > 0 &&
+                })
+                .populate({
+                    path: "products",
+                    select: "product",
+                    populate: {
+                        path: "product",
+                        select: "category",
+                        populate: { path: "category", select: "code" },
+                    },
+                })
+                .populate({
+                    path: "products",
+                    select:
+                        "totalprice  unitprice totalpriceuzs unitpriceuzs pieces createdAt discount saleproducts product fromFilial",
+                    options: { sort: { createdAt: -1 } },
+                    populate: {
+                        path: "product",
+                        select: "productdata",
+                        populate: {
+                            path: "productdata",
+                            select: "name code", // match: {name: product}
+                        },
+                    },
+                })
+                .populate({
+                    path: "products",
+                    select:
+                        "totalprice  priceFromLengthAmout lengthAmout sizePrice forWhat more_parameters1 more_parameters2 unitprice totalpriceuzs unitpriceuzs pieces createdAt discount saleproducts product fromFilial",
+                    options: { sort: { createdAt: -1 } },
+                    populate: {
+                        path: "saleproducts",
+                        select: "pieces totalprice totalpriceuzs",
+                    },
+                })
+                .populate(
+                    "payments",
+                    "payment paymentuzs comment totalprice totalpriceuzs createdAt cash cashuzs card carduzs transfer transferuzs"
+                )
+                .populate(
+                    "discounts",
+                    "discount discountuzs createdAt procient products totalprice totalpriceuzs"
+                )
+                .populate({
+                    path: "client",
+                    match: { name: name },
+                    select: "name phoneNumber",
+                })
+                .populate("packman", "name")
+                .populate("user", "firstname lastname")
+                .populate("dailyconnectors", "comment ")
+                .limit(countPage)
+                .lean()
+                .then((connectors) => {
+                    return filter(
+                        connectors,
+                        (connector) =>
+                            ((search.client.length > 0 &&
                                 connector.client !== null &&
                                 connector.client) ||
-                            search.client.length === 0) &&
-                        connector.products.some((item) =>
-                            search.product
-                                ? item.product.productdata.name === search.product
-                                : item.product.productdata.name
-                        )
-                );
-            });
+                                search.client.length === 0) &&
+                            connector.products.some((item) =>
+                                search.product
+                                    ? item.product.productdata.name === search.product
+                                    : item.product.productdata.name
+                            )
+                    );
+                });
+        } else {
+            saleconnectors = await SaleConnector.find({
+                market: marketId,
+                id,
+                updatedAt: {
+                    $gte: startDate,
+                    $lt: endDate,
+                },
+            })
+                .select("-isArchive -market -__v")
+                .sort({ updatedAt: -1 })
+                .populate("debts")
+                .populate({
+                    path: "products",
+                    select: "user",
+                    populate: {
+                        path: "user",
+                        select: "firstname lastname",
+                    },
+                })
+                .populate({
+                    path: "products",
+                    select: "product",
+                    populate: {
+                        path: "product",
+                        select: "category",
+                        populate: { path: "category", select: "code" },
+                    },
+                })
+                .populate({
+                    path: "products",
+                    select:
+                        "totalprice  unitprice totalpriceuzs unitpriceuzs pieces createdAt discount saleproducts product fromFilial",
+                    options: { sort: { createdAt: -1 } },
+                    populate: {
+                        path: "product",
+                        select: "productdata",
+                        populate: {
+                            path: "productdata",
+                            select: "name code", // match: {name: product}
+                        },
+                    },
+                })
+                .populate({
+                    path: "products",
+                    select:
+                        "totalprice  priceFromLengthAmout lengthAmout sizePrice forWhat more_parameters1 more_parameters2 unitprice totalpriceuzs unitpriceuzs pieces createdAt discount saleproducts product fromFilial",
+                    options: { sort: { createdAt: -1 } },
+                    populate: {
+                        path: "saleproducts",
+                        select: "pieces totalprice totalpriceuzs",
+                    },
+                })
+                .populate(
+                    "payments",
+                    "payment paymentuzs comment totalprice totalpriceuzs createdAt cash cashuzs card carduzs transfer transferuzs"
+                )
+                .populate(
+                    "discounts",
+                    "discount discountuzs createdAt procient products totalprice totalpriceuzs"
+                )
+                .populate({
+                    path: "client",
+                    match: { name: name },
+                    select: "name phoneNumber",
+                })
+                .populate("packman", "name")
+                .populate("user", "firstname lastname")
+                .populate("dailyconnectors", "comment ")
+                .limit(countPage)
+                .lean()
+                .then((connectors) => {
+                    return filter(
+                        connectors,
+                        (connector) =>
+                            ((search.client.length > 0 &&
+                                connector.client !== null &&
+                                connector.client) ||
+                                search.client.length === 0) &&
+                            connector.products.some((item) =>
+                                search.product
+                                    ? item.product.productdata.name === search.product
+                                    : item.product.productdata.name
+                            )
+                    );
+                });
+        }
         let totaldebtusd = 0;
         let totaldebtuzs = 0;
         let filteredProductsSale = [];
+
+        const result = {
+            totalsalesprice: 0,
+            totalsalespriceuzs: 0,
+            debts: 0,
+            debtsuzs: 0,
+            discounts: 0,
+            discountsuzs: 0,
+            payments: 0,
+            paymentsuzs: 0,
+        }
+
         for (const connector of saleconnectors) {
             const filterProducts = connector.products.filter((product) => {
                 return (
@@ -1125,7 +1228,17 @@ module.exports.getsaleconnectors = async (req, res) => {
                 totaldebtusd: totaldebtusd,
                 totaldebtuzs: totaldebtuzs,
             });
+            result.totalsalesprice += filterProducts.reduce((prev, el) => prev + el.totalprice, 0)
+            result.totalsalespriceuzs += filterProducts.reduce((prev, el) => prev + el.totalpriceuzs, 0)
+            result.discounts += filterDiscount.reduce((prev, el) => prev + el.discount, 0)
+            result.discountsuzs += filterDiscount.reduce((prev, el) => prev + el.discountuzs, 0)
+            result.payments += filterPayment.reduce((prev, el) => prev + el.payment, 0)
+            result.paymentsuzs += filterPayment.reduce((prev, el) => prev + el.paymentuzs, 0)
         }
+
+        result.debts = result.totalsalesprice - result.payments - result.discounts
+        result.debtsuzs = result.totalsalespriceuzs - result.paymentsuzs - result.discountsuzs
+
         let clientDebtMap = new Map();
 
         // Step 1: Sum the totaldebtuzs for each client
@@ -1142,24 +1255,28 @@ module.exports.getsaleconnectors = async (req, res) => {
             if (sale && sale.client && sale.client._id) {
                 const clientId = sale.client._id;
                 sale.totaldebtuzs = clientDebtMap.get(clientId);
+
+
             }
         });
+
 
         // send response
         const count = filteredProductsSale.length;
         res.status(200).json({
             saleconnectors: filteredProductsSale,
             count,
+            result
         });
     } catch (error) {
         console.log(error.message);
-        res.status(400).json({error: "Serverda xatolik yuz berdi..."});
+        res.status(400).json({ error: "Serverda xatolik yuz berdi..." });
     }
 };
 
 module.exports.getsaleconnectorsexcel = async (req, res) => {
     try {
-        const {market, startDate, endDate, search} = req.body;
+        const { market, startDate, endDate, search } = req.body;
 
         const marke = await Market.findById(market);
         if (!marke) {
@@ -1181,12 +1298,12 @@ module.exports.getsaleconnectorsexcel = async (req, res) => {
             },
         })
             .select("-isArchive -updatedAt -user -market -__v")
-            .sort({_id: -1})
+            .sort({ _id: -1 })
             .populate({
                 path: "products",
                 select:
                     "totalprice  priceFromLengthAmout lengthAmout sizePrice forWhat more_parameters1 more_parameters2 unitprice totalpriceuzs unitpriceuzs pieces createdAt discount saleproducts product fromFilial",
-                options: {sort: {createdAt: -1}},
+                options: { sort: { createdAt: -1 } },
                 populate: {
                     path: "product",
                     select: "productdata",
@@ -1199,7 +1316,7 @@ module.exports.getsaleconnectorsexcel = async (req, res) => {
             .populate("payments", "payment paymentuzs")
             .populate("discounts", "discount discountuzs procient products")
             .populate("debts", "debt debtuzs")
-            .populate({path: "client", match: {name: name}, select: "name"})
+            .populate({ path: "client", match: { name: name }, select: "name" })
             .populate("packman", "name");
 
         const filter = saleconnectors.filter((item) => {
@@ -1209,9 +1326,9 @@ module.exports.getsaleconnectorsexcel = async (req, res) => {
             );
         });
 
-        res.status(200).json({saleconnectors: filter});
+        res.status(200).json({ saleconnectors: filter });
     } catch (error) {
-        res.status(400).json({error: "Serverda xatolik yuz berdi..."});
+        res.status(400).json({ error: "Serverda xatolik yuz berdi..." });
     }
 };
 
@@ -1267,7 +1384,7 @@ module.exports.registeredit = async (req, res) => {
                     pieces,
                     product,
                 } = saleproduct;
-                const {error} = validateSaleProduct({
+                const { error } = validateSaleProduct({
                     totalprice,
                     totalpriceuzs,
                     unitprice,
@@ -1397,11 +1514,11 @@ module.exports.registeredit = async (req, res) => {
             .populate({
                 path: "products",
                 select: "totalprice unitprice totalpriceuzs unitpriceuzs pieces",
-                options: {sort: {created_at: -1}},
+                options: { sort: { created_at: -1 } },
                 populate: {
                     path: "product",
                     select: "poductdata total category",
-                    populate: {path: "productdata", select: "code name"},
+                    populate: { path: "productdata", select: "code name" },
                 },
             })
             .populate({
@@ -1410,7 +1527,7 @@ module.exports.registeredit = async (req, res) => {
                 populate: {
                     path: "product",
                     select: "poductdata total category",
-                    populate: {path: "category", select: "code name"},
+                    populate: { path: "category", select: "code name" },
                 },
             })
             .populate("payment", "payment paymentuzs totalprice totalpriceuzs")
@@ -1423,13 +1540,13 @@ module.exports.registeredit = async (req, res) => {
         res.status(201).send(connector);
     } catch (error) {
         console.log(error);
-        res.status(400).json({error: "Serverda xatolik yuz berdi..."});
+        res.status(400).json({ error: "Serverda xatolik yuz berdi..." });
     }
 };
 
 module.exports.payment = async (req, res) => {
     try {
-        const {payment, market, user, saleconnectorid} = req.body;
+        const { payment, market, user, saleconnectorid } = req.body;
         const marke = await Market.findById(market);
         if (!marke) {
             return res.status(400).json({
@@ -1470,17 +1587,17 @@ module.exports.payment = async (req, res) => {
         const returnpayment = await Payment.findById(newPayment._id).populate({
             path: "saleconnector",
             select: "client packman",
-            populate: {path: "client", select: "name"},
+            populate: { path: "client", select: "name" },
         });
         res.status(201).send(returnpayment);
     } catch (error) {
-        res.status(400).json({error: "Serverda xatolik yuz berdi..."});
+        res.status(400).json({ error: "Serverda xatolik yuz berdi..." });
     }
 };
 
 module.exports.getreportproducts = async (req, res) => {
     try {
-        const {market, countPage, currentPage, startDate, endDate, search} =
+        const { market, countPage, currentPage, startDate, endDate, search } =
             req.body;
         const marke = await Market.findById(market);
         if (!marke) {
@@ -1514,16 +1631,16 @@ module.exports.getreportproducts = async (req, res) => {
             },
         })
             .select("-isArchive -updatedAt -market -__v")
-            .sort({_id: -1})
+            .sort({ _id: -1 })
             .populate({
                 path: "user",
                 select: "firstname lastname",
-                match: {firstname},
+                match: { firstname },
             })
             .populate({
                 path: "saleconnector",
                 select: "id client",
-                populate: {path: "client", select: "name", match: {name: client}},
+                populate: { path: "client", select: "name", match: { name: client } },
             })
             .populate({
                 path: "product",
@@ -1531,7 +1648,7 @@ module.exports.getreportproducts = async (req, res) => {
                 populate: {
                     path: "productdata",
                     select: "name code",
-                    match: {code, name},
+                    match: { code, name },
                 },
             })
             .populate({
@@ -1569,12 +1686,12 @@ module.exports.getreportproducts = async (req, res) => {
             .populate({
                 path: "user",
                 select: "firstname lastname",
-                match: {firstname},
+                match: { firstname },
             })
             .populate({
                 path: "saleconnector",
                 select: "id client",
-                populate: {path: "client", select: "name", match: {name: client}},
+                populate: { path: "client", select: "name", match: { name: client } },
             })
             .populate({
                 path: "product",
@@ -1582,7 +1699,7 @@ module.exports.getreportproducts = async (req, res) => {
                 populate: {
                     path: "productdata",
                     select: "name code",
-                    match: {code, name},
+                    match: { code, name },
                 },
             })
             .populate({
@@ -1615,13 +1732,13 @@ module.exports.getreportproducts = async (req, res) => {
             count: count.length,
         });
     } catch (error) {
-        res.status(400).json({error: "Serverda xatolik yuz berdi..."});
+        res.status(400).json({ error: "Serverda xatolik yuz berdi..." });
     }
 };
 
 module.exports.getexcelreportproducts = async (req, res) => {
     try {
-        const {market, search, startDate, endDate} = req.body;
+        const { market, search, startDate, endDate } = req.body;
         const marke = await Market.findById(market);
         if (!marke) {
             return res.status(400).json({
@@ -1654,16 +1771,16 @@ module.exports.getexcelreportproducts = async (req, res) => {
             },
         })
             .select("-isArchive -updatedAt -market -__v")
-            .sort({_id: -1})
+            .sort({ _id: -1 })
             .populate({
                 path: "user",
                 select: "firstname lastname",
-                match: {firstname},
+                match: { firstname },
             })
             .populate({
                 path: "saleconnector",
                 select: "id client",
-                populate: {path: "client", select: "name", match: {name: client}},
+                populate: { path: "client", select: "name", match: { name: client } },
             })
             .populate({
                 path: "product",
@@ -1671,7 +1788,7 @@ module.exports.getexcelreportproducts = async (req, res) => {
                 populate: {
                     path: "productdata",
                     select: "name code",
-                    match: {code, name},
+                    match: { code, name },
                 },
             })
             .populate({
@@ -1703,13 +1820,13 @@ module.exports.getexcelreportproducts = async (req, res) => {
             products: saleproducts,
         });
     } catch (error) {
-        res.status(400).json({error: "Serverda xatolik yuz berdi..."});
+        res.status(400).json({ error: "Serverda xatolik yuz berdi..." });
     }
 };
 
 module.exports.addClient = async (req, res) => {
     try {
-        const {packmanid, client, market, saleconnectorid} = req.body;
+        const { packmanid, client, market, saleconnectorid } = req.body;
 
         const marke = await Market.findById(market);
         if (!marke) {
@@ -1745,7 +1862,7 @@ module.exports.addClient = async (req, res) => {
 
         res.status(200).json(saleConnector);
     } catch (error) {
-        res.status(400).json({error: "Serverda xatolik yuz berdi..."});
+        res.status(400).json({ error: "Serverda xatolik yuz berdi..." });
     }
 };
 
@@ -1757,13 +1874,13 @@ const editSaleConnector = async (client, saleconnectorid) => {
 
 module.exports.chnageComment = async (req, res) => {
     try {
-        const {comment, dailyid} = req.body;
+        const { comment, dailyid } = req.body;
 
         const dailyconnector = await DailySaleConnector.findById(dailyid);
         dailyconnector.comment = comment;
         await dailyconnector.save();
 
-        res.status(200).json({message: "Izoh o'zgardi!"});
+        res.status(200).json({ message: "Izoh o'zgardi!" });
     } catch (error) {
         res.status(400).json({
             error: "Serverda xatolik yuz berdi...",
@@ -1771,3 +1888,29 @@ module.exports.chnageComment = async (req, res) => {
         });
     }
 };
+
+module.exports.getSellers = async (req, res) => {
+    try {
+        const { market } = req.body;
+
+        const marke = await Market.findById(market);
+        if (!marke) {
+            return res.status(400).json({
+                message:
+                    "Diqqat! Foydalanuvchi ro'yxatga olinayotgan do'kon dasturda ro'yxatga olinmagan.",
+            });
+        }
+
+        const sellers = await User.find({ type: "Seller", market })
+            .select("firstname lastname market")
+            .sort({ _id: -1 })
+            .lean();
+
+        res.status(201).send(sellers);
+    } catch (error) {
+        res.status(400).json({
+            error: "Serverda xatolik yuz berdi...",
+            description: error.message,
+        });
+    }
+}

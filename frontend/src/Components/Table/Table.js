@@ -1,108 +1,111 @@
-import {PackmanTableRow} from './TableRows/PackmanTableRow'
-import {SellerTableRow} from './TableRows/SellerTableRow'
-import {CategoryTableRow} from './TableRows/CategoryTableRow'
-import {RegisterIncomingTableRow} from './TableRows/RegisterIncomingTableRow'
-import {InventoriesTableRow} from './TableRows/InventoriesTableRow'
-import {InventoryTableRow} from './TableRows/InventoryTableRow'
-import {ProductReportTableRow} from './TableRows/ProductReportTableRow'
-import {ProductTableRow} from './TableRows/ProductTableRow'
-import {SupplierTableRow} from './TableRows/SupplierTableRow'
-import {UnitTableRow} from './TableRows/UnitTableRow'
+import { PackmanTableRow } from './TableRows/PackmanTableRow'
+import { SellerTableRow } from './TableRows/SellerTableRow'
+import { CategoryTableRow } from './TableRows/CategoryTableRow'
+import { RegisterIncomingTableRow } from './TableRows/RegisterIncomingTableRow'
+import { InventoriesTableRow } from './TableRows/InventoriesTableRow'
+import { InventoryTableRow } from './TableRows/InventoryTableRow'
+import { ProductReportTableRow } from './TableRows/ProductReportTableRow'
+import { ProductTableRow } from './TableRows/ProductTableRow'
+import { SupplierTableRow } from './TableRows/SupplierTableRow'
+import { UnitTableRow } from './TableRows/UnitTableRow'
 import Thead from './Thead'
-import {IncomingsTableRow} from './TableRows/IncomingsTableRow'
-import {RegisterSaleTableRow} from './TableRows/RegisterSaleTableRow'
-import {TemporaryIncomingsTableRow} from './TableRows/TemporaryIncomingsTableRow'
-import {TemporarySaleTableRow} from './TableRows/TemporarySaleTableRow'
-import {SalesListTableRow} from './TableRows/SalesListTableRow'
-import {ClientTableRow} from './TableRows/ClientTableRow'
-import {ExchangenerateTableRow} from './TableRows/ExchangenerateTableRow'
-import {SaleReturnTableRow} from './TableRows/SaleReturnTableRow'
-import {CashierSaleTableRow} from './TableRows/CashierSaleTableRow'
-import {PaymentsTableRow} from './TableRows/PaymentsTableRow'
-import {IncomeTableRow} from './TableRows/IncomeTableRow'
-import {DebtsTableRow} from './TableRows/DebtsTableRow'
-import {DiscountTableRow} from './TableRows/DiscountTableRow'
-import {ExpensesTableRow} from './TableRows/ExpensesTableRow'
-import {BarcodeTableRow} from './TableRows/BarcodeTableRow.js'
-import {AdminProductTableRow} from './TableRows/AdminProductTableRow'
-import {ReturnProductsTableRow} from './TableRows/ReturnProductsTableRow.js'
-import {GeneralReportTableRow} from './TableRows/GeneralReportTableRow.js'
-import {RegisterSaleTableFooter} from './TableFooters/RegisterSaleTableFooter.js'
-import {FilialShopTableRow} from './TableRows/FilialShopTableRow'
+import { IncomingsTableRow } from './TableRows/IncomingsTableRow'
+import { RegisterSaleTableRow } from './TableRows/RegisterSaleTableRow'
+import { TemporaryIncomingsTableRow } from './TableRows/TemporaryIncomingsTableRow'
+import { TemporarySaleTableRow } from './TableRows/TemporarySaleTableRow'
+import { SalesListTableRow } from './TableRows/SalesListTableRow'
+import { ClientTableRow } from './TableRows/ClientTableRow'
+import { ExchangenerateTableRow } from './TableRows/ExchangenerateTableRow'
+import { SaleReturnTableRow } from './TableRows/SaleReturnTableRow'
+import { CashierSaleTableRow } from './TableRows/CashierSaleTableRow'
+import { PaymentsTableRow } from './TableRows/PaymentsTableRow'
+import { IncomeTableRow } from './TableRows/IncomeTableRow'
+import { DebtsTableRow } from './TableRows/DebtsTableRow'
+import { DiscountTableRow } from './TableRows/DiscountTableRow'
+import { ExpensesTableRow } from './TableRows/ExpensesTableRow'
+import { BarcodeTableRow } from './TableRows/BarcodeTableRow.js'
+import { AdminProductTableRow } from './TableRows/AdminProductTableRow'
+import { ReturnProductsTableRow } from './TableRows/ReturnProductsTableRow.js'
+import { GeneralReportTableRow } from './TableRows/GeneralReportTableRow.js'
+import { RegisterSaleTableFooter } from './TableFooters/RegisterSaleTableFooter.js'
+import { FilialShopTableRow } from './TableRows/FilialShopTableRow'
 import DailyReport from './TableRows/DailyReport.js'
 import SupplierIncomingsTableRow from './TableRows/SupplierIncomingsTableRow'
-import {FilialShopDataIdTableRow} from './TableRows/FilialShopDataIdTablerow'
-import {CategoryReportTableRow} from './TableRows/CategoryReportTableRow'
-import {MarketProductsTableRow} from './TableRows/MarketProductsTableRow'
-import {PartnerProductsTableRow} from './TableRows/PartnerProductsTableRow'
-import {RegisterOrdersTableRow} from './TableRows/RegisterOrdersTableRow'
-import {OrderProductsTableRow} from './TableRows/OrderProductsTableRow'
-import {SavedOrdersTableRow} from './TableRows/SavedOrdersTableRow.js'
-import {RegisterIncomingOrdersTableRow} from './TableRows/RegisterIncomingOrdersTableRow.js'
-import {IncomingOrderProductsTableRow} from './TableRows/IncomingOrderProductsTableRow.js'
-import {ReceiveOrderProductsTableRow} from './TableRows/ReceiveOrderProductsTableRow.js'
-import {LabelsIncome} from './TableRows/LabelsIncome'
-import {ClientSaleTable} from './TableRows/ClientSaleTable'
+import { FilialShopDataIdTableRow } from './TableRows/FilialShopDataIdTablerow'
+import { CategoryReportTableRow } from './TableRows/CategoryReportTableRow'
+import { MarketProductsTableRow } from './TableRows/MarketProductsTableRow'
+import { PartnerProductsTableRow } from './TableRows/PartnerProductsTableRow'
+import { RegisterOrdersTableRow } from './TableRows/RegisterOrdersTableRow'
+import { OrderProductsTableRow } from './TableRows/OrderProductsTableRow'
+import { SavedOrdersTableRow } from './TableRows/SavedOrdersTableRow.js'
+import { RegisterIncomingOrdersTableRow } from './TableRows/RegisterIncomingOrdersTableRow.js'
+import { IncomingOrderProductsTableRow } from './TableRows/IncomingOrderProductsTableRow.js'
+import { ReceiveOrderProductsTableRow } from './TableRows/ReceiveOrderProductsTableRow.js'
+import { LabelsIncome } from './TableRows/LabelsIncome'
+import { ClientSaleTable } from './TableRows/ClientSaleTable'
 import PackmanProfitClientsTableRow from './TableRows/PackmanProfitClientsTableRow.js'
+import { SellerPayments } from './TableRows/SellerPayments'
 
 function Table({
     showClients,
     changeCheckbox,
     selectedSale,
-                   page,
-                   data,
-                   headers,
-                   currentPage,
-                   countPage,
-                   Sort,
-                   Edit,
-                   salerDebts,
-                   Delete,
-                   hiddenPayButton,
-                   hiddenInfoButton,
-                   currency,
-                   changeHandler,
-                   Print,
-                   inputValue,
-                   inputDisabled,
-                   Excel,
-                   editedIncoming,
-                   saveEditIncoming,
-                   changeNumberHandler,
-                   sortItem,
-                   ReturnPayment,
-                   Save,
-                   onKeyUp,
-                   currencyType,
-                   type,
-                   Pay,
-                   isDisabled,
-                   reports,
-                   onClickTableRow,
-                   linkToSellerReports,
-                   sellers,
-                   addPlus,
-                   footer,
-                   increment,
-                   decrement,
-                   lowUnitpriceProducts,
-                   linkToSupplierReport,
-                   printedData,
-                   productminimumpage,
-                   handleDelete,
-                   wholeSale,
-                   handleShowProduct,
-                   updatePosition,
-                   handleCountProduct,
-                   handleUnitPrice,
-                   selectedFilial,
-                   editComment,
-                   startDate,
-                   endDate,
-                   modalOpen,
-                   totalDebt,
-                   handleClickProduct
-               }) {
+    page,
+    data,
+    headers,
+    currentPage,
+    countPage,
+    Sort,
+    Edit,
+    salerDebts,
+    getTotalDayReport,
+    Delete,
+    hiddenPayButton,
+    hiddenInfoButton,
+    currency,
+    changeHandler,
+    Print,
+    inputValue,
+    inputDisabled,
+    Excel,
+    editedIncoming,
+    saveEditIncoming,
+    changeNumberHandler,
+    sortItem,
+    ReturnPayment,
+    result,
+    Save,
+    onKeyUp,
+    currencyType,
+    type,
+    Pay,
+    isDisabled,
+    reports,
+    onClickTableRow,
+    linkToSellerReports,
+    sellers,
+    addPlus,
+    footer,
+    increment,
+    decrement,
+    lowUnitpriceProducts,
+    linkToSupplierReport,
+    printedData,
+    productminimumpage,
+    handleDelete,
+    wholeSale,
+    handleShowProduct,
+    updatePosition,
+    handleCountProduct,
+    handleUnitPrice,
+    selectedFilial,
+    editComment,
+    startDate,
+    endDate,
+    modalOpen,
+    totalDebt,
+    handleClickProduct,
+}) {
     const checkRows = () => {
         switch (page) {
             case 'product':
@@ -122,6 +125,21 @@ function Table({
             case 'clientssales':
                 return (
                     <ClientSaleTable
+                        data={data}
+                        currency={currency}
+                        currentPage={currentPage}
+                        countPage={countPage}
+                        Print={Print}
+                        ReturnPayment={ReturnPayment}
+                        sellers={sellers}
+                        addPlus={addPlus}
+                        editComment={editComment}
+                        handlePayDebt={Pay}
+                    />
+                )
+            case 'seller_payments':
+                return (
+                    <SellerPayments
                         data={data}
                         currency={currency}
                         currentPage={currentPage}
@@ -308,6 +326,7 @@ function Table({
                         Print={Print}
                         ReturnPayment={ReturnPayment}
                         sellers={sellers}
+                        resultTotal={result}
                         addPlus={addPlus}
                         handleDelete={handleDelete}
                         editComment={editComment}
@@ -336,9 +355,9 @@ function Table({
                         Delete={Delete}
                     />
                 )
-                case "packmanProfitClients":
-                    return (
-                        <PackmanProfitClientsTableRow
+            case 'packmanProfitClients':
+                return (
+                    <PackmanProfitClientsTableRow
                         data={data}
                         showClients={showClients}
                         selectedSale={selectedSale}
@@ -349,7 +368,7 @@ function Table({
                         Delete={Delete}
                         currency={currency}
                     />
-                    )
+                )
             case 'seller':
                 return (
                     <SellerTableRow
@@ -359,6 +378,7 @@ function Table({
                         Edit={Edit}
                         linkToSellerReports={linkToSellerReports}
                         currency={currency}
+                        getTotalDayReport={getTotalDayReport}
                     />
                 )
             case 'exchange':
@@ -517,9 +537,9 @@ function Table({
                     />
                 )
             case 'generalreport':
-                return <GeneralReportTableRow data={data} currency={currency}/>
+                return <GeneralReportTableRow data={data} currency={currency} />
             case 'dailyreport':
-                return <DailyReport data={data}/>
+                return <DailyReport data={data} />
             case 'incomingsupplier':
                 return (
                     <SupplierIncomingsTableRow
@@ -531,7 +551,7 @@ function Table({
                     />
                 )
             case 'categoryreport':
-                return <CategoryReportTableRow data={data}/>
+                return <CategoryReportTableRow data={data} />
             case 'marketProducts':
                 return (
                     <MarketProductsTableRow
@@ -643,7 +663,7 @@ function Table({
             className='overflow-x-auto lg:w-full  ms-3 me-3 mt-2  pb-[1.25rem]  max-h-[35rem] mb-[1rem]'
         >
             <thead className='rounded-t-lg sticky top-0'>
-            <Thead headers={headers} Sort={Sort} sortItem={sortItem}/>
+                <Thead headers={headers} Sort={Sort} sortItem={sortItem} />
             </thead>
             <tbody>{checkRows()}</tbody>
             {footer && <tfoot>{checkFooters()}</tfoot>}

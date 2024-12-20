@@ -1,12 +1,12 @@
-import {createAsyncThunk, createSlice} from '@reduxjs/toolkit'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import Api from '../../../Config/Api.js'
-import {universalToast} from '../../../Components/ToastMessages/ToastMessages.js'
+import { universalToast } from '../../../Components/ToastMessages/ToastMessages.js'
 
 export const getSellings = createAsyncThunk(
     'sellings/getSellings',
-    async (body = {}, {rejectWithValue}) => {
+    async (body = {}, { rejectWithValue }) => {
         try {
-            const {data} = await Api.post(
+            const { data } = await Api.post(
                 '/sales/saleproducts/getconnectors',
                 body
             )
@@ -17,11 +17,24 @@ export const getSellings = createAsyncThunk(
     }
 )
 
+export const getSellers = createAsyncThunk(
+    'sellings/getSellers',
+    async (body = {}, { rejectWithValue }) => {
+        try {
+            const { data } = await Api.post(
+                '/sales/saleproducts/getsellers',)
+            return data
+        } catch (err) {
+            return rejectWithValue(err)
+        }
+    }
+)
+
 export const getSellingsByFilter = createAsyncThunk(
     'sellings/getSellingsByFilter',
-    async (body = {}, {rejectWithValue}) => {
+    async (body = {}, { rejectWithValue }) => {
         try {
-            const {data} = await Api.post(
+            const { data } = await Api.post(
                 '/sales/saleproducts/getconnectors',
                 body
             )
@@ -34,9 +47,9 @@ export const getSellingsByFilter = createAsyncThunk(
 
 export const addClient = createAsyncThunk(
     'sellings/addClient',
-    async (body = {}, {rejectWithValue}) => {
+    async (body = {}, { rejectWithValue }) => {
         try {
-            const {data} = await Api.post('/sales/saleproducts/addclient', body)
+            const { data } = await Api.post('/sales/saleproducts/addclient', body)
             return data
         } catch (err) {
             return rejectWithValue(err)
@@ -45,9 +58,9 @@ export const addClient = createAsyncThunk(
 )
 export const deleteSaleConnector = createAsyncThunk(
     'sellings/deleteConnector',
-    async (body, {rejectWithValue}) => {
+    async (body, { rejectWithValue }) => {
         try {
-            const {data} = await Api.delete('/sales/saleproducts/delete', {
+            const { data } = await Api.delete('/sales/saleproducts/delete', {
                 data: body,
             })
             return data
@@ -59,9 +72,9 @@ export const deleteSaleConnector = createAsyncThunk(
 
 export const excelAllSellings = createAsyncThunk(
     'sellings/excelAllSellings',
-    async (body, {rejectWithValue}) => {
+    async (body, { rejectWithValue }) => {
         try {
-            const {data} = await Api.post(
+            const { data } = await Api.post(
                 '/sales/saleproducts/getconnectorsexcel',
                 body
             )
@@ -77,6 +90,8 @@ const sellingsSlice = createSlice({
     initialState: {
         excelAllData: [],
         sellings: [],
+        sellers: [],
+        result: {},
         total: 0,
         totalSearched: 0,
         searchedSellings: [],
@@ -90,14 +105,31 @@ const sellingsSlice = createSlice({
         },
     },
     extraReducers: {
+        [getSellers.pending]: (state) => {
+            state.getSellingsLoading = true
+        },
+        [getSellers.fulfilled]: (
+            state,
+            { payload }
+        ) => {
+            console.log(payload);
+            state.getSellingsLoading = false
+            state.sellers = payload
+        },
+        [getSellers.rejected]: (state, { payload }) => {
+            universalToast(payload, 'error')
+            state.getSellingsError = payload
+            state.getSellingsLoading = false
+        },
         [getSellings.pending]: (state) => {
             state.getSellingsLoading = true
         },
         [getSellings.fulfilled]: (
             state,
-            {payload: {saleconnectors, count}}
+            { payload: { saleconnectors, count, result } }
         ) => {
             state.getSellingsLoading = false
+            state.result = result
             state.searchedSellings.length
                 ? (state.searchedSellings = saleconnectors)
                 : (state.sellings = saleconnectors)
@@ -105,7 +137,7 @@ const sellingsSlice = createSlice({
                 ? (state.totalSearched = count)
                 : (state.total = count)
         },
-        [getSellings.rejected]: (state, {payload}) => {
+        [getSellings.rejected]: (state, { payload }) => {
             universalToast(payload, 'error')
             state.getSellingsError = payload
             state.getSellingsLoading = false
@@ -116,13 +148,13 @@ const sellingsSlice = createSlice({
         },
         [getSellingsByFilter.fulfilled]: (
             state,
-            {payload: {saleconnectors, count}}
+            { payload: { saleconnectors, count } }
         ) => {
             state.getSellingsLoading = false
             state.searchedSellings = saleconnectors
             state.totalSearched = count
         },
-        [getSellingsByFilter.rejected]: (state, {payload}) => {
+        [getSellingsByFilter.rejected]: (state, { payload }) => {
             universalToast(payload, 'error')
             state.getSellingsError = payload
             state.getSellingsLoading = false
@@ -131,20 +163,20 @@ const sellingsSlice = createSlice({
         [excelAllSellings.pending]: (state) => {
             state.getSellingsLoading = true
         },
-        [excelAllSellings.fulfilled]: (state, {payload}) => {
+        [excelAllSellings.fulfilled]: (state, { payload }) => {
             state.getSellingsLoading = false
             if (payload && payload.saleconnectors) {
                 state.excelAllData = payload.saleconnectors
             }
         },
-        [excelAllSellings.rejected]: (state, {payload}) => {
+        [excelAllSellings.rejected]: (state, { payload }) => {
             state.getSellingsLoading = false
             state.getSellingsError = payload
         },
         [addClient.pending]: (state) => {
             state.loading = true
         },
-        [addClient.rejected]: (state, {payload}) => {
+        [addClient.rejected]: (state, { payload }) => {
             state.loading = false
             universalToast(payload, 'error')
         },
@@ -154,5 +186,5 @@ const sellingsSlice = createSlice({
         },
     },
 })
-export const {clearSearchedSellings} = sellingsSlice.actions
+export const { clearSearchedSellings } = sellingsSlice.actions
 export default sellingsSlice.reducer

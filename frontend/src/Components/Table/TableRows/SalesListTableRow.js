@@ -14,6 +14,7 @@ export const SalesListTableRow = ({
     addPlus,
     editComment,
     handleDelete,
+    resultTotal
 }) => {
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
     const { login } = useSelector((state) => state)
@@ -46,6 +47,7 @@ export const SalesListTableRow = ({
 
     const navigate = useNavigate()
     const linkToSale = (saleconnector, returnProducts) => {
+        console.log(saleconnector);
         navigate(`${sellers ? '/' : '/sotuv/sotish'}`, {
             replace: true,
             state: { saleconnector, returnProducts },
@@ -264,6 +266,7 @@ export const SalesListTableRow = ({
                                 </span>
                             </div>
                         </td>
+                        <td className='text-left td'>{saleconnector?.user?.firstname} {saleconnector?.user?.lastname}</td>
                         <td className='text-left td'>{saleconnector?.id}</td>
                         <td className='text-left td'>
                             {saleconnector?.client?.name ? (
@@ -517,6 +520,28 @@ export const SalesListTableRow = ({
                     </li>
                 )
             )}
+            <tr className='tr'>
+                <td className='text-left td'></td>
+                <td className='td '></td>
+                <td className='text-left td'></td>
+                <td className='text-left td'></td>
+                <td className='text-left td'>
+                </td>
+                <td className='text-success-500 text-left td py-2'>
+                    {currency === 'USD' ? resultTotal?.totalsalesprice : resultTotal?.totalsalespriceuzs} {' '}
+                    {currency}
+                </td>
+                <td className='text-warning-500 text-left td'>
+                    {currency === 'USD' ? resultTotal?.discounts : resultTotal?.discountsuzs}{' '}
+                    {currency}
+                </td>
+                <td className='text-error-500 text-left td'>
+                    {currency === 'USD' ? resultTotal?.debts : resultTotal?.debtsuzs}{' '}
+                    {currency}
+                </td>
+                <td className='text-left td'></td>
+                <td className='py-[0.375rem] td border-r-0'></td>
+            </tr>
         </>
     )
 }

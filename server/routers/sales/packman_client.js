@@ -69,6 +69,10 @@ router.post('/saleproducts/returnproducts', auth, (req, res) => {
   require('./saleproduct').registeredit(req, res);
 });
 
+router.post('/saleproducts/getsellers', auth, (req, res) => {
+  require('./saleproduct').getSellers(req, res);
+});
+
 router.post('/saleproducts/addproducts', auth, (req, res) => {
   require('./saleproduct').addproducts(req, res);
 });
@@ -144,6 +148,10 @@ router.post('/temporary/delete', auth, (req, res) => {
 // Seller Reports
 router.post('/sellers/getreports', auth, (req, res) => {
   require('./sellersreport').getSellersReport(req, res);
+});
+
+router.post('/sellers/get_day_total_report', auth, (req, res) => {
+  require('./sellersreport').getDayTotalReport(req, res);
 });
 
 router.post('/comment/update', auth, (req, res) => {

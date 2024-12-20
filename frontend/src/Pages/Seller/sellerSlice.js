@@ -1,12 +1,12 @@
-import {createAsyncThunk, createSlice} from '@reduxjs/toolkit'
-import {universalToast} from '../../Components/ToastMessages/ToastMessages'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+import { universalToast } from '../../Components/ToastMessages/ToastMessages'
 import Api from '../../Config/Api'
 
 export const getSellers = createAsyncThunk(
     'sellers/getSellers',
-    async (body, {rejectWithValue}) => {
+    async (body, { rejectWithValue }) => {
         try {
-            const {data} = await Api.post('/user/getsellers', body)
+            const { data } = await Api.post('/user/getsellers', body)
             return data
         } catch (error) {
             return rejectWithValue(error)
@@ -15,9 +15,9 @@ export const getSellers = createAsyncThunk(
 )
 export const smsApiKey = createAsyncThunk(
     'sellers/smsApiKey',
-    async (body, {rejectWithValue}) => {
+    async (body, { rejectWithValue }) => {
         try {
-            const {data} = await Api.post('/market/getsmsApiKey/create_update', body)
+            const { data } = await Api.post('/market/getsmsApiKey/create_update', body)
             return data
         } catch (error) {
             return rejectWithValue(error)
@@ -26,9 +26,9 @@ export const smsApiKey = createAsyncThunk(
 )
 export const getsmsApiKey = createAsyncThunk(
     'sellers/getsmsApiKey',
-    async (body, {rejectWithValue}) => {
+    async (body, { rejectWithValue }) => {
         try {
-            const {data} = await Api.post('/market/getsmsApiKey', body)
+            const { data } = await Api.post('/market/getsmsApiKey', body)
             return data
         } catch (error) {
             return rejectWithValue(error)
@@ -37,9 +37,9 @@ export const getsmsApiKey = createAsyncThunk(
 )
 export const addSeller = createAsyncThunk(
     'sellers/addSeller',
-    async (body, {rejectWithValue}) => {
+    async (body, { rejectWithValue }) => {
         try {
-            const {data} = await Api.post('/user/createseller', body)
+            const { data } = await Api.post('/user/createseller', body)
             return data
         } catch (error) {
             return rejectWithValue(error)
@@ -49,9 +49,9 @@ export const addSeller = createAsyncThunk(
 
 export const updateSeller = createAsyncThunk(
     'sellers/updateSeller',
-    async (body, {rejectWithValue}) => {
+    async (body, { rejectWithValue }) => {
         try {
-            const {data} = await Api.post('/user/createseller', body)
+            const { data } = await Api.post('/user/createseller', body)
             return data
         } catch (error) {
             return rejectWithValue(error)
@@ -61,9 +61,9 @@ export const updateSeller = createAsyncThunk(
 
 export const getSellerReports = createAsyncThunk(
     'sellers/getsellersreport',
-    async (body, {rejectWithValue}) => {
+    async (body, { rejectWithValue }) => {
         try {
-            const {data} = await Api.post('/sales/sellers/getreports', body)
+            const { data } = await Api.post('/sales/sellers/getreports', body)
             return data
         } catch (error) {
             return rejectWithValue(error)
@@ -98,51 +98,51 @@ const sellerSlice = createSlice({
         [getSellers.pending]: (state) => {
             state.loading = true
         },
-        [getSellers.fulfilled]: (state, {payload}) => {
+        [getSellers.fulfilled]: (state, { payload }) => {
             state.loading = false
             state.sellers = payload
         },
-        [getSellers.rejected]: (state, {payload}) => {
+        [getSellers.rejected]: (state, { payload }) => {
             state.loading = false
             state.errorSellings = payload
         },
         [addSeller.pending]: (state) => {
             state.loading = true
         },
-        [addSeller.fulfilled]: (state, {payload}) => {
+        [addSeller.fulfilled]: (state, { payload }) => {
             state.loading = false
             state.successAddSelling = true
             state.sellers = payload
         },
-        [addSeller.rejected]: (state, {payload}) => {
+        [addSeller.rejected]: (state, { payload }) => {
             state.loading = false
             state.errorSellings = payload
         },
         [updateSeller.pending]: (state) => {
             state.loading = false
         },
-        [updateSeller.fulfilled]: (state, {payload}) => {
+        [updateSeller.fulfilled]: (state, { payload }) => {
             state.loading = false
             state.successUpdateSelling = true
             state.sellers = payload
         },
-        [updateSeller.rejected]: (state, {payload}) => {
+        [updateSeller.rejected]: (state, { payload }) => {
             state.loading = false
             state.errorSellings = payload
         },
         [getSellerReports.pending]: (state) => {
             state.loading = true
         },
-        [getSellerReports.rejected]: (state, {payload}) => {
+        [getSellerReports.rejected]: (state, { payload }) => {
             state.loading = false
             universalToast(`${payload}`, 'error')
         },
         [getSellerReports.fulfilled]: (
             state,
-            {payload: {saleconnectors, count}}
+            { payload: { data, count } }
         ) => {
             state.loading = false
-            state.sellersreport = saleconnectors
+            state.sellersreport = data
             state.count = count
         },
     },

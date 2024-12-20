@@ -140,7 +140,6 @@ module.exports.createQrcode = async (req, res) => {
         const marke = await Market.findById(market)
         marke.qrcode = qrcode;
         await marke.save()
-        console.log(marke);
         res.status(200).json(marke.qrcode)
 
     } catch (error) {
