@@ -345,10 +345,11 @@ const sendMessageFromMorning = async (_, res) => {
       }, 0);
 
       if (totalDebt > 0) {
-        const SMS_API_KEY = client.market.SMS_API_KEY ;
-        const validPhoneNumber = client.phoneNumber.startsWith("+998")
-          ? client.phoneNumber.slice(4)
-          : client.phoneNumber;
+        const SMS_API_KEY = client.market.SMS_API_KEY;
+        const validPhoneNumber = client.phoneNumber
+        // const validPhoneNumber = client.phoneNumber.startsWith("+998")
+        //   ? client.phoneNumber.slice(4)
+        //   : client.phoneNumber;
 
         currentClient.fullname = client.name;
         currentClient.phone = client.phoneNumber;
