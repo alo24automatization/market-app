@@ -1,22 +1,22 @@
-const {Client, validateClient} = require("../../models/Sales/Client.js");
-const {Market} = require("../../models/MarketAndBranch/Market");
-const {Packman} = require("../../models/Sales/Packman.js");
-const {SaleConnector} = require("../../models/Sales/SaleConnector");
+const { Client, validateClient } = require("../../models/Sales/Client.js");
+const { Market } = require("../../models/MarketAndBranch/Market");
+const { Packman } = require("../../models/Sales/Packman.js");
+const { SaleConnector } = require("../../models/Sales/SaleConnector");
 require("../../models/Sales/SaleProduct");
 require("../../models/Sales/Packman");
-const {Payment} = require("../../models/Sales/Payment");
+const { Payment } = require("../../models/Sales/Payment");
 require("../../models/Sales/Discount");
 require("../../models/Sales/Debt");
 require("../../models/Sales/DailySaleConnector");
 require("../../models/Products/Productdata");
 require("../../models/Products/Product");
 require("../../models/Users");
-const {filter} = require("lodash/collection.js");
-const {regExpression} = require("../globalFunctions.js");
-const {DailySaleConnector} = require("../../models/Sales/DailySaleConnector");
-const {Debt} = require("../../models/Sales/Debt");
-const {all} = require("axios");
-const {Discount} = require("../../models/Sales/Discount");
+const { filter } = require("lodash/collection.js");
+const { regExpression } = require("../globalFunctions.js");
+const { DailySaleConnector } = require("../../models/Sales/DailySaleConnector");
+const { Debt } = require("../../models/Sales/Debt");
+const { all } = require("axios");
+const { Discount } = require("../../models/Sales/Discount");
 
 const reduce = (arr, el) =>
     arr.reduce((prev, item) => prev + (item[el] || 0), 0);
@@ -32,7 +32,7 @@ module.exports.register = async (req, res) => {
             currentPage,
             countPage,
         } = req.body;
-        const {error} = validateClient({name, phoneNumber, market});
+        const { error } = validateClient({ name, phoneNumber, market });
         if (error) {
             return res.status(400).json({
                 error: error.message,
@@ -84,19 +84,19 @@ module.exports.register = async (req, res) => {
             "i"
         );
 
-        const clientsCount = await Client.find({market, name: clientname})
-            .sort({_id: -1})
+        const clientsCount = await Client.find({ market, name: clientname })
+            .sort({ _id: -1 })
             .select("name market packman phoneNumber")
-            .populate({path: "packman", match: {name: clientpackman}});
+            .populate({ path: "packman", match: { name: clientpackman } });
 
         const filterCount = clientsCount.filter((item) => {
             return item.packman !== null;
         });
 
-        const clients = await Client.find({market, name: clientname})
-            .sort({_id: -1})
+        const clients = await Client.find({ market, name: clientname })
+            .sort({ _id: -1 })
             .select("name market packman phoneNumber")
-            .populate({path: "packman", match: {name: clientpackman}})
+            .populate({ path: "packman", match: { name: clientpackman } })
             .populate("packman", "name")
             .skip(currentPage * countPage)
             .limit(countPage);
@@ -105,15 +105,15 @@ module.exports.register = async (req, res) => {
             return item.packman !== null;
         });
 
-        res.status(201).json({clients: filter, count: filterCount.length});
+        res.status(201).json({ clients: filter, count: filterCount.length });
     } catch (error) {
-        res.status(400).json({error: "Serverda xatolik yuz berdi..."});
+        res.status(400).json({ error: "Serverda xatolik yuz berdi..." });
     }
 };
 
 module.exports.getAll = async (req, res) => {
     try {
-        const {market} = req.body;
+        const { market } = req.body;
 
         const marke = await Market.findById(market);
         if (!marke) {
@@ -122,7 +122,7 @@ module.exports.getAll = async (req, res) => {
             });
         }
 
-        const clients = await Client.find({market})
+        const clients = await Client.find({ market })
             .select("name phoneNumber")
             .populate("packman", "name")
             .lean();
@@ -131,7 +131,7 @@ module.exports.getAll = async (req, res) => {
             for (const client of clients) {
                 const saleconnector = await SaleConnector.find({
                     client: client._id,
-                }).sort({createdAt: -1});
+                }).sort({ createdAt: -1 });
                 if (saleconnector.length > 0) {
                     client.saleconnectorid = saleconnector[0]._id;
                 }
@@ -140,7 +140,7 @@ module.exports.getAll = async (req, res) => {
 
         res.status(201).send(clients);
     } catch (error) {
-        res.status(501).json({error: "Serverda xatolik yuz berdi..."});
+        res.status(501).json({ error: "Serverda xatolik yuz berdi..." });
     }
 };
 
@@ -160,13 +160,13 @@ module.exports.updateClient = async (req, res) => {
         if (!marke) {
             return res
                 .status(400)
-                .json({message: "Diqqat! Do'kon haqida malumot topilmadi!"});
+                .json({ message: "Diqqat! Do'kon haqida malumot topilmadi!" });
         }
         const client = await Client.findById(_id);
         if (!client) {
             return res
                 .status(400)
-                .json({message: `Diqqat! ${name} mijoz avval yaratilmagan`});
+                .json({ message: `Diqqat! ${name} mijoz avval yaratilmagan` });
         }
         const updatedClient = {
             name,
@@ -192,7 +192,7 @@ module.exports.updateClient = async (req, res) => {
                     },
                 });
             }
-            updatedClient.packman = {name: packMan.name, _id: packMan._id};
+            updatedClient.packman = { name: packMan.name, _id: packMan._id };
         }
 
         await Client.findByIdAndUpdate(_id, {
@@ -208,19 +208,19 @@ module.exports.updateClient = async (req, res) => {
             "i"
         );
 
-        const clientsCount = await Client.find({market, name: clientname})
-            .sort({_id: -1})
+        const clientsCount = await Client.find({ market, name: clientname })
+            .sort({ _id: -1 })
             .select("name market packman phoneNumber")
-            .populate({path: "packman", match: {name: clientpackman}});
+            .populate({ path: "packman", match: { name: clientpackman } });
 
         const filterCount = clientsCount.filter((item) => {
             return item.packman !== null;
         });
 
-        const clients = await Client.find({market, name: clientname})
-            .sort({_id: -1})
+        const clients = await Client.find({ market, name: clientname })
+            .sort({ _id: -1 })
             .select("name market packman phoneNumber")
-            .populate({path: "packman", match: {name: clientpackman}})
+            .populate({ path: "packman", match: { name: clientpackman } })
             .populate("packman", "name")
             .skip(currentPage * countPage)
             .limit(countPage);
@@ -229,28 +229,28 @@ module.exports.updateClient = async (req, res) => {
             return item.packman !== null;
         });
 
-        res.status(201).json({clients: filter, count: filterCount.length});
+        res.status(201).json({ clients: filter, count: filterCount.length });
     } catch (error) {
-        res.status(501).json({error: "Serverda xatolik yuz berdi..."});
+        res.status(501).json({ error: "Serverda xatolik yuz berdi..." });
     }
 };
 
 module.exports.deleteClient = async (req, res) => {
     try {
-        const {_id, market, name, packman, search, currentPage, countPage} =
+        const { _id, market, name, packman, search, currentPage, countPage } =
             req.body;
 
         const marke = await Market.findById(market);
         if (!marke) {
             return res
                 .status(400)
-                .json({message: "Diqqat! Do'kon haqida malumot topilmadi!"});
+                .json({ message: "Diqqat! Do'kon haqida malumot topilmadi!" });
         }
         const client = await Client.findById(_id);
         if (!client) {
             return res
                 .status(400)
-                .json({message: `Diqqat! ${name} mijoz avval yaratilmagan!`});
+                .json({ message: `Diqqat! ${name} mijoz avval yaratilmagan!` });
         }
 
         if (packman) {
@@ -275,19 +275,19 @@ module.exports.deleteClient = async (req, res) => {
             "i"
         );
 
-        const clientsCount = await Client.find({market, name: clientname})
-            .sort({_id: -1})
+        const clientsCount = await Client.find({ market, name: clientname })
+            .sort({ _id: -1 })
             .select("name market packman phoneNumber")
-            .populate({path: "packman", match: {name: clientpackman}});
+            .populate({ path: "packman", match: { name: clientpackman } });
 
         const filterCount = clientsCount.filter((item) => {
             return item.packman !== null;
         });
 
-        const clients = await Client.find({market, name: clientname})
-            .sort({_id: -1})
+        const clients = await Client.find({ market, name: clientname })
+            .sort({ _id: -1 })
             .select("name market packman phoneNumber")
-            .populate({path: "packman", match: {name: clientpackman}})
+            .populate({ path: "packman", match: { name: clientpackman } })
             .populate("packman", "name")
             .skip(currentPage * countPage)
             .limit(countPage);
@@ -296,27 +296,27 @@ module.exports.deleteClient = async (req, res) => {
             return item.packman !== null;
         });
 
-        res.status(201).json({clients: filter, count: filterCount.length});
+        res.status(201).json({ clients: filter, count: filterCount.length });
     } catch (error) {
-        res.status(501).json({error: "Serverda xatolik yuz berdi..."});
+        res.status(501).json({ error: "Serverda xatolik yuz berdi..." });
     }
 };
 
 module.exports.paymentDebt = async (req, res) => {
     try {
-        const {payment, user, saleconnectorid, products, debt_id, market} =
+        const { payment, user, saleconnectorid, products, debt_id, market } =
             req.body;
 
         const debt = await Debt.findById(debt_id);
         if (!debt) {
-            return res.status(404).json({message: "Debt not found"});
+            return res.status(404).json({ message: "Debt not found" });
         }
         debt.debt -= payment.card + payment.cash + payment.transfer;
         debt.debtuzs -= payment.carduzs + payment.cashuzs + payment.transferuzs;
         await debt.save();
         const saleConnector = await SaleConnector.findById(saleconnectorid);
         if (!saleConnector) {
-            return res.status(404).json({message: "SaleConnector not found"});
+            return res.status(404).json({ message: "SaleConnector not found" });
         }
         const newPayment = new Payment({
             comment: payment.comment,
@@ -341,7 +341,7 @@ module.exports.paymentDebt = async (req, res) => {
         const returnpayment = await Payment.findById(newPayment._id).populate({
             path: "saleconnector",
             select: "client packman",
-            populate: {path: "client", select: "name"},
+            populate: { path: "client", select: "name" },
         });
         res.status(200).json(returnpayment);
     } catch (error) {
@@ -355,12 +355,12 @@ module.exports.paymentDebt = async (req, res) => {
 };
 module.exports.getClients = async (req, res) => {
     try {
-        const {market, search} = req.body;
+        const { market, search } = req.body;
         const marke = await Market.findById(market);
         if (!marke) {
             return res
                 .status(401)
-                .json({message: "Diqqat! Do'kon malumotlari topilmadi."});
+                .json({ message: "Diqqat! Do'kon malumotlari topilmadi." });
         }
 
         const name = regExpression(search ? search.client : "");
@@ -380,7 +380,7 @@ module.exports.getClients = async (req, res) => {
                 name: name,
                 packman,
             })
-                .sort({_id: -1})
+                .sort({ _id: -1 })
                 .select("name market packman phoneNumber")
                 .populate("packman", "name");
         } else {
@@ -393,7 +393,7 @@ module.exports.getClients = async (req, res) => {
                 market,
                 name: name,
             })
-                .sort({_id: -1})
+                .sort({ _id: -1 })
                 .select("name market phoneNumber packman")
                 .populate("packman", "name");
         }
@@ -417,7 +417,7 @@ module.exports.getClients = async (req, res) => {
                 // },
             })
                 .select("-isArchive -market -__v")
-                .sort({createdAt: -1})
+                .sort({ createdAt: -1 })
                 .populate({
                     path: "products",
                     select: "user",
@@ -438,11 +438,11 @@ module.exports.getClients = async (req, res) => {
                     path: "products",
                     select:
                         "totalprice unitprice totalpriceuzs unitpriceuzs pieces createdAt discount saleproducts product",
-                    options: {sort: {createdAt: -1}},
+                    options: { sort: { createdAt: -1 } },
                     populate: {
                         path: "product",
                         select: "productdata",
-                        populate: {path: "productdata", select: "name code"},
+                        populate: { path: "productdata", select: "name code" },
                     },
                 })
                 .populate(
@@ -453,7 +453,7 @@ module.exports.getClients = async (req, res) => {
                     "discounts",
                     "discount discountuzs procient products totalprice totalpriceuzs"
                 )
-                .populate({path: "client", select: "name phoneNumber"})
+                .populate({ path: "client", select: "name phoneNumber" })
                 .populate("packman", "name")
                 .populate("user", "firstname lastname")
                 .populate("dailyconnectors", "comment");
@@ -521,22 +521,22 @@ module.exports.getClients = async (req, res) => {
             newClients.push(newClient);
         }
 
-        res.status(201).json({clients: newClients, count: clientsCount});
+        res.status(201).json({ clients: newClients, count: clientsCount });
     } catch (error) {
         console.log(error);
-        res.status(501).json({error: "Serverda xatolik yuz berdi..."});
+        res.status(501).json({ error: "Serverda xatolik yuz berdi..." });
     }
 };
 
 module.exports.getClientsSales = async (req, res) => {
     try {
-        const {market, clientId} = req.body;
+        const { market, clientId } = req.body;
 
         const marke = await Market.findById(market);
         if (!marke) {
             return res
                 .status(401)
-                .json({message: `Diqqat! Do'kon haqida malumotlar topilmadi!`});
+                .json({ message: `Diqqat! Do'kon haqida malumotlar topilmadi!` });
         }
 
 
@@ -554,7 +554,7 @@ module.exports.getClientsSales = async (req, res) => {
                     populate: {
                         path: "productdata",
                         select: "code name",
-                        options: {sort: {code: 1}},
+                        options: { sort: { code: 1 } },
                     },
                 },
             })
@@ -564,16 +564,16 @@ module.exports.getClientsSales = async (req, res) => {
             .populate({
                 path: "client",
                 select: "name",
-                match: {_id: clientId},
+                match: { _id: clientId },
             })
             .populate("packman", "name")
             .populate("user", "firstname lastname")
             .populate({
                 path: "saleconnector",
                 populate: [
-                    {path: "payments", }, // Populate payments in saleconnector
-                    {path: "products"}, // Populate products in saleconnector
-                    {path: "discounts"} // Populate discounts in saleconnector
+                    { path: "payments", }, // Populate payments in saleconnector
+                    { path: "products" }, // Populate products in saleconnector
+                    { path: "discounts" } // Populate discounts in saleconnector
                 ]
             })
             .lean()
@@ -589,14 +589,14 @@ module.exports.getClientsSales = async (req, res) => {
             }
             return {
                 ...payment,
-                debt: {...payment.debt, debtuzs: sum}
+                debt: { ...payment.debt, debtuzs: sum }
             };
         });
         const filteredPayments = updatedPayments.filter(payment => payment.products.length > 0); // Assuming you want to keep all payments
         const count = filteredPayments.length;
-        res.status(201).json({data: filteredPayments, count});
+        res.status(201).json({ data: filteredPayments, count });
     } catch (error) {
         console.log(error);
-        res.status(501).json({error: "Serverda xatolik yuz berdi..."});
+        res.status(501).json({ error: "Serverda xatolik yuz berdi...", error });
     }
 };
