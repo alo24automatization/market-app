@@ -682,10 +682,10 @@ module.exports.getClientsSales = async (req, res) => {
         const updatedPayments = allpayments.map((payment) => {
             let sum = 0;
             if (payment.saleconnector.totalOfBackAndDebt) {
-                sum = payment.debt.debtuzs - payment.saleconnector.totalOfBackAndDebt;
+                sum = payment?.debt?.debtuzs - payment.saleconnector.totalOfBackAndDebt;
             } else {
                 if (payment.debt) {
-                    sum = payment.debt.debtuzs || 0;
+                    sum = payment?.debt?.debtuzs || 0;
                 }
             }
             return {
