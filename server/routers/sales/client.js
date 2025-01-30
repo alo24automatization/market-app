@@ -700,6 +700,6 @@ module.exports.getClientsSales = async (req, res) => {
         res.status(201).json({ data: filteredPayments, count });
     } catch (error) {
         console.log(error);
-        res.status(501).json({ error: "Serverda xatolik yuz berdi..." });
+        res.status(501).json({ error: "Serverda xatolik yuz berdi...", error });
     }
 };
