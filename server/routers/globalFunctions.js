@@ -299,7 +299,7 @@ const sendMessageFromMorning = async (_, res) => {
   console.log("Morning message sending process has been started.");
 
   const formatMessage = (name, debt, market_name) => {
-    return `Xurmatli ${name}, sizning ${market_name} дан ${debt} uzs miqdorida umumiy qarzingiz mavjud. Iltimos, to'lovni o'z vaqtida amalga oshiring!`;
+    return `Xurmatli ${name}, sizning ${market_name} dan ${debt} uzs miqdorida umumiy qarzingiz mavjud. Iltimos, to'lovni o'z vaqtida amalga oshiring!`;
   };
 
   let count = 1;
@@ -346,10 +346,10 @@ const sendMessageFromMorning = async (_, res) => {
 
       if (totalDebt > 0) {
         const SMS_API_KEY = client.market.SMS_API_KEY;
-        const validPhoneNumber = client.phoneNumber
-        // const validPhoneNumber = client.phoneNumber.startsWith("+998")
-        //   ? client.phoneNumber.slice(4)
-        //   : client.phoneNumber;
+        // const validPhoneNumber = client.phoneNumber
+        const validPhoneNumber = client.phoneNumber.startsWith("+998")
+          ? client.phoneNumber.slice(4)
+          : client.phoneNumber;
 
         currentClient.fullname = client.name;
         currentClient.phone = client.phoneNumber;

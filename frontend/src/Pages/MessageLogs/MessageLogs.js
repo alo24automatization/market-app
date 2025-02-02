@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from 'react'
-import Api, {baseURL} from '../../Config/Api.js'
+import React, { useEffect, useState } from 'react'
+import Api, { baseURL } from '../../Config/Api.js'
 
 const MessageLogs = () => {
     const localStorage_isSending = Boolean(localStorage.getItem('isSending'))
@@ -26,7 +26,7 @@ const MessageLogs = () => {
         if (!isSending) return
 
         Api.post('/stop_message_sending')
-            .then(({data}) => {
+            .then(({ data }) => {
                 alert(data.message)
                 setIsSending(false)
             })
@@ -39,7 +39,7 @@ const MessageLogs = () => {
         <div className='py-2 pt-16 md:pt-2 bg-black-800 px-1 h-full overflow-y-auto'>
             <div className='flex items-center gap-x-3'>
                 <button
-                    className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'
+                    className={`${isSending ? 'bg-green-500 hover:bg-green-700' : 'bg-blue-500 hover:bg-blue-700'} text-white font-bold py-2 px-4 rounded`}
                     onClick={startSendingMessages}
                     disabled={isSending}
                 >
