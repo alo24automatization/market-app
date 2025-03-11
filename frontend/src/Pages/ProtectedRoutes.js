@@ -8,6 +8,7 @@ const SellersReport = lazy(() => import('./Seller/SellersReport.js'))
 const ProductReport = lazy(() => import('./ProductReport/ProductReport.js'))
 const Category = lazy(() => import('./Category/Category.js'))
 const Supplier = lazy(() => import('./SupplierPage/SupplierPage'))
+const SuppliersProduct = lazy(() => import('./SupplierPage/SuppliersProduct'))
 const Labels = lazy(() => import('./Labels/Labels.js'))
 const Inventory = lazy(() => import('./Inventory/Inventory'))
 const Inventories = lazy(() => import('./Inventories/Inventories'))
@@ -188,6 +189,10 @@ const directorRoutes = [
     {
         path: '/hamkorlar/yetkazuvchilar/:id',
         element: <SupplierReport />
+    },
+    {
+        path: '/hamkorlar/yetkazuvchilar/maxsulotlar/:id',
+        element: <SuppliersProduct />
     },
     {
         path: '/hamkorlar/agentlar',

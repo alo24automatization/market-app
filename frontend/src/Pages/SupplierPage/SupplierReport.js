@@ -1,27 +1,31 @@
-import React, {useEffect, useState} from 'react'
-import {useDispatch, useSelector} from 'react-redux'
-import {useParams} from 'react-router-dom'
-import {UsdToUzs, UzsToUsd} from '../../App/globalFunctions'
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate, useParams } from 'react-router-dom'
+import { exportExcel, UsdToUzs, UzsToUsd } from '../../App/globalFunctions'
 import LinkToBack from '../../Components/LinkToBack/LinkToBack'
 import UniversalModal from '../../Components/Modal/UniversalModal'
 import Pagination from '../../Components/Pagination/Pagination'
 import CustomerPayment from '../../Components/Payment/CustomerPayment'
 import SearchForm from '../../Components/SearchForm/SearchForm'
 import Table from '../../Components/Table/Table'
-import {warningMorePayment} from '../../Components/ToastMessages/ToastMessages'
-import {payDebt} from '../Incomings/incomingSlice'
-import {getIncomingConnectorsBySupplier} from './suppliersSlice'
-import {t} from 'i18next'
+import { warningMorePayment } from '../../Components/ToastMessages/ToastMessages'
+import { payDebt } from '../Incomings/incomingSlice'
+import { getIncomingConnectorsBySupplier } from './suppliersSlice'
+import { t } from 'i18next'
+import ExportBtn from '../../Components/Buttons/ExportBtn'
+import { map } from 'lodash'
 
 const SupplierReport = () => {
-    const {id} = useParams()
+    const { id } = useParams()
     const dispatch = useDispatch()
 
-    const {user} = useSelector((state) => state.login)
-    const {currencyType, currency} = useSelector((state) => state.currency)
-    const {incomingconnectors, connectorscount} = useSelector(
+    const { user } = useSelector((state) => state.login)
+    const { currencyType, currency } = useSelector((state) => state.currency)
+    const { incomingconnectors, connectorscount } = useSelector(
         (state) => state.suppliers
     )
+
+    const navigate = useNavigate()
 
     const [currentData, setCurrentData] = useState([])
 
@@ -37,6 +41,10 @@ const SupplierReport = () => {
     const [endDate, setEndDate] = useState(
         new Date(new Date().setHours(23, 59, 59, 0)).toISOString()
     )
+
+    const linkToSupplierReport = (id) => {
+        navigate(`/hamkorlar/yetkazuvchilar/maxsulotlar/${id}`)
+    }
 
     const [paymentModalVisible, setPaymentModalVisible] = useState(false)
     const [paymentType, setPaymentType] = useState('cash')
@@ -345,7 +353,7 @@ const SupplierReport = () => {
             user: user._id,
             incomingconnectorid: currentId
         }
-        dispatch(payDebt(body)).then(({error}) => {
+        dispatch(payDebt(body)).then(({ error }) => {
             if (!error) {
                 dispatch(
                     getIncomingConnectorsBySupplier({
@@ -364,6 +372,59 @@ const SupplierReport = () => {
     }
     const changeComment = (e) => {
         setSaleComment(e)
+    }
+
+    const exportData = () => {
+        let fileName = 'Yetkazuvchilar'
+        const exportHeader = [
+            t('тДЦ'),
+            t('Sana'),
+            t('Vaqt'),
+            t('ID'),
+            t('Mahsulot turi'),
+            t('Soni'),
+            t('Umumiy'),
+            t("To'langan"),
+            t("Qarz"),
+        ]
+        const body = {
+            supplierid: id,
+            startDate,
+            endDate,
+            currentPage,
+            countPage
+        }
+        const reducer = (arr, key) =>
+            arr.reduce((prev, item) => prev + item[key], 0)
+        const changeCurrency = (item, key) =>
+            currencyType === 'USD' ? item[key] : item[key + 'uzs']
+        dispatch(getIncomingConnectorsBySupplier(body)).then(({ error, payload }) => {
+            if (!error) {
+                if (payload?.data.length > 0) {
+                    console.log(payload);
+                    const newData = map(payload?.data, (item, index) => ({
+                        nth: index + 1,
+                        createdAt: new Date(item.createdAt).toLocaleDateString() || '',
+                        time: new Date(item.createdAt).toLocaleTimeString() || '',
+                        id: item?.id || '',
+                        incoming: item?.incoming.length || '',
+                        pieces: reducer(item.incoming, 'pieces') || '',
+                        total: changeCurrency(item, 'total').toLocaleString(
+                            'ru-RU'
+                        ) || '',
+                        totalpayment: changeCurrency(item, 'totalpayment').toLocaleString(
+                            'ru-RU'
+                        ) || '',
+                        debt: changeCurrency(item, 'debt').toLocaleString(
+                            'ru-RU'
+                        ) || '',
+                    }))
+                    exportExcel(newData, fileName, exportHeader)
+                } else {
+                    universalToast("Jadvalda ma'lumot mavjud emas !", 'warning')
+                }
+            }
+        })
     }
 
     useEffect(() => {
@@ -434,11 +495,15 @@ const SupplierReport = () => {
                     countPage={countPage}
                     totalDatas={connectorscount || 1}
                 />
+                <div className={'flex px-4 py-2 gap-2'}>
+                    <ExportBtn onClick={exportData} />
+                </div>
             </div>
             <div className='tableContainerPadding'>
                 {currentData.length > 0 && (
                     <Table
                         page={'incomingsupplier'}
+                        linkToProducts={linkToSupplierReport}
                         currentPage={currentPage}
                         countPage={countPage}
                         currency={currencyType}

@@ -37,4 +37,8 @@ router.post('/incomingsreport', auth, (req, res) => {
   require('./supplier').getSupplierReport(req, res);
 });
 
+router.post('/incomingsreportproduct', auth, (req, res) => {
+  require('./supplier').getSuppliersProduct(req, res);
+});
+
 module.exports = router;

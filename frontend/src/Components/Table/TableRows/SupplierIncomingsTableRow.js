@@ -1,6 +1,6 @@
-import {map} from 'lodash'
+import { map } from 'lodash'
 import React from 'react'
-import {IoCheckmark} from 'react-icons/io5'
+import { IoCheckmark } from 'react-icons/io5'
 import TableBtn from '../../Buttons/TableBtn'
 
 const SupplierIncomingsTableRow = ({
@@ -9,6 +9,7 @@ const SupplierIncomingsTableRow = ({
     countPage,
     currency,
     Pay,
+    linkToProducts
 }) => {
     const reducer = (arr, key) =>
         arr.reduce((prev, item) => prev + item[key], 0)
@@ -49,11 +50,10 @@ const SupplierIncomingsTableRow = ({
                         {currency}
                     </td>
                     <td
-                        className={`td text-right font-medium ${
-                            connector.debt !== 0
-                                ? 'text-error-500'
-                                : 'text-black-900'
-                        }`}
+                        className={`td text-right font-medium ${connector.debt !== 0
+                            ? 'text-error-500'
+                            : 'text-black-900'
+                            }`}
                     >
                         {changeCurrency(connector, 'debt').toLocaleString(
                             'ru-RU'
@@ -62,6 +62,13 @@ const SupplierIncomingsTableRow = ({
                     </td>
                     <td className='py-[0.375rem] td border-r-0 text-center'>
                         <div className='flex items-center justify-center gap-[0.625rem]'>
+                            <TableBtn
+                                type={'info'}
+                                bgcolor={'bg-blue-600'}
+                                onClick={() =>
+                                    linkToProducts(connector._id)
+                                }
+                            />
                             {connector.debt !== 0 ? (
                                 <TableBtn
                                     type={'pay'}

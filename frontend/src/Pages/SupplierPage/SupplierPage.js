@@ -1,13 +1,13 @@
-import React, {useEffect, useState} from 'react'
+import React, { useEffect, useState } from 'react'
 import FieldContainer from '../../Components/FieldContainer/FieldContainer'
 import Button from '../../Components/Buttons/BtnAddRemove'
 import Pagination from '../../Components/Pagination/Pagination'
 import Table from '../../Components/Table/Table'
 import TableMobile from '../../Components/Table/TableMobile'
-import {useDispatch, useSelector} from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import Spinner from '../../Components/Spinner/SmallLoader.js'
 import NotFind from '../../Components/NotFind/NotFind.js'
-import {motion} from 'framer-motion'
+import { motion } from 'framer-motion'
 import {
     addSupplier,
     clearErrorSuppliers,
@@ -21,7 +21,7 @@ import {
     updateSupplier
 } from './suppliersSlice.js'
 
-import {getAllSuppliers} from '../Incomings/incomingSlice.js'
+import { getAllSuppliers } from '../Incomings/incomingSlice.js'
 import {
     successAddSupplierMessage,
     successDeleteSupplierMessage,
@@ -31,11 +31,12 @@ import {
 } from '../../Components/ToastMessages/ToastMessages.js'
 import UniversalModal from '../../Components/Modal/UniversalModal.js'
 import SearchForm from '../../Components/SearchForm/SearchForm.js'
-import {checkEmptyString} from '../../App/globalFunctions.js'
-import {useTranslation} from 'react-i18next'
-import {filter} from 'lodash'
-import {useNavigate} from 'react-router-dom'
+import { checkEmptyString, exportExcel } from '../../App/globalFunctions.js'
+import { useTranslation } from 'react-i18next'
+import { filter, map } from 'lodash'
+import { useNavigate } from 'react-router-dom'
 import SelectForm from '../../Components/Select/SelectForm.js'
+import ExportBtn from '../../Components/Buttons/ExportBtn'
 
 const Supplier = () => {
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
@@ -50,9 +51,10 @@ const Supplier = () => {
             window.removeEventListener('resize', handleResize);
         };
     }, []);
-    const {t} = useTranslation(['common'])
+    const { t } = useTranslation(['common'])
     const dispatch = useDispatch()
     const navigate = useNavigate()
+    const { currency, currencyType } = useSelector((state) => state.currency)
     const {
         errorSuppliers,
         suppliers,
@@ -66,9 +68,18 @@ const Supplier = () => {
     } = useSelector((state) => state.suppliers)
 
     const headers = [
-        {title: t('№'), styles: 'w-[8%] text-left'},
-        {title: t('Yetkazuvchi'), styles: 'w-[84%] text-left'},
-        {title: '', styles: 'w-[8%] text-left'}
+        { title: t('№'), styles: 'text-left' },
+        { title: t('Yetkazuvchi'), styles: 'text-left' },
+        {
+            title: t('Umumiy')
+        },
+        {
+            title: t('To\'langan')
+        },
+        {
+            title: t('Qarz')
+        },
+        { title: '', styles: 'text-left' }
     ]
 
     // states
@@ -122,7 +133,7 @@ const Supplier = () => {
     // handle submit of inputs
     const addNewSupplier = (e) => {
         e.preventDefault()
-        const {failed, message} = checkEmptyString([{
+        const { failed, message } = checkEmptyString([{
             value: supplierName,
             message: t('Yetkazuvchi ismi')
         }])
@@ -143,7 +154,7 @@ const Supplier = () => {
 
     const handleEdit = (e) => {
         e.preventDefault()
-        const {failed, message} = checkEmptyString([{
+        const { failed, message } = checkEmptyString([{
             value: supplierName,
             message: t('Yetkazuvchi ismi')
         }])
@@ -172,7 +183,7 @@ const Supplier = () => {
     }
 
     // filter by total
-    const filterByTotal = ({value}) => {
+    const filterByTotal = ({ value }) => {
         setShowByTotal(value)
         setCurrentPage(0)
     }
@@ -182,8 +193,8 @@ const Supplier = () => {
         let val = e.target.value
         let valForSearch = val.toLowerCase().replace(/\s+/g, ' ').trim()
         setSearchByName(val)
-        ;(searchedData.length > 0 || totalSearched > 0) &&
-        dispatch(clearSearchedSuppliers())
+            ; (searchedData.length > 0 || totalSearched > 0) &&
+                dispatch(clearSearchedSuppliers())
         if (valForSearch === '') {
             setData(suppliers)
             setFilteredDataTotal(total)
@@ -206,6 +217,48 @@ const Supplier = () => {
             }
             dispatch(getSuppliersByFilter(body))
         }
+    }
+
+    const exportData = () => {
+        let fileName = 'Yetkazuvchilar'
+        const exportHeader = [
+            t('тДЦ'),
+            t('Yetkazuvchi'),
+            t('Umumiy'),
+            t("To'langan"),
+            t('Qarz'),
+        ]
+        const body = {
+            currentPage,
+            countPage: showByTotal,
+            search: {
+                name: searchByName.replace(/\s+/g, ' ').trim()
+            }
+        }
+        const changeCurrency = (item, key) =>
+            currencyType === 'USD' ? item[key] : item[key + 'uzs']
+        dispatch(getSuppliers(body)).then(({ error, payload }) => {
+            if (!error) {
+                if (payload?.suppliers.length > 0) {
+                    const newData = map(payload?.suppliers, (item, index) => ({
+                        nth: index + 1,
+                        supplier: item?.name || '',
+                        total: changeCurrency(item, 'total').toLocaleString(
+                            'ru-RU'
+                        ) || '',
+                        totalpayment: changeCurrency(item, 'totalpayment').toLocaleString(
+                            'ru-RU'
+                        ) || '',
+                        debt: changeCurrency(item, 'debt').toLocaleString(
+                            'ru-RU'
+                        ) || '',
+                    }))
+                    exportExcel(newData, fileName, exportHeader)
+                } else {
+                    universalToast("Jadvalda ma'lumot mavjud emas !", 'warning')
+                }
+            }
+        })
     }
 
     // link to next page
@@ -277,10 +330,10 @@ const Supplier = () => {
             animate='open'
             exit='collapsed'
             variants={{
-                open: {opacity: 1, height: 'auto'},
-                collapsed: {opacity: 0, height: 0}
+                open: { opacity: 1, height: 'auto' },
+                collapsed: { opacity: 0, height: 0 }
             }}
-            transition={{duration: 0.8, ease: [0.04, 0.62, 0.23, 0.98]}}
+            transition={{ duration: 0.8, ease: [0.04, 0.62, 0.23, 0.98] }}
         >
             <UniversalModal
                 headerText={`${deletedSupplier && deletedSupplier.name} ${t(
@@ -296,9 +349,8 @@ const Supplier = () => {
                 isOpen={modalVisible}
             />
             <form
-                className={`flex ps-[20px] gap-[1.25rem] lg:mt-0 mt-[40px] bg-background flex-col mainPadding transition ease-linear duration-200 ${
-                    stickyForm && 'stickyForm'
-                }`}
+                className={`flex ps-[20px] gap-[1.25rem] lg:mt-0 mt-[40px] bg-background flex-col mainPadding transition ease-linear duration-200 ${stickyForm && 'stickyForm'
+                    }`}
             >
                 <div className='supplier-style'>
                     <FieldContainer
@@ -325,16 +377,19 @@ const Supplier = () => {
                 </div>
             </form>
             <div className='flex ps-[10px] items-center '>
-            <SelectForm  key={'total_1'}  onSelect={filterByTotal}/>
-            <SearchForm
-                filterByTotal={filterByTotal}
-                filterBy={['total', 'name']}
-                filterByName={filterByName}
-                searchByName={searchByName}
-                filterByCodeAndNameAndCategoryWhenPressEnter={
-                    filterByNameWhenPressEnter
-                }
-            />
+                <SelectForm key={'total_1'} onSelect={filterByTotal} />
+                <SearchForm
+                    filterByTotal={filterByTotal}
+                    filterBy={['total', 'name']}
+                    filterByName={filterByName}
+                    searchByName={searchByName}
+                    filterByCodeAndNameAndCategoryWhenPressEnter={
+                        filterByNameWhenPressEnter
+                    }
+                />
+                <div className={'flex px-4 py-2 gap-2'}>
+                    <ExportBtn onClick={exportData} />
+                </div>
             </div>
 
             <div className='lg:tableContainerPadding'>
@@ -343,29 +398,29 @@ const Supplier = () => {
                 ) : data.length === 0 && searchedData.length === 0 ? (
                     <NotFind text={t('Yetkazib beruvchilar mavjud emas')} />
                 ) : (
-                    !isMobile?
-                    <Table
-                        data={searchedData.length > 0 ? searchedData : data}
-                        page={'supplier'}
-                        currentPage={currentPage}
-                        countPage={showByTotal}
-                        headers={headers}
-                        Edit={handleEditSupplier}
-                        Delete={handleDeleteSupplier}
-                        linkToSupplierReport={linkToSupplierReport}
-                    />:
-                    <TableMobile
-                        data={searchedData.length > 0 ? searchedData : data}
-                        page={'supplier'}
-                        currentPage={currentPage}
-                        countPage={showByTotal}
-                        headers={headers}
-                        Edit={handleEditSupplier}
-                        Delete={handleDeleteSupplier}
-                        linkToSupplierReport={linkToSupplierReport}
-                    />
+                    !isMobile ?
+                        <Table
+                            data={searchedData.length > 0 ? searchedData : data}
+                            page={'supplier'}
+                            currentPage={currentPage}
+                            countPage={showByTotal}
+                            headers={headers}
+                            Edit={handleEditSupplier}
+                            Delete={handleDeleteSupplier}
+                            linkToSupplierReport={linkToSupplierReport}
+                        /> :
+                        <TableMobile
+                            data={searchedData.length > 0 ? searchedData : data}
+                            page={'supplier'}
+                            currentPage={currentPage}
+                            countPage={showByTotal}
+                            headers={headers}
+                            Edit={handleEditSupplier}
+                            Delete={handleDeleteSupplier}
+                            linkToSupplierReport={linkToSupplierReport}
+                        />
                 )}
-                
+
             </div>
             <div className='pagination-supplier flex justify-center [mb-30px] mt-[30px]'>
                 {(filteredDataTotal !== 0 || totalSearched !== 0) && (

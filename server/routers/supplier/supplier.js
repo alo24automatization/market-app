@@ -8,6 +8,9 @@ const {
 } = require('../../models/Products/IncomingConnector');
 require('../../models/Products/IncomingPayment');
 require('../../models/Products/Incoming');
+require('../../models/Products/Product');
+require('../../models/Products/Category');
+require('../../models/Products/ProductPrice');
 
 //Supplier register
 
@@ -177,13 +180,47 @@ module.exports.getSuppliers = async (req, res) => {
       .sort({ _id: -1 })
       .select('name market')
       .skip(currentPage * countPage)
-      .limit(countPage);
+      .limit(countPage)
+      .lean()
 
-    res.status(201).json({ suppliers: suppliers, count: count });
+
+    const reducer = (arr, key) =>
+      arr.reduce((prev, item) => prev + (item[key] || 0), 0);
+
+    const response = []
+
+    for (const supplier of suppliers) {
+      const connectors = await IncomingConnector.find({
+        market,
+        supplier: supplier._id,
+      })
+        .select('-isArchive -updatedAt -__v')
+        .populate('supplier', 'name')
+        .populate('payments', 'totalprice totalpriceuzs payment paymentuzs')
+        .populate('incoming', 'pieces')
+        .lean()
+
+      const totalpayment = connectors.reduce((prev, item) => prev + (reducer(item.payments, 'payment') || 0), 0);
+      const totalpaymentuzs = connectors.reduce((prev, item) => prev + (reducer(item.payments, 'paymentuzs') || 0), 0);
+      const debt = reducer(connectors, 'total') - totalpayment;
+      const debtuzs = reducer(connectors, 'totaluzs') - totalpaymentuzs;
+      response.push({
+        ...supplier,
+        totalpayment,
+        totalpaymentuzs,
+        total: reducer(connectors, 'total'),
+        totaluzs: reducer(connectors, 'totaluzs'),
+        debt,
+        debtuzs
+      })
+    }
+
+    res.status(201).json({ suppliers: response, count: count });
   } catch (error) {
     res.status(501).json({ error: 'Serverda xatolik yuz berdi...' });
   }
 };
+
 
 module.exports.getSuppliersExcel = async (req, res) => {
   try {
@@ -283,6 +320,54 @@ module.exports.getSupplierReport = async (req, res) => {
       data: response.splice(currentPage * countPage, countPage),
     });
   } catch (error) {
+    res.status(501).json({ error: 'Serverda xatolik yuz berdi...' });
+  }
+};
+
+module.exports.getSuppliersProduct = async (req, res) => {
+  try {
+    const { incoming, market, currentPage, countPage } =
+      req.body;
+
+    const marke = await Market.findById(market);
+    if (!marke) {
+      return res
+        .status(401)
+        .json({ message: "Diqqat! Do'kon malumotlari topilmadi." });
+    }
+
+
+    const connector = await IncomingConnector.findById(incoming)
+      .select('-isArchive -updatedAt -__v')
+      .populate('supplier', 'name')
+      .populate('payments', 'totalprice totalpriceuzs payment paymentuzs')
+      .populate('incoming', '-isArchive -updatedAt -__v')
+      .populate({
+        path: "incoming",
+        select: "-isArchive -updatedAt -__v",
+        populate: {
+          path: "product",
+          select: "-isArchive -updatedAt -__v",
+          populate: [{
+            path: "productdata",
+            select: "-isArchive -updatedAt -__v"
+          }, {
+            path: "category",
+            select: "-isArchive -updatedAt -__v"
+          }, {
+            path: "price",
+            select: "-isArchive -updatedAt -__v"
+          }]
+        },
+      })
+      .lean()
+    console.log(connector);
+    res.status(201).json({
+      count: connector.length,
+      data: connector.incoming,
+    });
+  } catch (error) {
+    console.log(error);
     res.status(501).json({ error: 'Serverda xatolik yuz berdi...' });
   }
 };

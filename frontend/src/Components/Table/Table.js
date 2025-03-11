@@ -45,6 +45,7 @@ import { LabelsIncome } from './TableRows/LabelsIncome'
 import { ClientSaleTable } from './TableRows/ClientSaleTable'
 import PackmanProfitClientsTableRow from './TableRows/PackmanProfitClientsTableRow.js'
 import { SellerPayments } from './TableRows/SellerPayments'
+import SuppliersProductTable from './TableRows/SuppliersProductTable'
 
 function Table({
     showClients,
@@ -62,6 +63,7 @@ function Table({
     Delete,
     hiddenPayButton,
     hiddenInfoButton,
+    linkToProducts,
     currency,
     changeHandler,
     Print,
@@ -193,6 +195,7 @@ function Table({
                         currentPage={currentPage}
                         countPage={countPage}
                         Edit={Edit}
+                        currency={currency}
                         Delete={Delete}
                         linkToSupplierReport={linkToSupplierReport}
                     />
@@ -548,6 +551,16 @@ function Table({
                         currentPage={currentPage}
                         countPage={countPage}
                         Pay={Pay}
+                        linkToProducts={linkToProducts}
+                    />
+                )
+            case 'suppliersproduct':
+                return (
+                    <SuppliersProductTable
+                        data={data}
+                        currency={currency}
+                        currentPage={currentPage}
+                        countPage={countPage}
                     />
                 )
             case 'categoryreport':

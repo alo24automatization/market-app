@@ -1,12 +1,12 @@
-import {createAsyncThunk, createSlice} from '@reduxjs/toolkit'
-import {universalToast} from '../../Components/ToastMessages/ToastMessages'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+import { universalToast } from '../../Components/ToastMessages/ToastMessages'
 import Api from '../../Config/Api'
 
 export const getSuppliers = createAsyncThunk(
     'suppliers/getSuppliers',
-    async (body = {}, {rejectWithValue}) => {
+    async (body = {}, { rejectWithValue }) => {
         try {
-            const {data} = await Api.post('supplier/getsuppliers', body)
+            const { data } = await Api.post('supplier/getsuppliers', body)
             return data
         } catch (error) {
             return rejectWithValue(error)
@@ -16,9 +16,9 @@ export const getSuppliers = createAsyncThunk(
 
 export const addSupplier = createAsyncThunk(
     'suppliers/register',
-    async (body, {rejectWithValue}) => {
+    async (body, { rejectWithValue }) => {
         try {
-            const {data} = await Api.post('supplier/register', body)
+            const { data } = await Api.post('supplier/register', body)
             return data
         } catch (error) {
             return rejectWithValue(error)
@@ -28,9 +28,9 @@ export const addSupplier = createAsyncThunk(
 
 export const updateSupplier = createAsyncThunk(
     'supplier/update',
-    async (body, {rejectWithValue}) => {
+    async (body, { rejectWithValue }) => {
         try {
-            const {data} = await Api.put('supplier/update', body)
+            const { data } = await Api.put('supplier/update', body)
             return data
         } catch (error) {
             return rejectWithValue(error)
@@ -40,9 +40,9 @@ export const updateSupplier = createAsyncThunk(
 
 export const deleteSupplier = createAsyncThunk(
     'suppliers/delete',
-    async (body, {rejectWithValue}) => {
+    async (body, { rejectWithValue }) => {
         try {
-            const {data} = await Api.post('supplier/delete', body)
+            const { data } = await Api.post('supplier/delete', body)
             return data
         } catch (error) {
             return rejectWithValue(error)
@@ -52,9 +52,9 @@ export const deleteSupplier = createAsyncThunk(
 
 export const getSuppliersByFilter = createAsyncThunk(
     'suppliers/getSuppliersByFilter',
-    async (body = {}, {rejectWithValue}) => {
+    async (body = {}, { rejectWithValue }) => {
         try {
-            const {data} = await Api.post('supplier/getsuppliers', body)
+            const { data } = await Api.post('supplier/getsuppliers', body)
             return data
         } catch (error) {
             return rejectWithValue(error)
@@ -64,9 +64,21 @@ export const getSuppliersByFilter = createAsyncThunk(
 
 export const getIncomingConnectorsBySupplier = createAsyncThunk(
     'suppliers/getIncomingConnectorsBySupplier',
-    async (body = {}, {rejectWithValue}) => {
+    async (body = {}, { rejectWithValue }) => {
         try {
-            const {data} = await Api.post('supplier/incomingsreport', body)
+            const { data } = await Api.post('supplier/incomingsreport', body)
+            return data
+        } catch (error) {
+            return rejectWithValue(error)
+        }
+    }
+)
+
+export const getSuppliersProduct = createAsyncThunk(
+    'suppliers/getSuppliersProduct',
+    async (body = {}, { rejectWithValue }) => {
+        try {
+            const { data } = await Api.post('supplier/incomingsreportproduct', body)
             return data
         } catch (error) {
             return rejectWithValue(error)
@@ -78,6 +90,7 @@ const suppliersSlice = createSlice({
     name: 'suppliers',
     initialState: {
         suppliers: [],
+        products: [],
         total: 0,
         searchedSuppliers: [],
         totalSearched: 0,
@@ -111,7 +124,7 @@ const suppliersSlice = createSlice({
         [getSuppliers.pending]: (state) => {
             state.loading = true
         },
-        [getSuppliers.fulfilled]: (state, {payload: {suppliers, count}}) => {
+        [getSuppliers.fulfilled]: (state, { payload: { suppliers, count } }) => {
             state.loading = false
             state.searchedSuppliers.length
                 ? (state.searchedSuppliers = suppliers)
@@ -120,7 +133,18 @@ const suppliersSlice = createSlice({
                 ? (state.totalSearched = count)
                 : (state.total = count)
         },
-        [getSuppliers.rejected]: (state, {payload}) => {
+        [getSuppliers.rejected]: (state, { payload }) => {
+            state.loading = false
+            state.errorSuppliers = payload
+        },
+        [getSuppliersProduct.pending]: (state) => {
+            state.loading = true
+        },
+        [getSuppliersProduct.fulfilled]: (state, { payload: { data, count } }) => {
+            state.loading = false
+            state.products = data
+        },
+        [getSuppliersProduct.rejected]: (state, { payload }) => {
             state.loading = false
             state.errorSuppliers = payload
         },
@@ -129,20 +153,20 @@ const suppliersSlice = createSlice({
         },
         [getSuppliersByFilter.fulfilled]: (
             state,
-            {payload: {suppliers, count}}
+            { payload: { suppliers, count } }
         ) => {
             state.loading = false
             state.searchedSuppliers = suppliers
             state.totalSearched = count
         },
-        [getSuppliersByFilter.rejected]: (state, {payload}) => {
+        [getSuppliersByFilter.rejected]: (state, { payload }) => {
             state.loading = false
             state.errorSuppliers = payload
         },
         [addSupplier.pending]: (state) => {
             state.loading = true
         },
-        [addSupplier.fulfilled]: (state, {payload: {suppliers, count}}) => {
+        [addSupplier.fulfilled]: (state, { payload: { suppliers, count } }) => {
             state.loading = false
             state.successAddSupplier = true
             state.searchedSuppliers.length
@@ -152,14 +176,14 @@ const suppliersSlice = createSlice({
                 ? (state.totalSearched = count)
                 : (state.total = count)
         },
-        [addSupplier.rejected]: (state, {payload}) => {
+        [addSupplier.rejected]: (state, { payload }) => {
             state.loading = false
             state.errorSuppliers = payload
         },
         [updateSupplier.pending]: (state) => {
             state.loading = true
         },
-        [updateSupplier.fulfilled]: (state, {payload: {suppliers, count}}) => {
+        [updateSupplier.fulfilled]: (state, { payload: { suppliers, count } }) => {
             state.searchedSuppliers.length
                 ? (state.searchedSuppliers = suppliers)
                 : (state.suppliers = suppliers)
@@ -169,14 +193,14 @@ const suppliersSlice = createSlice({
             state.loading = false
             state.successUpdateSupplier = true
         },
-        [updateSupplier.rejected]: (state, {payload}) => {
+        [updateSupplier.rejected]: (state, { payload }) => {
             state.loading = false
             state.errorSuppliers = payload
         },
         [deleteSupplier.pending]: (state) => {
             state.loading = true
         },
-        [deleteSupplier.fulfilled]: (state, {payload: {suppliers, count}}) => {
+        [deleteSupplier.fulfilled]: (state, { payload: { suppliers, count } }) => {
             state.searchedSuppliers.length
                 ? (state.searchedSuppliers = suppliers)
                 : (state.suppliers = suppliers)
@@ -186,7 +210,7 @@ const suppliersSlice = createSlice({
             state.loading = false
             state.successDeleteSupplier = true
         },
-        [deleteSupplier.rejected]: (state, {payload}) => {
+        [deleteSupplier.rejected]: (state, { payload }) => {
             state.loading = false
             state.errorSuppliers = payload
         },
@@ -195,13 +219,13 @@ const suppliersSlice = createSlice({
         },
         [getIncomingConnectorsBySupplier.fulfilled]: (
             state,
-            {payload: {data, count}}
+            { payload: { data, count } }
         ) => {
             state.pending = false
             state.incomingconnectors = data
             state.connectorscount = count
         },
-        [getIncomingConnectorsBySupplier.rejected]: (state, {payload}) => {
+        [getIncomingConnectorsBySupplier.rejected]: (state, { payload }) => {
             state.loading = false
             universalToast(payload, 'error')
         },
