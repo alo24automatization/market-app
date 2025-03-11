@@ -10,6 +10,7 @@ import { getIncomingConnectorsBySupplier, getSuppliersProduct } from './supplier
 import { t } from 'i18next'
 import ExportBtn from '../../Components/Buttons/ExportBtn'
 import { map } from 'lodash'
+import { universalToast } from '../../Components/ToastMessages/ToastMessages'
 
 const SuppliersProduct = () => {
     const { id } = useParams()
