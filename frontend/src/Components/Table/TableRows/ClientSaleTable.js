@@ -365,16 +365,6 @@ export const ClientSaleTable = ({
                             {currency}
                         </td>
                         <td className='text-error-500 text-left td'>
-                            {/*{(currency === 'UZS' &&*/}
-                            {/*    saleconnector?.debt?.debtuzs !== 0) ||*/}
-                            {/*(currency !== 'UZS' &&*/}
-                            {/*    saleconnector?.debt?.debt !== 0) ? (*/}
-                            {/*    <>*/}
-                            {/*        {currency === 'UZS'*/}
-                            {/*            ? parseToIntOrFloat(saleconnector?.debt?.debtuzs)?.toLocaleString("ru-Ru")*/}
-                            {/*            : parseToIntOrFloat(saleconnector?.debt?.debt).toLocaleString("ru-Ru")}{' '}*/}
-                            {/*    </>*/}
-                            {/*) : null}*/}
                             {(
                                 reduceEl(
                                     saleconnector.saleconnector.products,

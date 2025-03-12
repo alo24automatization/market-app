@@ -39,12 +39,43 @@ const SuppliersProductTable = ({
                         )}
                     </td>
                     <td className='td text-right'>
+                        {connector.totalpriceuzs.toLocaleString(
+                            'ru-RU'
+                        )}
+                    </td>
+                    <td className='td text-right'>
                         {connector.product?.price?.sellingpriceuzs.toLocaleString(
                             'ru-RU'
                         )}
                     </td>
                 </tr>
             ))}
+            <tr className='tr'>
+                <td className='td'>
+                </td>
+                <td className='td text-right py-[0.375rem]'>
+                </td>
+                <td className='td text-right'>
+                </td>
+                <td className='td text-right'></td>
+                <td className='td text-right'>
+                </td>
+                <td className='td text-right py-[0.375rem]'>
+                    {data.reduce((prev, item) => prev + item.product?.price?.incomingpriceuzs, 0).toLocaleString(
+                        'ru-RU'
+                    )}
+                </td>
+                <td className='td text-right'>
+                    {data.reduce((prev, item) => prev + item.totalpriceuzs, 0).toLocaleString(
+                        'ru-RU'
+                    )}
+                </td>
+                <td className='td text-right'>
+                    {data.reduce((prev, item) => prev + item.product?.price?.sellingpriceuzs, 0).toLocaleString(
+                        'ru-RU'
+                    )}
+                </td>
+            </tr>
         </>
     )
 }

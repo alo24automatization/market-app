@@ -9,25 +9,26 @@ import Check from './ModalBodys/Check.js'
 import AllChecks from './ModalBodys/AllChecks.js'
 import StepperPage from './ModalBodys/StepperPage.js'
 import AdminMarkets from './ModalBodys/AdminMarkets.js'
-import {SavedSalesCheck} from '../SaleCheck/SavedSalesCheck.js'
+import { SavedSalesCheck } from '../SaleCheck/SavedSalesCheck.js'
 import ExchangesBody from './ModalBodys/ExchangesBody'
-import {useTranslation} from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 import SalesList from './ModalBodys/SalesList'
 import TotalReports from '../TotalReports/TotalReports.js'
-import {SavedIncomingsCheck} from '../SaleCheck/SavedIncomingsCheck.js'
+import { SavedIncomingsCheck } from '../SaleCheck/SavedIncomingsCheck.js'
 import RequestConnection from './ModalBodys/RequestConnection.js'
 import RequestApplication from './ModalBodys/ReuqestApplication.js'
 import SendingApplication from './ModalBodys/SendingApplication.js'
-import {SavedOrdersCheck} from '../OrdersCheck/SavedOrdersCheck.js'
+import { SavedOrdersCheck } from '../OrdersCheck/SavedOrdersCheck.js'
 import DebtComment from './ModalBodys/DebtComment'
 import ChangeComment from './ModalBodys/ChangeComment'
-import {DailySaleCheck} from './ModalBodys/DailySaleCheck.js'
+import { DailySaleCheck } from './ModalBodys/DailySaleCheck.js'
 import MiniSaleDebtPaymentCheck from './ModalBodys/MiniSaleDebtPaymentCheck.js'
 import DebtsList from '../DebtsList/DebtsList'
 import TableBtn from '../Buttons/TableBtn'
 import React from 'react'
-import {Payment} from '../Buttons/SaleBtns'
-import {t} from 'i18next'
+import { Payment } from '../Buttons/SaleBtns'
+import { t } from 'i18next'
+import SupplierMiniSaleDebtPaymentCheck from './ModalBodys/SupplierMiniSaleDebtPaymentCheck'
 
 function UniversalModal({
     isOpen,
@@ -66,9 +67,9 @@ function UniversalModal({
     dailyid,
     isSalesList,
     children,
-    payDebt = () => {},
+    payDebt = () => { },
 }) {
-    const {t} = useTranslation(['common'])
+    const { t } = useTranslation(['common'])
 
     const customStyles = {
         content: {
@@ -240,6 +241,8 @@ function UniversalModal({
                         isSalesList={isSalesList}
                     />
                 )
+            case 'oneSaleDebtPaymentsSupplier':
+                return <SupplierMiniSaleDebtPaymentCheck data={payment} type={'one'} />
             case 'oneSaleDebtPayments':
                 return <MiniSaleDebtPaymentCheck data={payment} type={'one'} />
             case 'allSaleDebtPayments':
@@ -260,17 +263,17 @@ function UniversalModal({
             isOpen={isOpen}
             style={
                 body === 'checkSell' ||
-                body === 'allChecks' ||
-                body === 'addMarket' ||
-                body === 'filterBranch'
-                    ? {...modalFull}
+                    body === 'allChecks' ||
+                    body === 'addMarket' ||
+                    body === 'filterBranch'
+                    ? { ...modalFull }
                     : body === 'exchanges'
-                    ? {content: {width: '70%'}}
-                    : body === 'approve' ||
-                      body === 'complete' ||
-                      body === 'requestconnection'
-                    ? {}
-                    : {...customStyles}
+                        ? { content: { width: '70%' } }
+                        : body === 'approve' ||
+                            body === 'complete' ||
+                            body === 'requestconnection'
+                            ? {}
+                            : { ...customStyles }
             }
             onRequestClose={closeModal || toggleModal}
             closeTimeoutMS={100}
@@ -288,7 +291,7 @@ function UniversalModal({
                         disablePayButton={disablePayButton}
                         loading={false}
                         onClick={payDebt}
-                        // onDoubleClick={onDoubleClick}
+                    // onDoubleClick={onDoubleClick}
                     />
                 </div>
             ) : null}

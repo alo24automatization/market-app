@@ -1,10 +1,10 @@
-import {IoPerson} from 'react-icons/io5'
-import {DiscountBtn, Payment, SaleBtn} from '../Buttons/SaleBtns.js'
-import {DiscountInput} from '../Inputs/DiscountInputs.js'
-import {useSelector} from 'react-redux'
+import { IoPerson } from 'react-icons/io5'
+import { DiscountBtn, Payment, SaleBtn } from '../Buttons/SaleBtns.js'
+import { DiscountInput } from '../Inputs/DiscountInputs.js'
+import { useSelector } from 'react-redux'
 import PaymentInput from './PaymentInput/PaymentInput.js'
-import {t} from 'i18next'
-import {useLocation} from 'react-router-dom'
+import { t } from 'i18next'
+import { useLocation } from 'react-router-dom'
 import Dates from '../Dates/Dates.js'
 
 function CustomerPayment({
@@ -69,8 +69,8 @@ function CustomerPayment({
                 )
             case 'mixed':
                 return [
-                    {label: t('Naqd'), key: 'cash', value: cash},
-                    {label: t('Plastik'), key: 'card', value: card},
+                    { label: t('Naqd'), key: 'cash', value: cash },
+                    { label: t('Plastik'), key: 'card', value: card },
                     {
                         label: t('O`tkazma'),
                         key: 'transfer',
@@ -100,14 +100,13 @@ function CustomerPayment({
                 )
         }
     }
-    const {currencyType} = useSelector((state) => state.currency)
+    const { currencyType } = useSelector((state) => state.currency)
     return (
         <section
-            className={`fixed transition-all left-0 top-0 right-0 bottom-0 overflow-hidden duration-200 ease-out bg-black-300 backdrop-blur-[3px] z-20 ${
-                active
+            className={`fixed transition-all left-0 top-0 right-0 bottom-0 overflow-hidden duration-200 ease-out bg-black-300 backdrop-blur-[3px] z-20 ${active
                     ? 'opacity-100 pointer-events-auto'
                     : 'opacity-0 pointer-events-none'
-            }`}
+                }`}
             onClick={togglePaymentModal}
         >
             <h3
@@ -118,9 +117,8 @@ function CustomerPayment({
                 {t('')}
             </h3>
             <div
-                className={`customerPay-head-style transition-all duration-200 ease-linear h-full overflow-auto absolute top-0 bottom-0 right-0 ${
-                    active ? 'translate-x-0' : 'translate-x-full'
-                }`}
+                className={`customerPay-head-style transition-all duration-200 ease-linear h-full overflow-auto absolute top-0 bottom-0 right-0 ${active ? 'translate-x-0' : 'translate-x-full'
+                    }`}
                 onClick={(e) => e.stopPropagation()}
                 autoFocus
             >
@@ -141,6 +139,7 @@ function CustomerPayment({
                         {!returned && defineLabel()}
                         {(location.pathname.includes('/kassa/debts') ||
                             location.pathname.includes('/qarzdorlar') ||
+                            location.pathname.includes('/yetkazuvchilar') ||
                             location.pathname.includes(
                                 '/maxsulotlar/qabul/qabulqilish'
                             ) ||
@@ -246,7 +245,7 @@ function CustomerPayment({
                                 ? handleClickPay
                                 : () => console.log('wait')
                         }
-                        // onDoubleClick={onDoubleClick}
+                    // onDoubleClick={onDoubleClick}
                     />
                 </div>
             </div>

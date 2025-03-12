@@ -552,6 +552,7 @@ function Table({
                         countPage={countPage}
                         Pay={Pay}
                         linkToProducts={linkToProducts}
+                        Print={Print}
                     />
                 )
             case 'suppliersproduct':

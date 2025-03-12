@@ -14,6 +14,7 @@ import { getIncomingConnectorsBySupplier } from './suppliersSlice'
 import { t } from 'i18next'
 import ExportBtn from '../../Components/Buttons/ExportBtn'
 import { map } from 'lodash'
+import SelectForm from '../../Components/Select/SelectForm'
 
 const SupplierReport = () => {
     const { id } = useParams()
@@ -62,6 +63,7 @@ const SupplierReport = () => {
     const [paidUzs, setPaidUzs] = useState(0)
     const [modalBody, setModalBody] = useState('approve')
     const [modalVisible, setModalVisible] = useState(false)
+    const [modalData, setModalData] = useState(false)
     const [exchangerate, setExchangerate] = useState(currency)
     const [saleComment, setSaleComment] = useState('')
     const [currentId, setCurrentId] = useState('')
@@ -374,6 +376,22 @@ const SupplierReport = () => {
         setSaleComment(e)
     }
 
+    const handleClickPrint = (saleconnector, key) => {
+        if (key === 'oneAllPay') {
+            setModalBody('oneSaleDebtPayments')
+            setModalData(saleconnector)
+            setModalVisible(!modalVisible)
+        } else {
+            setModalBody('allSaleDebtPayments')
+            let sales = [];
+            saleconnector.map(sale => {
+                sales.push(...sale.payments)
+            })
+            setModalData({ payments: sales.filter((item) => item.totalpriceuzs === undefined) })
+            setModalVisible(!modalVisible)
+        }
+    }
+
     const exportData = () => {
         let fileName = 'Yetkazuvchilar'
         const exportHeader = [
@@ -471,6 +489,9 @@ const SupplierReport = () => {
             title: t('Qarz')
         },
         {
+            title: t("Qarzdan to'lov")
+        },
+        {
             title: ''
         }
     ]
@@ -480,10 +501,10 @@ const SupplierReport = () => {
             <div className='mainPadding'>
                 <LinkToBack link={'/hamkorlar/yetkazuvchilar'} />
             </div>
-            <div className='flex items-center'>
+            <div className='flex items-center pl-2'>
+                <SelectForm key={'total_1'} onSelect={(e) => setCountPage(e.value)} />
                 <SearchForm
                     filterBy={['total', 'startDate', 'endDate']}
-                    filterByTotal={(e) => setCountPage(e.value)}
                     startDate={new Date(startDate)}
                     endDate={new Date(endDate)}
                     setStartDate={setStartDate}
@@ -508,6 +529,7 @@ const SupplierReport = () => {
                         countPage={countPage}
                         currency={currencyType}
                         headers={headers}
+                        Print={handleClickPrint}
                         data={currentData}
                         Pay={onClickPayDebt}
                     />
@@ -539,6 +561,7 @@ const SupplierReport = () => {
             <UniversalModal
                 body={modalBody}
                 isOpen={modalVisible}
+                payment={modalData}
                 headerText={'To\'lovni amalga oshirishni tasdiqlaysizmi ?'}
                 title={
                     'To\'lovni amalga oshirgach bu ma`lumotlarni o`zgaritirb bo`lmaydi !'

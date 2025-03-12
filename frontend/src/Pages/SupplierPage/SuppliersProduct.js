@@ -120,6 +120,9 @@ const SuppliersProduct = () => {
             title: t('Kelish narxi')
         },
         {
+            title: t('Kelish umumiy')
+        },
+        {
             title: t('Sotish narxi')
         }
     ]
