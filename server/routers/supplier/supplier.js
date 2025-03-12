@@ -291,7 +291,7 @@ module.exports.getSupplierReport = async (req, res) => {
     })
       .select('-isArchive -updatedAt -__v')
       .populate('supplier', 'name')
-      .populate('payments', 'totalprice totalpriceuzs payment paymentuzs')
+      .populate('payments', '-isArchive -updatedAt -__v')
       .populate('incoming', 'pieces');
 
     const response = connectors.map((connector) => {
@@ -306,6 +306,7 @@ module.exports.getSupplierReport = async (req, res) => {
         supplier: connector.supplier,
         createdAt: connector.createdAt,
         incoming: connector.incoming,
+        payments: connector.payments,
         total: connector.total,
         totaluzs: connector.totaluzs,
         totalpayment: totalpayment,
