@@ -3,6 +3,7 @@ import { map, uniqueId } from 'lodash'
 import { Route, Redirect, Navigate } from 'react-router-dom'
 import SmsApi from './EditProfile/SmsApi.js'
 import MessageLogs from './MessageLogs/MessageLogs.js'
+import Server from './Server/Server.js'
 // pages -->
 const SellersReport = lazy(() => import('./Seller/SellersReport.js'))
 const ProductReport = lazy(() => import('./ProductReport/ProductReport.js'))
@@ -376,6 +377,10 @@ const adminRoutes = [
     {
         path: '/maxsulotlar',
         element: <Barcode />
+    },
+    {
+        path: '/server',
+        element: <Server />
     },
     {
         path: '/shaxsiy/parol',

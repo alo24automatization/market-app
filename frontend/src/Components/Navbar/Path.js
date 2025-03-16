@@ -11,7 +11,7 @@ import {
     IoSettingsOutline,
     IoWallet,
 } from 'react-icons/io5'
-import { FaCashRegister, FaHandHoldingUsd, FaSms } from 'react-icons/fa'
+import { FaCashRegister, FaHandHoldingUsd, FaServer, FaSms } from 'react-icons/fa'
 import { t } from 'i18next'
 import { BiMessage } from 'react-icons/bi'
 const navListForDirector = [
@@ -287,6 +287,13 @@ export const navListForAdmin = [
         label: "Xabarlar",
         icon: <BiMessage size={'1.5rem'} />,
         path: 'xabarlar',
+        submenu: false,
+    },
+    {
+        id: 5,
+        label: "VPS Server",
+        icon: <FaServer size={'1.5rem'} />,
+        path: 'server',
         submenu: false,
     },
 ]
