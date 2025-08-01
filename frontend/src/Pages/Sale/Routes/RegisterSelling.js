@@ -1109,6 +1109,7 @@ const RegisterSelling = () => {
                 }))
             )
         } else {
+            console.log(clients)
             setOptionClient([
                 {
                     label: t('Tanlang'),
@@ -1705,12 +1706,13 @@ const RegisterSelling = () => {
     }, [packmans, t])
 
     useEffect(() => {
+        console.log(clients)
         setOptionClient([
             {
                 label: t('Barchasi'),
                 value: '',
             },
-            ...map([...clients], (client) => ({
+            ...map(clients.data || [], (client) => ({
                 value: client._id,
                 label: client.name,
                 saleconnectorid: client?.saleconnectorid || null,
