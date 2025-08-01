@@ -146,7 +146,7 @@ module.exports.getAll = async (req, res) => {
     }
 
     res.status(201).send({
-      data: clients,
+      clients,
       pagination: {
         current_page: page,
         total_pages: Math.ceil(totalCount / limit),
