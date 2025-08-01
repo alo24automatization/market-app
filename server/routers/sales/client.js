@@ -11,12 +11,9 @@ require("../../models/Sales/DailySaleConnector");
 require("../../models/Products/Productdata");
 require("../../models/Products/Product");
 require("../../models/Users");
-const { filter } = require("lodash/collection.js");
 const { regExpression } = require("../globalFunctions.js");
 const { DailySaleConnector } = require("../../models/Sales/DailySaleConnector");
 const { Debt } = require("../../models/Sales/Debt");
-const { all } = require("axios");
-const { Discount } = require("../../models/Sales/Discount");
 
 const reduce = (arr, el) =>
   arr.reduce((prev, item) => prev + (item[el] || 0), 0);
