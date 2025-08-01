@@ -122,11 +122,14 @@ module.exports.getAll = async (req, res) => {
             });
         }
 
+        console.time("clientsFromDB")
         const clients = await Client.find({ market })
             .select("name phoneNumber")
             .populate("packman", "name")
             .lean();
+        console.timeEnd("clientsFromDB")
 
+        console.time("saleconnector")
         if (clients.length > 0) {
             for (const client of clients) {
                 const saleconnector = await SaleConnector.find({
@@ -138,6 +141,7 @@ module.exports.getAll = async (req, res) => {
             }
         }
 
+        console.timeEnd("saleconnector")
         res.status(201).send(clients);
     } catch (error) {
         res.status(501).json({ error: "Serverda xatolik yuz berdi..." });
@@ -353,6 +357,7 @@ module.exports.paymentDebt = async (req, res) => {
         });
     }
 };
+
 module.exports.getClients = async (req, res) => {
     try {
         const { market, search, currentPage, countPage } = req.body;
