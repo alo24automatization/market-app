@@ -1706,7 +1706,6 @@ const RegisterSelling = () => {
     }, [packmans, t])
 
     useEffect(() => {
-        console.log(clients)
         setOptionClient([
             {
                 label: t('Barchasi'),
