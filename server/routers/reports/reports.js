@@ -741,6 +741,7 @@ module.exports.getPayment = async (req, res) => {
     res.status(400).json({ error: "Serverda xatolik yuz berdi..." });
   }
 };
+
 module.exports.getDebtsReport = async (req, res) => {
   try {
     const { market, startDate, endDate } = req.body;
@@ -751,6 +752,7 @@ module.exports.getDebtsReport = async (req, res) => {
         .json({ message: `Diqqat! Do'kon haqida malumotlar topilmadi!` });
     }
 
+    console.time("saleconnectors")
     const saleconnectors = await SaleConnector.find({
       market,
       createdAt: { $gte: startDate, $lte: endDate },
@@ -784,7 +786,9 @@ module.exports.getDebtsReport = async (req, res) => {
       .populate("dailyconnectors", "comment debt")
       .populate("packman", "name")
       .lean();
+    console.timeEnd("saleconnectors")
 
+    console.time("debtsreport")
     const debtsreport = saleconnectors
       .map((sale) => {
         const reduce = (arr, el) =>
@@ -828,7 +832,9 @@ module.exports.getDebtsReport = async (req, res) => {
         return { ...returnObj, saleconnectors: [returnObj] };
       })
       .filter((sale) => sale.debtuzs > 0);
+    console.timeEnd("debtsreport")
 
+    console.time("clientDebtMap")
     let clientDebtMap = new Map();
 
     debtsreport.forEach((sale) => {
@@ -855,7 +861,9 @@ module.exports.getDebtsReport = async (req, res) => {
         });
       }
     });
+    console.timeEnd("clientDebtMap")
 
+    console.time("updateDebtsReport")
     // Update each sale connector with the total debt for its client
     debtsreport.forEach((sale) => {
       if (sale.client && sale.client._id) {
@@ -869,7 +877,9 @@ module.exports.getDebtsReport = async (req, res) => {
         sale.saleconnectors = clientData.saleconnectors;
       }
     });
+    console.timeEnd("updateDebtsReport")
 
+    console.time("filterDebtsReport")
     // Filter out duplicate client reports
     const uniqueClientDebts = new Set();
     const filteredDebtsReport = debtsreport.filter((sale) => {
@@ -886,7 +896,8 @@ module.exports.getDebtsReport = async (req, res) => {
         return false;
       }
     });
-
+    console.timeEnd("filterDebtsReport")
+    
     res
       .status(201)
       .json({ data: filteredDebtsReport.filter((sale) => sale.debtuzs > 0) });
