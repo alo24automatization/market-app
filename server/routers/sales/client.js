@@ -140,7 +140,7 @@ module.exports.getAll = async (req, res) => {
           .sort({ createdAt: -1 })
           .take(1)
           .lean();
-          
+
         if (saleconnector.length > 0) {
           client.saleconnectorid = saleconnector[0]._id;
         }
@@ -156,6 +156,7 @@ module.exports.getAll = async (req, res) => {
       },
     });
   } catch (error) {
+    console.log(error);
     res.status(501).json({ error: "Serverda xatolik yuz berdi..." });
   }
 };
