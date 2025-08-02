@@ -54,6 +54,7 @@ const transferWarhouseProducts = async (products) => {
     await warhouseproduct.save();
   }
 };
+
 module.exports.register = async (req, res) => {
   const start = performance.now();
   start;
@@ -70,6 +71,7 @@ module.exports.register = async (req, res) => {
       comment,
     } = req.body;
     const marke = await Market.findById(market);
+
     if (!marke) {
       return res.status(400).json({
         message: `Diqqat! Do'kon haqida malumotlar topilmadi!`,
@@ -366,6 +368,7 @@ module.exports.register = async (req, res) => {
     let filteredProductsSale = [];
     let totaldebtuzs = 0;
 
+    console.time("saleproduct");
     const [connector, saleconnectors] = await Promise.all([
       DailySaleConnector.findById(dailysaleconnector._id)
         .select("-isArchive -updatedAt -market -__v")
@@ -461,6 +464,7 @@ module.exports.register = async (req, res) => {
         .populate("dailyconnectors", "comment ")
         .lean(),
     ]);
+    console.timeEnd("saleproduct");
 
     // NEW ======================================
     // console.log('========================');
@@ -468,11 +472,13 @@ module.exports.register = async (req, res) => {
 
     const connectorIds = saleconnectors.map((connector) => connector._id);
 
+    console.time("saleproduct2");
     const [allProducts, allPayments, allDiscounts] = await Promise.all([
       SaleProduct.find({ saleconnector: { $in: connectorIds } }).lean(),
       Payment.find({ saleconnector: { $in: connectorIds } }).lean(),
       Discount.find({ saleconnector: { $in: connectorIds } }).lean(),
     ]);
+    console.timeEnd("saleproduct2");
 
     const productsByConnector = {};
     allProducts.forEach((product) => {
@@ -887,6 +893,7 @@ module.exports.addproducts = async (req, res) => {
       .json({ error: "Serverda xatolik yuz berdi...", message: error.message });
   }
 };
+
 const sendMessageToClientAboutHisDebt = async (
   client,
   debtUzs,
