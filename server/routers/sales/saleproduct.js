@@ -408,60 +408,60 @@ module.exports.register = async (req, res) => {
       })
         .select("-isArchive -market -__v")
         .sort({ updatedAt: -1 })
-        .populate("debts")
-        .populate({
-          path: "products",
-          select: "user",
-          populate: {
-            path: "user",
-            select: "firstname lastname",
-          },
-        })
-        .populate({
-          path: "products",
-          select: "product",
-          populate: {
-            path: "product",
-            select: "category",
-            populate: { path: "category", select: "code" },
-          },
-        })
-        .populate({
-          path: "products",
-          select:
-            "totalprice  unitprice totalpriceuzs unitpriceuzs pieces createdAt discount saleproducts product fromFilial",
-          options: { sort: { createdAt: -1 } },
-          populate: {
-            path: "product",
-            select: "productdata",
-            populate: {
-              path: "productdata",
-              select: "name code", // match: {name: product}
-            },
-          },
-        })
-        .populate({
-          path: "products",
-          select:
-            "totalprice  priceFromLengthAmout lengthAmout sizePrice forWhat more_parameters1 more_parameters2 unitprice totalpriceuzs unitpriceuzs pieces createdAt discount saleproducts product fromFilial",
-          options: { sort: { createdAt: -1 } },
-          populate: {
-            path: "saleproducts",
-            select: "pieces totalprice totalpriceuzs",
-          },
-        })
-        .populate(
-          "payments",
-          "payment paymentuzs comment totalprice totalpriceuzs createdAt cash cashuzs card carduzs transfer transferuzs"
-        )
-        .populate(
-          "discounts",
-          "discount discountuzs createdAt procient products totalprice totalpriceuzs"
-        )
-        .populate({ path: "client", select: "name phoneNumber" })
-        .populate("packman", "name")
-        .populate("user", "firstname lastname")
-        .populate("dailyconnectors", "comment ")
+        // .populate("debts")
+        // .populate({
+        //   path: "products",
+        //   select: "user",
+        //   populate: {
+        //     path: "user",
+        //     select: "firstname lastname",
+        //   },
+        // })
+        // .populate({
+        //   path: "products",
+        //   select: "product",
+        //   populate: {
+        //     path: "product",
+        //     select: "category",
+        //     populate: { path: "category", select: "code" },
+        //   },
+        // })
+        // .populate({
+        //   path: "products",
+        //   select:
+        //     "totalprice  unitprice totalpriceuzs unitpriceuzs pieces createdAt discount saleproducts product fromFilial",
+        //   options: { sort: { createdAt: -1 } },
+        //   populate: {
+        //     path: "product",
+        //     select: "productdata",
+        //     populate: {
+        //       path: "productdata",
+        //       select: "name code", // match: {name: product}
+        //     },
+        //   },
+        // })
+        // .populate({
+        //   path: "products",
+        //   select:
+        //     "totalprice  priceFromLengthAmout lengthAmout sizePrice forWhat more_parameters1 more_parameters2 unitprice totalpriceuzs unitpriceuzs pieces createdAt discount saleproducts product fromFilial",
+        //   options: { sort: { createdAt: -1 } },
+        //   populate: {
+        //     path: "saleproducts",
+        //     select: "pieces totalprice totalpriceuzs",
+        //   },
+        // })
+        // .populate(
+        //   "payments",
+        //   "payment paymentuzs comment totalprice totalpriceuzs createdAt cash cashuzs card carduzs transfer transferuzs"
+        // )
+        // .populate(
+        //   "discounts",
+        //   "discount discountuzs createdAt procient products totalprice totalpriceuzs"
+        // )
+        // .populate({ path: "client", select: "name phoneNumber" })
+        // .populate("packman", "name")
+        // .populate("user", "firstname lastname")
+        // .populate("dailyconnectors", "comment ")
         .lean(),
     ]);
     console.timeEnd("saleproduct");
