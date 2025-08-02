@@ -138,7 +138,7 @@ module.exports.getAll = async (req, res) => {
         })
           .select("_id")
           .sort({ createdAt: -1 })
-          .take(1)
+          .limit(1)
           .lean();
 
         if (saleconnector.length > 0) {
