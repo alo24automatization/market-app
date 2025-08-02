@@ -1711,7 +1711,7 @@ const RegisterSelling = () => {
                 label: t('Barchasi'),
                 value: '',
             },
-            ...map(clients.data || [], (client) => ({
+            ...map(clients.clients || [], (client) => ({
                 value: client._id,
                 label: client.name,
                 saleconnectorid: client?.saleconnectorid || null,

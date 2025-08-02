@@ -123,8 +123,8 @@ module.exports.getAll = async (req, res) => {
 
     const [clients, totalCount] = await Promise.all([
       Client.find({ market })
-        .skip((Number(page) - 1) * Number(limit))
-        .limit(Number(limit))
+        // .skip((Number(page) - 1) * Number(limit))
+        // .limit(Number(limit))
         .select("name phoneNumber")
         .populate("packman", "name")
         .lean(),
@@ -135,7 +135,12 @@ module.exports.getAll = async (req, res) => {
       for (const client of clients) {
         const saleconnector = await SaleConnector.find({
           client: client._id,
-        }).sort({ createdAt: -1 });
+        })
+          .select("_id")
+          .sort({ createdAt: -1 })
+          .take(1)
+          .lean();
+          
         if (saleconnector.length > 0) {
           client.saleconnectorid = saleconnector[0]._id;
         }
