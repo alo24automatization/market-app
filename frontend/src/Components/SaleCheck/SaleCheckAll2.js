@@ -1,7 +1,7 @@
-import React, { forwardRef } from 'react'
-import { map, uniqueId } from 'lodash'
-import { useSelector } from 'react-redux'
-import { t } from 'i18next'
+import React, {forwardRef} from 'react'
+import {map, uniqueId} from 'lodash'
+import {useSelector} from 'react-redux'
+import {t} from 'i18next'
 
 export const SaleCheckAll2 = forwardRef((props, ref) => {
     const {
@@ -15,18 +15,18 @@ export const SaleCheckAll2 = forwardRef((props, ref) => {
         userInfo,
         totalOfBackAndDebt
     } = props;
-    const { market } = useSelector((state) => state.login)
-    const { currencyType } = useSelector((state) => state.currency)
+    const {market} = useSelector((state) => state.login)
+    const {currencyType} = useSelector((state) => state.currency)
     const calculateAllSum = (data) => {
         return data
             ? data.reduce((acc, pr) => {
                 return (
                     acc +
                     pr[
-                    currencyType === 'USD'
-                        ? 'totalprice'
-                        : 'totalpriceuzs'
-                    ]
+                        currencyType === 'USD'
+                            ? 'totalprice'
+                            : 'totalpriceuzs'
+                        ]
                 )
             }, 0)
             : 0
@@ -106,7 +106,7 @@ export const SaleCheckAll2 = forwardRef((props, ref) => {
                     </li>
                 </ul>
                 <div>
-                    <img className='w-[200px]' src={market?.image} alt='logo' />
+                    <img className='w-[200px]' src={market?.image} alt='logo'/>
                 </div>
                 <div className='check-ul-li flex-col'>
                     <div className={'grow text-center'}>
@@ -143,63 +143,66 @@ export const SaleCheckAll2 = forwardRef((props, ref) => {
                                             {item?.product?.productdata?.name}
                                         </div>
                                         {item?.forWhat !== "" || item.forWhat ?
-                                            <div className='flex justify-between text-[12px] border  border-b-0 !text-black-900 p-1 pr-3 border-slate-400'>
+                                            <div
+                                                className='flex justify-between text-[12px] border  border-b-0 !text-black-900 p-1 pr-3 border-slate-400'>
                                                 <b>{item?.forWhat}</b> {" "}
                                                 <b>{item?.pieces}</b> {" "}
                                             </div> : null
                                         }
-                                        <table className='border-collapse border border-slate-400 w-full break-inside-auto'>
+                                        <table
+                                            className='border-collapse border border-slate-400 w-full break-inside-auto'>
                                             <thead>
-                                                <tr
-                                                    className={
-                                                        'break-inside-avoid break-after-auto'
-                                                    }
-                                                >
-                                                    <th className='check-table-rtr'>
-                                                        {t('O`lchami')}
-                                                    </th>
-                                                    <th className='check-table-rtr'>
-                                                        {t('Uzunligi')}
-                                                    </th>
-                                                    <th className='check-table-rtr'>
-                                                        {t('Narxi')}
-                                                    </th>
-                                                </tr>
+                                            <tr
+                                                className={
+                                                    'break-inside-avoid break-after-auto'
+                                                }
+                                            >
+                                                <th className='check-table-rtr'>
+                                                    {t('O`lchami')}
+                                                </th>
+                                                <th className='check-table-rtr'>
+                                                    {t('Uzunligi')}
+                                                </th>
+                                                <th className='check-table-rtr'>
+                                                    {t('Narxi')}
+                                                </th>
+                                            </tr>
                                             </thead>
                                             <tbody>
-                                                <tr>
+                                            <tr>
 
-                                                    <td className='check-table-body text-center'>
-                                                        {
-                                                            item
-                                                                .more_parameters1
-                                                                ?.size
-                                                        }{" "}
-                                                    </td>
-                                                    <td className='check-table-body text-center'>
-                                                        {
-                                                            item
-                                                                .more_parameters1
-                                                                ?.length
-                                                        }
-                                                    </td>
-                                                    <td className='check-table-body text-center'>
-                                                        {
-                                                            currencyType === 'USD'
-                                                                ? item?.sizePrice?.toLocaleString(
-                                                                    'ru-Ru'
-                                                                )
-                                                                : item?.sizePrice?.toLocaleString(
-                                                                    'ru-Ru'
-                                                                )
-                                                        }
-                                                        {currencyType}
-                                                    </td>
-                                                </tr>
+                                                <td className='check-table-body text-center'>
+                                                    {
+                                                        item
+                                                            .more_parameters1
+                                                            ?.size
+                                                    }{" "}
+                                                </td>
+                                                <td className='check-table-body text-center'>
+                                                    {
+                                                        item
+                                                            .more_parameters1
+                                                            ?.length
+                                                    }
+                                                </td>
+                                                <td className='check-table-body text-center'>
+                                                    {
+                                                        currencyType === 'USD'
+                                                            ? item?.sizePrice?.toLocaleString(
+                                                                'ru-Ru'
+                                                            )
+                                                            : item?.sizePrice?.toLocaleString(
+                                                                'ru-Ru'
+                                                            )
+                                                    }
+                                                    {currencyType}
+                                                </td>
+                                            </tr>
                                             </tbody>
                                         </table>
-                                        <div className='text-end text-[12px] border font-bold border-t-0 !text-black-900 p-1 pr-3 border-slate-400'>
-                                            Umumiy: {item?.more_parameters1?.length}  *{' '}
+                                        <div
+                                            className='text-end text-[12px] border font-bold border-t-0 !text-black-900 p-1 pr-3 border-slate-400'>
+                                            Umumiy: {item?.more_parameters1?.length} *{' '}
                                             {currencyType === 'USD'
                                                 ? item?.[item?.sizePrice === "" || item?.sizePrice === undefined ? "unitprice" : "sizePrice"]?.toLocaleString(
                                                     'ru-Ru'
@@ -227,48 +230,49 @@ export const SaleCheckAll2 = forwardRef((props, ref) => {
                                     </div>
                                     <table className='border-collapse border border-slate-400 w-full break-inside-auto'>
                                         <thead>
-                                            <tr
-                                                className={
-                                                    'break-inside-avoid break-after-auto'
-                                                }
-                                            >
-                                                <th className='check-table-rtr'>
-                                                    {t("O`lcham")}
-                                                </th>
-                                                <th className='check-table-rtr'>
-                                                    {t('Soni')}
-                                                </th>
-                                                <th className='check-table-rtr'>
-                                                    {t('Umumiy')}
-                                                </th>
-                                            </tr>
+                                        <tr
+                                            className={
+                                                'break-inside-avoid break-after-auto'
+                                            }
+                                        >
+                                            <th className='check-table-rtr'>
+                                                {t("O`lcham")}
+                                            </th>
+                                            <th className='check-table-rtr'>
+                                                {t('Soni')}
+                                            </th>
+                                            <th className='check-table-rtr'>
+                                                {t('Umumiy')}
+                                            </th>
+                                        </tr>
                                         </thead>
                                         <tbody>
-                                            {
-                                                item.more_parameters2.map((column) => <tr>
-                                                    <td className='check-table-body text-center'>
-                                                        {
-                                                            column.col1
-                                                        }
-                                                    </td>
-                                                    <td className='check-table-body text-center'>
-                                                        {
-                                                            column.col2
-                                                        }
-                                                    </td>
-                                                    <td className='check-table-body text-center'>
-                                                        {
-                                                            column.result
-                                                        }
-                                                    </td>
-                                                </tr>)
-                                            }
+                                        {
+                                            item.more_parameters2.map((column) => <tr>
+                                                <td className='check-table-body text-center'>
+                                                    {
+                                                        column.col1
+                                                    }
+                                                </td>
+                                                <td className='check-table-body text-center'>
+                                                    {
+                                                        column.col2
+                                                    }
+                                                </td>
+                                                <td className='check-table-body text-center'>
+                                                    {
+                                                        column.result
+                                                    }
+                                                </td>
+                                            </tr>)
+                                        }
                                         </tbody>
                                     </table>
-                                    <div className='text-end text-[12px] border border-t-0 !text-black-900 p-1 pr-3 font-bold border-slate-400'>
+                                    <div
+                                        className='text-end text-[12px] border border-t-0 !text-black-900 p-1 pr-3 font-bold border-slate-400'>
                                         {t("Umumiy")}: {item.more_parameters2.reduce((el, prev) => {
-                                            return el + prev.result
-                                        }, 0)}
+                                        return el + prev.result
+                                    }, 0)}
                                     </div>
                                     <div className='text-end mt-4 font-bold'>
                                         <h1>{item.more_parameters2.reduce((el, prev) => {
@@ -304,82 +308,83 @@ export const SaleCheckAll2 = forwardRef((props, ref) => {
                             item.more_parameters2.length === 0) &&
                         <table className='border-collapse border border-slate-400 w-full mt-2'>
                             <thead>
-                                <tr>
-                                    <td className='check-table-rtr'>№</td>
-                                    <td className='check-table-rtr'>{t('Sana')}</td>
-                                    <td className='check-table-rtr'>{t('Kodi')}</td>
-                                    <td className='check-table-rtr'>{t('Maxsulot')}</td>
-                                    <td className='check-table-rtr'>{t('Soni')}</td>
-                                    {selled.some(el => el.fromFilial > 0) &&
-                                        <td style={{ backgroundColor: 'grey' }} className='check-table-rtr'>{t('Ombordan')}</td>}
-                                    <td className='check-table-rtr'>{t('Narxi')}({t('Dona')})</td>
-                                    <td className='check-table-rtr'>{t('Jami')}</td>
-                                    <td className='check-table-rtr'>{t('Sotuvchi')}</td>
-                                </tr>
+                            <tr>
+                                <td className='check-table-rtr'>№</td>
+                                <td className='check-table-rtr'>{t('Sana')}</td>
+                                <td className='check-table-rtr'>{t('Kodi')}</td>
+                                <td className='check-table-rtr'>{t('Maxsulot')}</td>
+                                <td className='check-table-rtr'>{t('Soni')}</td>
+                                {selled.some(el => el.fromFilial > 0) &&
+                                    <td style={{backgroundColor: 'grey'}}
+                                        className='check-table-rtr'>{t('Ombordan')}</td>}
+                                <td className='check-table-rtr'>{t('Narxi')}({t('Dona')})</td>
+                                <td className='check-table-rtr'>{t('Jami')}</td>
+                                <td className='check-table-rtr'>{t('Sotuvchi')}</td>
+                            </tr>
                             </thead>
                             <tbody>
-                                {map([...selled].sort((a, b) => Number(a?.product?.category?.code) - Number(b?.product?.category?.code)), (item, index) => {
-                                    if (
-                                        item.more_parameters1.length == 0 &&
-                                        item.more_parameters1.size == 0 &&
-                                        item.more_parameters1.piece == 0 &&
-                                        item.more_parameters2.length === 0
-                                    ) {
-                                        return (
-                                            <tr key={uniqueId('selled-row')}>
-                                                <td className='p-1 border text-center text-[0.875rem] font-bold'>
-                                                    {index + 1}
-                                                </td>
-                                                <td className='check-table-body'>
-                                                    {new Date(
-                                                        item?.createdAt
-                                                    ).toLocaleDateString()}
-                                                </td>
-                                                <td className='check-table-body text-center'>
-                                                    {item?.product?.category?.code} {item?.product?.productdata?.code}
-                                                </td>
-                                                <td className='check-table-body text-start'>
-                                                    {item?.product?.productdata?.name}
-                                                </td>
-                                                <td className='check-table-body'>
-                                                    {item?.pieces}
-                                                </td>
-                                                {selled.some(el => el.fromFilial > 0) &&
-                                                    <td style={{ backgroundColor: item?.fromFilial ? 'grey' : 'white' }}
-                                                        className='check-table-body'>
-                                                        {item?.fromFilial}
-                                                    </td>}
-                                                <td className='check-table-body'>
-                                                    {currencyType === 'USD'
-                                                        ? item?.unitprice.toLocaleString(
-                                                            'ru-Ru'
-                                                        )
-                                                        : item?.unitpriceuzs.toLocaleString(
-                                                            'ru-Ru'
-                                                        )}{' '}
-                                                    {currencyType}
-                                                </td>
-                                                <td className='check-table-body'>
-                                                    {currencyType === 'USD'
-                                                        ? item?.totalprice.toLocaleString(
-                                                            'ru-Ru'
-                                                        )
-                                                        : item?.totalpriceuzs.toLocaleString(
-                                                            'ru-Ru'
-                                                        )}{' '}
-                                                    {currencyType}
-                                                </td>
-                                                <td className='check-table-body'>
-                                                    {item?.user
-                                                        ? item.user.firstname +
-                                                        ' ' +
-                                                        item.user.lastname[0]
-                                                        : ''}
-                                                </td>
-                                            </tr>
-                                        )
-                                    }
-                                })}
+                            {map([...selled].sort((a, b) => Number(a?.product?.category?.code) - Number(b?.product?.category?.code)), (item, index) => {
+                                if (
+                                    item.more_parameters1.length == 0 &&
+                                    item.more_parameters1.size == 0 &&
+                                    item.more_parameters1.piece == 0 &&
+                                    item.more_parameters2.length === 0
+                                ) {
+                                    return (
+                                        <tr key={uniqueId('selled-row')}>
+                                            <td className='p-1 border text-center text-[0.875rem] font-bold'>
+                                                {index + 1}
+                                            </td>
+                                            <td className='check-table-body'>
+                                                {new Date(
+                                                    item?.createdAt
+                                                ).toLocaleDateString()}
+                                            </td>
+                                            <td className='check-table-body text-center'>
+                                                {item?.product?.category?.code} {item?.product?.productdata?.code}
+                                            </td>
+                                            <td className='check-table-body text-start'>
+                                                {item?.product?.productdata?.name}
+                                            </td>
+                                            <td className='check-table-body'>
+                                                {item?.pieces}{' '}{item?.isMetr ? 'm' : ""}
+                                            </td>
+                                            {selled.some(el => el.fromFilial > 0) &&
+                                                <td style={{backgroundColor: item?.fromFilial ? 'grey' : 'white'}}
+                                                    className='check-table-body'>
+                                                    {item?.fromFilial}
+                                                </td>}
+                                            <td className='check-table-body'>
+                                                {currencyType === 'USD'
+                                                    ? item?.unitprice.toLocaleString(
+                                                        'ru-Ru'
+                                                    )
+                                                    : item?.unitpriceuzs.toLocaleString(
+                                                        'ru-Ru'
+                                                    )}{' '}
+                                                {currencyType}
+                                            </td>
+                                            <td className='check-table-body'>
+                                                {currencyType === 'USD'
+                                                    ? item?.totalprice.toLocaleString(
+                                                        'ru-Ru'
+                                                    )
+                                                    : item?.totalpriceuzs.toLocaleString(
+                                                        'ru-Ru'
+                                                    )}{' '}
+                                                {currencyType}
+                                            </td>
+                                            <td className='check-table-body'>
+                                                {item?.user
+                                                    ? item.user.firstname +
+                                                    ' ' +
+                                                    item.user.lastname[0]
+                                                    : ''}
+                                            </td>
+                                        </tr>
+                                    )
+                                }
+                            })}
                             </tbody>
                         </table>
                     }
@@ -410,70 +415,70 @@ export const SaleCheckAll2 = forwardRef((props, ref) => {
                         </h3>
                         <table className='border-collapse border border-slate-400 w-full'>
                             <thead>
-                                <tr>
-                                    <td className='check-table-rtr'>№</td>
-                                    <td className='check-table-rtr'>{t('Sana')}</td>
-                                    <td className='check-table-rtr'>{t('Kodi')}</td>
-                                    <td className='check-table-rtr'>
-                                        {t('Maxsulot')}
-                                    </td>
-                                    <td className='check-table-rtr'>{t('Soni')}</td>
-                                    <td className='check-table-rtr'>
-                                        {t('Narxi')}({t('Dona')})
-                                    </td>
-                                    <td className='check-table-rtr'>{t('Jami')}</td>
-                                </tr>
+                            <tr>
+                                <td className='check-table-rtr'>№</td>
+                                <td className='check-table-rtr'>{t('Sana')}</td>
+                                <td className='check-table-rtr'>{t('Kodi')}</td>
+                                <td className='check-table-rtr'>
+                                    {t('Maxsulot')}
+                                </td>
+                                <td className='check-table-rtr'>{t('Soni')}</td>
+                                <td className='check-table-rtr'>
+                                    {t('Narxi')}({t('Dona')})
+                                </td>
+                                <td className='check-table-rtr'>{t('Jami')}</td>
+                            </tr>
                             </thead>
                             <tbody>
-                                {map(returned, (item, index) => {
-                                    return (
-                                        <tr key={uniqueId('selled-row')}>
-                                            <td className='p-1 border text-center text-[0.875rem] font-bold'>
-                                                {index + 1}
-                                            </td>
-                                            <td className='check-table-body'>
-                                                {new Date(
-                                                    item?.createdAt
-                                                ).toLocaleDateString()}
-                                            </td>
-                                            <td className='check-table-body'>
-                                                {
-                                                    item?.product?.productdata
-                                                        ?.code
-                                                }
-                                            </td>
-                                            <td className='check-table-body'>
-                                                {
-                                                    item?.product?.productdata
-                                                        ?.name
-                                                }
-                                            </td>
-                                            <td className='check-table-body'>
-                                                {item?.pieces}
-                                            </td>
-                                            <td className='check-table-body'>
-                                                {currencyType === 'USD'
-                                                    ? item?.unitprice.toLocaleString(
-                                                        'ru-Ru'
-                                                    )
-                                                    : item?.unitpriceuzs.toLocaleString(
-                                                        'ru-Ru'
-                                                    )}{' '}
-                                                {currencyType}
-                                            </td>
-                                            <td className='check-table-body'>
-                                                {currencyType === 'USD'
-                                                    ? item?.totalprice.toLocaleString(
-                                                        'ru-Ru'
-                                                    )
-                                                    : item?.totalpriceuzs.toLocaleString(
-                                                        'ru-Ru'
-                                                    )}{' '}
-                                                {currencyType}
-                                            </td>
-                                        </tr>
-                                    )
-                                })}
+                            {map(returned, (item, index) => {
+                                return (
+                                    <tr key={uniqueId('selled-row')}>
+                                        <td className='p-1 border text-center text-[0.875rem] font-bold'>
+                                            {index + 1}
+                                        </td>
+                                        <td className='check-table-body'>
+                                            {new Date(
+                                                item?.createdAt
+                                            ).toLocaleDateString()}
+                                        </td>
+                                        <td className='check-table-body'>
+                                            {
+                                                item?.product?.productdata
+                                                    ?.code
+                                            }
+                                        </td>
+                                        <td className='check-table-body'>
+                                            {
+                                                item?.product?.productdata
+                                                    ?.name
+                                            }
+                                        </td>
+                                        <td className='check-table-body'>
+                                            {item?.pieces}
+                                        </td>
+                                        <td className='check-table-body'>
+                                            {currencyType === 'USD'
+                                                ? item?.unitprice.toLocaleString(
+                                                    'ru-Ru'
+                                                )
+                                                : item?.unitpriceuzs.toLocaleString(
+                                                    'ru-Ru'
+                                                )}{' '}
+                                            {currencyType}
+                                        </td>
+                                        <td className='check-table-body'>
+                                            {currencyType === 'USD'
+                                                ? item?.totalprice.toLocaleString(
+                                                    'ru-Ru'
+                                                )
+                                                : item?.totalpriceuzs.toLocaleString(
+                                                    'ru-Ru'
+                                                )}{' '}
+                                            {currencyType}
+                                        </td>
+                                    </tr>
+                                )
+                            })}
                             </tbody>
                         </table>
                     </div>
@@ -525,7 +530,7 @@ export const SaleCheckAll2 = forwardRef((props, ref) => {
                     </span>
                 </li>
                 <li className='text-black-900 check-ul-li-foot'
-                style={{display:returned?.length>0?"flex":"none"}}
+                    style={{display: returned?.length > 0 ? "flex" : "none"}}
                 >
                     {' '}
                     {t("Qarzdan qaytarilganlar")}:{' '}

@@ -1,7 +1,6 @@
 {
-  "PORT": 8801,
-  "mongoUriONLINE": "-",
-  "mongoUri": "mongodb://localhost:27017/system_db",
+  "PORT": 8800,
+  "mongoUri": "mongodb://localhost:27017/market",
   "jwtSecret": "market",
   "baseUrl": "http://localhost:8801"
 }

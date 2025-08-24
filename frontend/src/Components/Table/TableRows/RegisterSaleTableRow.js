@@ -1,24 +1,24 @@
-import React, { useEffect, useState } from 'react'
+import React, {useEffect, useState} from 'react'
 import TableBtn from '../../Buttons/TableBtn'
 import TableInput from '../../Inputs/TableInput'
-import { filter, map } from 'lodash'
-import { IoAdd, IoEye, IoEyeOff, IoRemove } from 'react-icons/io5'
-import { useSelector } from 'react-redux'
-import { t } from 'i18next'
+import {filter, map} from 'lodash'
+import {IoAdd, IoEye, IoEyeOff, IoRemove} from 'react-icons/io5'
+import {useSelector} from 'react-redux'
+import {t} from 'i18next'
 
 export const RegisterSaleTableRow = ({
-    data,
-    Delete,
-    changeHandler,
-    currency,
-    increment,
-    decrement,
-    lowUnitpriceProducts,
-    wholeSale,
-    productId,
-    productModal,
-    handleClickProduct
-}) => {
+                                         data,
+                                         Delete,
+                                         changeHandler,
+                                         currency,
+                                         increment,
+                                         decrement,
+                                         lowUnitpriceProducts,
+                                         wholeSale,
+                                         productId,
+                                         productModal,
+                                         handleClickProduct
+                                     }) => {
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
     useEffect(() => {
         const handleResize = () => {
@@ -31,8 +31,8 @@ export const RegisterSaleTableRow = ({
             window.removeEventListener('resize', handleResize)
         }
     }, [])
-    const { filials } = useSelector((state) => state.registerSelling)
-    const { market } = useSelector((state) => state.login)
+    const {filials} = useSelector((state) => state.registerSelling)
+    const {market} = useSelector((state) => state.login)
     const [showIncomingPrice, setShowIncomingPrice] = useState([])
     const changeShow = (i) => {
         const price = [...showIncomingPrice]
@@ -47,15 +47,35 @@ export const RegisterSaleTableRow = ({
             {map(data, (product, index) =>
                 !isMobile ? (
                     <tr
-                        className={`tr ${product?.minimumcount>= product.filialProductsTotal ? 'bg-error-300' : ''} ${filter(
+                        className={`tr ${product?.minimumcount >= product.filialProductsTotal ? 'bg-error-300' : ''} ${filter(
                             lowUnitpriceProducts,
                             (id) => id === product.product._id
                         ).length > 0
                             ? 'bg-warning-300'
                             : ''
-                            }`}
+                        }`}
                         key={'salerow-' + index + 1}
                     >
+                        {product.metrOfProduct && <td className='text-left td'>
+                            <div className={'flex justify-end items-start'}>
+                                <div className='checkbox-card sale-toggle-container'>
+                                    <p className={'toggleText'}>
+                                        {t('Metrda')} :
+                                    </p>
+                                    <input
+                                        type='checkbox'
+                                        checked={product.isMetr}
+                                        onChange={(e) =>
+                                            changeHandler(
+                                                product.product._id,
+                                                e.target.checked,
+                                                'metr'
+                                            )
+                                        }
+                                    />
+                                </div>
+                            </div>
+                        </td>}
                         <td className='text-left td'>{index + 1}</td>
                         {filials.length > 1 && (
                             <td className='td w-[100px]'>
@@ -66,9 +86,9 @@ export const RegisterSaleTableRow = ({
                                             {
                                                 filial: e.target.value,
                                                 productcode:
-                                                    product.product.code,
+                                                product.product.code,
                                                 categorycode:
-                                                    product.categorycode,
+                                                product.categorycode,
                                             },
                                             'select'
                                         )
@@ -97,7 +117,7 @@ export const RegisterSaleTableRow = ({
                                             : 'red',
                                 }}
                             >
-                                {product?.filialProductsTotal}
+                                {product?.isMetr ? product?.totalMetrOfProduct : product?.filialProductsTotal}
                             </span>
                         </td>
                         <td
@@ -116,7 +136,7 @@ export const RegisterSaleTableRow = ({
                                         decrement(product.product._id)
                                     }
                                 >
-                                    <IoRemove size={'0.875rem'} />
+                                    <IoRemove size={'0.875rem'}/>
                                 </button>
                                 <TableInput
                                     value={product.lengthAmout === undefined || product.lengthAmout === "" ? product.pieces : product.lengthAmout}
@@ -137,7 +157,7 @@ export const RegisterSaleTableRow = ({
                                         increment(product.product._id)
                                     }
                                 >
-                                    <IoAdd size={'0.875rem'} />
+                                    <IoAdd size={'0.875rem'}/>
                                 </button>
                             </span>
                         </td>
@@ -207,21 +227,14 @@ export const RegisterSaleTableRow = ({
                             <div className='flex justify-between'>
                                 <button onClick={() => changeShow(index)}>
                                     {showIncomingPrice[index] ? (
-                                        <IoEye />
+                                        <IoEye/>
                                     ) : (
-                                        <IoEyeOff />
+                                        <IoEyeOff/>
                                     )}
                                 </button>
                                 <span className='min-w-fit'>
                                     {showIncomingPrice[index]
-                                        ? currency === 'UZS'
-                                            ? product.incomingpriceuzs.toLocaleString(
-                                                'ru-Ru'
-                                            ) + ' UZS'
-                                            : product.incomingprice.toLocaleString(
-                                                'ru-Ru'
-                                            ) + ' USD'
-                                        : ''}
+                                        ? (product?.isMetr ? product?.metrIncPriceOfProduct : product?.incomingpriceuzs) : ''}
                                 </span>
                             </div>
                         </td>

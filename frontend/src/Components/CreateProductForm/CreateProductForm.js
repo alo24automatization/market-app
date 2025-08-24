@@ -3,48 +3,51 @@ import Button from '../Buttons/BtnAddRemove'
 import {useTranslation} from 'react-i18next'
 
 function CreateProductForm({
-    searchBarcode,
-    stickyForm,
-    handleChangeCodeOfProduct,
-    codeOfProduct,
-    handleChangeNameOfProduct,
-    nameOfProduct,
-    numberOfProduct,
-    handleChangeNumberOfProduct,
-    handleChangeProductHeight,
-    productHeight,
-    unitOfProduct,
-    handleChangeUnitOfProduct,
-    handleChangePriceOfProduct,
-    priceOfProduct,
-    sellingPriceOfProduct,
-    handleChangeSellingPriceOfProduct,
-    handleEdit,
-    addNewProduct,
-    clearForm,
-    pageName,
-    unitOptions,
-    categoryOfProduct,
-    categoryOptions,
-    handleChangeCategoryOfProduct,
-    checkOfProduct,
-    handleChangeCheckOfProduct,
-    tradePrice,
-    handleChangeTradePrice,
-    minimumCount,
-    handleChangeMinimumCount,
-    sellingPriceOfProcient,
-    handleChangeSellingPriceOfProcient,
-    handleChangeTradePriceProcient,
-    tradePriceProcient,
-    productWidth,
-    handleChangeProductWidth
-}) {
+                               searchBarcode,
+                               stickyForm,
+                               handleChangeCodeOfProduct,
+                               codeOfProduct,
+                               handleChangeNameOfProduct,
+                               nameOfProduct,
+                               metrOfProduct,
+                               numberOfProduct,
+                               totalMetrOfProduct,
+                               handleChangeNumberOfProduct,
+                               handleMetrOfProduct,
+                               metrPriceOfProduct,
+                               handleMetrPriceOfProduct,
+                               unitOfProduct,
+                               handleChangeUnitOfProduct,
+                               handleChangePriceOfProduct,
+                               priceOfProduct,
+                               sellingPriceOfProduct,
+                               handleChangeSellingPriceOfProduct,
+                               handleEdit,
+                               addNewProduct,
+                               clearForm,
+                               pageName,
+                               unitOptions,
+                               categoryOfProduct,
+                               categoryOptions,
+                               handleChangeCategoryOfProduct,
+                               checkOfProduct,
+                               handleChangeCheckOfProduct,
+                               tradePrice,
+                               handleChangeTradePrice,
+                               minimumCount,
+                               handleChangeMinimumCount,
+                               sellingPriceOfProcient,
+                               handleChangeSellingPriceOfProcient,
+                               handleChangeTradePriceProcient,
+                               tradePriceProcient,
+                               productWidth,
+                               handleChangeProductWidth,
+                               metrIncPriceOfProduct
+                           }) {
     const {t} = useTranslation(['common'])
     return (
         <form
-            className={`bg-[white] flex pl-[20px] gap-[1.25rem] shadow-none  flex-col mainPadding   duration-200 ${
-                stickyForm ? 'stickyForm' : ''
+            className={`bg-[white] flex pl-[20px] gap-[1.25rem] shadow-none  flex-col mainPadding   duration-200 ${stickyForm ? 'stickyForm' : ''
             }`}
         >
             <div className={'flex flex-wrap gap-[2.5rem]'}>
@@ -110,6 +113,45 @@ function CreateProductForm({
                         />
                     </>
                 )}
+                <>
+                    {/* -- maxsulotlar soni -- */}
+                    <FieldContainer
+                        value={metrOfProduct}
+                        onChange={handleMetrOfProduct}
+                        label={t('Metr')}
+                        placeholder={`${t('misol')}: 100`}
+                        type={'text'}
+                    />
+                </>
+                <>
+                    {/* -- maxsulotlar soni -- */}
+                    <FieldContainer
+                        value={totalMetrOfProduct}
+                        onChange={handleChangeNumberOfProduct}
+                        label={t('Jami metrda')}
+                        placeholder={`${t('misol')}: 100`}
+                        type={'text'}
+                        disabled
+                    />
+                </>
+                <>
+                    {/* -- maxsulotlar soni -- */}
+                    <FieldContainer
+                        value={metrPriceOfProduct}
+                        onChange={handleMetrPriceOfProduct}
+                        label={t('Sotish metrda')}
+                        placeholder={`${t('misol')}: 100`}
+                        type={'text'}
+                    />
+                    <FieldContainer
+                        value={metrIncPriceOfProduct}
+                        // onChange={handleMetrPriceOfProduct}
+                        label={t('Kelish metrda')}
+                        placeholder={`${t('misol')}: 100`}
+                        type={'text'}
+                        disabled
+                    />
+                </>
 
                 {pageName !== 'accept' && (
                     <>
@@ -141,8 +183,6 @@ function CreateProductForm({
                         />
                     </>
                 )}
-            </div>
-            <div className='flex flex-wrap gap-[2.5rem] items-end'>
                 <FieldContainer
                     value={tradePriceProcient}
                     onChange={handleChangeTradePriceProcient}
@@ -164,20 +204,25 @@ function CreateProductForm({
                     placeholder={`${t('misol')}: 300`}
                     type={'text'}
                 />
-                <FieldContainer
-                    value={productWidth}
-                    onChange={handleChangeProductWidth}
-                    label={t(`Eni`)}
-                    placeholder={`${t('misol')}: 100 metr`}
-                    type={'text'}
-                />
-                 <FieldContainer
+                <div style={{maxWidth: "300px"}}>
+                    <FieldContainer
+                        value={productWidth}
+                        onChange={handleChangeProductWidth}
+                        label={t(`Eni`)}
+                        placeholder={`${t('misol')}: 100 metr`}
+                        type={'text'}
+                    />
+                </div>
+                {/* <FieldContainer
                     value={productHeight}
                     onChange={handleChangeProductHeight}
                     label={t(`Uzunligi`)}
                     placeholder={`${t('misol')}: 100 metr`}
                     type={'text'}
-                />
+                /> */}
+            </div>
+            <div className='flex flex-wrap gap-[2.5rem] items-end'>
+
                 <div className={'flex gap-[1.25rem] min-w-[20rem]'}>
                     <Button
                         onClick={stickyForm ? handleEdit : addNewProduct}
@@ -189,7 +234,7 @@ function CreateProductForm({
                                 : t("Yangi maxsulot qo'shish")
                         }
                     />
-                    <Button onClick={clearForm} text={t('Tozalash')} />
+                    <Button onClick={clearForm} text={t('Tozalash')}/>
                 </div>
             </div>
         </form>

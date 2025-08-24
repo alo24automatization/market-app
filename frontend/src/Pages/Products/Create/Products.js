@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from 'react'
+import React, {useEffect, useState} from 'react'
 import ExportBtn from '../../../Components/Buttons/ExportBtn'
 import ImportBtn from '../../../Components/Buttons/ImportBtn'
 import * as XLSX from 'xlsx'
 import Pagination from '../../../Components/Pagination/Pagination'
 import Table from '../../../Components/Table/Table'
-import { useDispatch, useSelector } from 'react-redux'
+import {useDispatch, useSelector} from 'react-redux'
 import Spinner from '../../../Components/Spinner/SmallLoader'
 import SmallLoader from '../../../Components/Spinner/SmallLoader'
 import NotFind from '../../../Components/NotFind/NotFind'
-import { motion } from 'framer-motion'
-import { VscChromeClose } from 'react-icons/vsc'
+import {motion} from 'framer-motion'
+import {VscChromeClose} from 'react-icons/vsc'
 
 import {
     addProduct,
@@ -22,17 +22,12 @@ import {
     getProductsByFilter,
     updateProduct,
 } from './productSlice'
-import { getUnits } from '../../Units/unitsSlice'
-import {
-    universalToast,
-    warningCurrencyRate,
-    warningDeleteProduct,
-    warningEmptyInput,
-} from '../../../Components/ToastMessages/ToastMessages'
-import { regexForTypeNumber } from '../../../Components/RegularExpressions/RegularExpressions'
+import {getUnits} from '../../Units/unitsSlice'
+import {universalToast, warningCurrencyRate, warningEmptyInput,} from '../../../Components/ToastMessages/ToastMessages'
+import {regexForTypeNumber} from '../../../Components/RegularExpressions/RegularExpressions'
 import UniversalModal from '../../../Components/Modal/UniversalModal'
 import CreateProductForm from '../../../Components/CreateProductForm/CreateProductForm'
-import { getAllCategories } from '../../Category/categorySlice'
+import {getAllCategories} from '../../Category/categorySlice'
 import {
     checkEmptyString,
     exportExcel,
@@ -44,24 +39,24 @@ import {
 } from '../../../App/globalFunctions'
 import SearchForm from '../../../Components/SearchForm/SearchForm'
 import BarcodeReader from 'react-barcode-reader'
-import { getBarcode } from '../../Barcode/barcodeSlice.js'
-import { getCurrency } from '../../Currency/currencySlice.js'
-import { useTranslation } from 'react-i18next'
-import { filter, map } from 'lodash'
-import { getAllProducts, getProductNotArchive } from '../../Sale/Slices/registerSellingSlice.js'
-import { FaFilter } from 'react-icons/fa'
+import {getBarcode} from '../../Barcode/barcodeSlice.js'
+import {getCurrency} from '../../Currency/currencySlice.js'
+import {useTranslation} from 'react-i18next'
+import {filter, map} from 'lodash'
+import {getAllProducts} from '../../Sale/Slices/registerSellingSlice.js'
+import {FaFilter} from 'react-icons/fa'
 import TableMobile from '../../../Components/Table/TableMobile.js'
 import SelectForm from '../../../Components/Select/SelectForm.js'
 
 function Products() {
-    const { t } = useTranslation(['common'])
+    const {t} = useTranslation(['common'])
     const dispatch = useDispatch()
     const {
-        market: { _id },
+        market: {_id},
     } = useSelector((state) => state.login)
-    const { units } = useSelector((state) => state.units)
-    const { allcategories } = useSelector((state) => state.category)
-    const { currency, currencyType } = useSelector((state) => state.currency)
+    const {units} = useSelector((state) => state.units)
+    const {allcategories} = useSelector((state) => state.category)
+    const {currency, currencyType} = useSelector((state) => state.currency)
     const {
         products,
         total,
@@ -71,12 +66,16 @@ function Products() {
         totalSearched,
         loadingExcel,
     } = useSelector((state) => state.products)
-    const { barcode } = useSelector((state) => state.barcode)
+    const {barcode} = useSelector((state) => state.barcode)
     const [data, setData] = useState(products)
     const [searchedData, setSearchedData] = useState(searchedProducts)
     const [checkOfProduct, setCheckOfProduct] = useState('')
     const [codeOfProduct, setCodeOfProduct] = useState('')
     const [nameOfProduct, setNameOfProduct] = useState('')
+    const [metrOfProduct, setMetrOfProduct] = useState('')
+    const [totalMetrOfProduct, setTotalMetrOfProduct] = useState('')
+    const [metrPriceOfProduct, setMetrPriceOfProduct] = useState('')
+    const [metrIncPriceOfProduct, setMetrIncPriceOfProduct] = useState('')
     const [numberOfProduct, setNumberOfProduct] = useState('')
     const [unitOfProduct, setUnitOfProduct] = useState('')
     const [priceOfProduct, setPriceOfProduct] = useState('')
@@ -123,7 +122,7 @@ function Products() {
 
     // table headers
     const headers = [
-        { title: t('№') },
+        {title: t('№')},
         {
             filter: 'productdata.barcode',
             title: t('Shtrix kodi'),
@@ -132,11 +131,27 @@ function Products() {
             title: t('Kategoriyasi'),
             filter: t('category.code'),
         },
-        { title: t('Kodi'), filter: 'productdata.code' },
-        { title: t('Nomi'), filter: 'productdata.name' },
+        {title: t('Kodi'), filter: 'productdata.code'},
+        {title: t('Nomi'), filter: 'productdata.name'},
         {
             title: t('Soni'),
             filter: 'total',
+        },
+        {
+            title: t('Metr'),
+            filter: 'metrOfProduct',
+        },
+        {
+            title: t('Jami metrda'),
+            filter: 'totalMetrOfProduct',
+        },
+        {
+            title: t('Sotish metrda'),
+            filter: 'metrPriceOfProduct',
+        },
+        {
+            title: t('Kelish metrda'),
+            filter: 'metrIncPriceOfProduct',
         },
         {
             title: t('Olish'),
@@ -164,23 +179,23 @@ function Products() {
             filter: 'minimumcount',
             styles: 'w-[5%]',
         },
-        { title: '' },
+        {title: ''},
     ]
 
     const importHeaders = [
-        { name: 'Shtrix kodi', value: 'barcode' },
-        { name: 'Kategoriyasi', value: 'category' },
-        { name: 'Kodi', value: 'code' },
-        { name: 'Nomi', value: 'name' },
-        { name: 'Soni', value: 'total' },
-        { name: "O'lchov birligi", value: 'unit' },
-        { name: 'Kelish narxi USD', value: 'incomingprice' },
-        { name: 'Kelish narxi UZS', value: 'incomingpriceuzs' },
-        { name: 'Sotish narxi USD', value: 'sellingprice' },
-        { name: 'Sotish narxi UZS', value: 'sellingpriceuzs' },
-        { name: 'Optom narxi USD', value: 'tradeprice' },
-        { name: 'Optom narxi UZS', value: 'tradepriceuzs' },
-        { name: 'Minimum qiymat', value: 'minimumcount' },
+        {name: 'Shtrix kodi', value: 'barcode'},
+        {name: 'Kategoriyasi', value: 'category'},
+        {name: 'Kodi', value: 'code'},
+        {name: 'Nomi', value: 'name'},
+        {name: 'Soni', value: 'total'},
+        {name: "O'lchov birligi", value: 'unit'},
+        {name: 'Kelish narxi USD', value: 'incomingprice'},
+        {name: 'Kelish narxi UZS', value: 'incomingpriceuzs'},
+        {name: 'Sotish narxi USD', value: 'sellingprice'},
+        {name: 'Sotish narxi UZS', value: 'sellingpriceuzs'},
+        {name: 'Optom narxi USD', value: 'tradeprice'},
+        {name: 'Optom narxi UZS', value: 'tradepriceuzs'},
+        {name: 'Minimum qiymat', value: 'minimumcount'},
     ]
     useEffect(() => {
         const handleResize = () => {
@@ -213,8 +228,34 @@ function Products() {
         let val = Number(e.target.value)
         if (regexForTypeNumber.test(val)) {
             setNumberOfProduct(val)
+            if (metrOfProduct) {
+                setTotalMetrOfProduct(val * metrOfProduct)
+            }
         }
     }
+
+    const handleMetrOfProduct = (e) => {
+        let val = Number(e.target.value)
+        if (regexForTypeNumber.test(val)) {
+            setMetrOfProduct(val)
+            setTotalMetrOfProduct(val * numberOfProduct)
+            // if (val === 0) {
+            //     setMetrIncPriceOfProduct(0)
+            // }
+            if (priceOfProduct) {
+                setMetrIncPriceOfProduct(roundUzs(priceOfProduct / val))
+            }
+        }
+    }
+    console.log(metrIncPriceOfProduct);
+
+    const handleMetrPriceOfProduct = (e) => {
+        let val = e.target.value
+        if (regexForTypeNumber.test(val)) {
+            setMetrPriceOfProduct(val)
+        }
+    }
+
     const setProcient = (datausd, datauzs, procient) => {
         if (procient && data) {
             setSellingPriceOfProduct(
@@ -248,6 +289,9 @@ function Products() {
                     Number(val),
                     Number(sellingPriceOfProcient)
                 )
+                if (metrOfProduct) {
+                    setMetrIncPriceOfProduct(roundUzs(Number(val) / metrOfProduct))
+                }
             } else {
                 setPriceOfProductsUsd(val)
                 setPriceOfProduct(UsdToUzs(val, currency))
@@ -322,8 +366,8 @@ function Products() {
         let val = e.target.value
         let valForSearch = val.replace(/\s+/g, ' ').trim()
         setSearchByCode(val)
-            ; (searchedData.length > 0 || totalSearched > 0) &&
-                dispatch(clearSearchedProducts())
+        ;(searchedData.length > 0 || totalSearched > 0) &&
+        dispatch(clearSearchedProducts())
         if (valForSearch === '') {
             setData(products)
             setFilteredDataTotal(total)
@@ -340,8 +384,8 @@ function Products() {
         let val = e.target.value
         let valForSearch = val.replace(/\s+/g, ' ').trim()
         setBarCode(val)
-            ; (searchedData.length > 0 || totalSearched > 0) &&
-                dispatch(clearSearchedProducts())
+        ;(searchedData.length > 0 || totalSearched > 0) &&
+        dispatch(clearSearchedProducts())
         if (valForSearch === '') {
             setData(products)
             setFilteredDataTotal(total)
@@ -358,8 +402,8 @@ function Products() {
         let val = e.target.value
         let valForSearch = val.replace(/\s+/g, ' ').trim()
         setSearchByCategory(val)
-            ; (searchedData.length > 0 || totalSearched > 0) &&
-                dispatch(clearSearchedProducts())
+        ;(searchedData.length > 0 || totalSearched > 0) &&
+        dispatch(clearSearchedProducts())
         if (valForSearch === '') {
             setData(products)
             setFilteredDataTotal(total)
@@ -375,8 +419,8 @@ function Products() {
         let val = e.target.value
         let valForSearch = val.toLowerCase().replace(/\s+/g, ' ').trim()
         setSearchByName(val)
-            ; (searchedData.length > 0 || totalSearched > 0) &&
-                dispatch(clearSearchedProducts())
+        ;(searchedData.length > 0 || totalSearched > 0) &&
+        dispatch(clearSearchedProducts())
         if (valForSearch === '') {
             setData(products)
             setFilteredDataTotal(total)
@@ -433,7 +477,7 @@ function Products() {
     }
 
     // filter by total
-    const filterByTotal = ({ value }) => {
+    const filterByTotal = ({value}) => {
         setShowByTotal(value)
         setCurrentPage(0)
     }
@@ -451,7 +495,7 @@ function Products() {
     const addNewProduct = (e) => {
         e.preventDefault()
         if (currency) {
-            const { failed, message } = checkEmptyString([
+            const {failed, message} = checkEmptyString([
                 {
                     value: checkOfProduct,
                     message: t('Maxsulot shtrix kodi'),
@@ -518,9 +562,13 @@ function Products() {
                         minimumcount: minimumCount,
                         width: productWidth === "" ? 0 : productWidth,
                         height: productHeight === "" ? 0 : productHeight,
+                        metrOfProduct: metrOfProduct || 0,
+                        totalMetrOfProduct: totalMetrOfProduct || 0,
+                        metrPriceOfProduct: metrPriceOfProduct || 0,
+                        metrIncPriceOfProduct: metrIncPriceOfProduct || 0,
                     },
                 }
-                dispatch(addProduct(body)).then(({ error }) => {
+                dispatch(addProduct(body)).then(({error}) => {
                     if (!error) {
                         const body = {
                             currentPage,
@@ -564,10 +612,14 @@ function Products() {
         setTradePriceProcient('')
         setProductWidth('')
         setProductHeight('')
+        setMetrOfProduct('')
+        setMetrPriceOfProduct('')
+        setTotalMetrOfProduct('')
+        setMetrIncPriceOfProduct('')
     }
     const handleEdit = (e) => {
         e.preventDefault()
-        const { failed, message } = checkEmptyString([
+        const {failed, message} = checkEmptyString([
             {
                 value: checkOfProduct,
                 message: t('Maxsulot shtrix kodi'),
@@ -628,6 +680,10 @@ function Products() {
                     minimumcount: minimumCount,
                     width: productWidth === "" ? 0 : productWidth,
                     height: productHeight === "" ? 0 : productHeight,
+                    metrOfProduct: metrOfProduct || 0,
+                    totalMetrOfProduct: totalMetrOfProduct || 0,
+                    metrPriceOfProduct: metrPriceOfProduct || 0,
+                    metrIncPriceOfProduct: metrIncPriceOfProduct || 0
                 },
                 currentPage,
                 countPage: showByTotal,
@@ -637,7 +693,7 @@ function Products() {
                     category: searchByCategory.replace(/\s+/g, ' ').trim(),
                 },
             }
-            dispatch(updateProduct(body)).then(({ error }) => {
+            dispatch(updateProduct(body)).then(({error}) => {
                 if (!error) {
                     clearForm()
                     setStickyForm(false)
@@ -655,7 +711,7 @@ function Products() {
                     dispatch(getProducts(body)).then(() => {
                         document
                             .querySelector(`#${tableRowId}`)
-                            .scrollIntoView({ block: 'center' })
+                            .scrollIntoView({block: 'center'})
                     })
                 }
             })
@@ -711,7 +767,7 @@ function Products() {
         setTableRowId(ident)
         setCurrentProduct(product)
         setStickyForm(true)
-        
+
     }
     const handleDeleteProduct = (product) => {
         const body = {
@@ -732,7 +788,7 @@ function Products() {
         toggleModal()
     }
     const handleClickApproveToDelete = () => {
-        dispatch(deleteProduct(deletedProduct)).then(({ error }) => {
+        dispatch(deleteProduct(deletedProduct)).then(({error}) => {
             if (!error) {
                 handleClickCancelToDelete()
                 const body = {
@@ -779,7 +835,7 @@ function Products() {
                 category: searchByCategory.replace(/\s+/g, ' ').trim(),
             },
         }
-        dispatch(addProductsFromExcel(body)).then(({ error }) => {
+        dispatch(addProductsFromExcel(body)).then(({error}) => {
             if (!error) {
                 handleClickCancelToImport()
                 dispatch(getAllProducts())
@@ -853,10 +909,10 @@ function Products() {
             )
         }
     }
-    const handleChangeProductWidth = ({ target }) => {
+    const handleChangeProductWidth = ({target}) => {
         setProductWidth(target.value)
     }
-    const handleChangeProductHeight=({target})=>{
+    const handleChangeProductHeight = ({target}) => {
         console.log(target.value);
         setProductHeight(target.value)
     }
@@ -868,7 +924,7 @@ function Products() {
         const body = {
             code: data,
         }
-        dispatch(getBarcode(body)).then(({ error }) => {
+        dispatch(getBarcode(body)).then(({error}) => {
             if (error) {
                 return setNameOfProduct('')
             }
@@ -901,7 +957,7 @@ function Products() {
                 category: searchByCategory.replace(/\s+/g, ' ').trim(),
             },
         }
-        dispatch(getProductsAll(body)).then(({ error, payload }) => {
+        dispatch(getProductsAll(body)).then(({error, payload}) => {
             if (!error) {
                 if (payload?.length > 0) {
                     const newData = map(payload, (item, index) => ({
@@ -957,13 +1013,17 @@ function Products() {
     useEffect(() => {
         if (currentProduct) {
             const {
-                productdata: { name, code, barcode },
+                productdata: {name, code, barcode},
                 unit,
                 total,
                 category,
                 minimumcount,
                 width,
                 height,
+                metrOfProduct,
+                totalMetrOfProduct,
+                metrPriceOfProduct,
+                metrIncPriceOfProduct,
                 price: {
                     sellingprice,
                     incomingprice,
@@ -973,6 +1033,12 @@ function Products() {
                     tradepriceuzs,
                 },
             } = currentProduct
+
+            setMetrOfProduct(metrOfProduct)
+            setTotalMetrOfProduct(totalMetrOfProduct)
+            setMetrPriceOfProduct(metrPriceOfProduct)
+            setMetrIncPriceOfProduct(metrIncPriceOfProduct)
+
             setCodeOfProduct(code)
             setNameOfProduct(name)
             setProductWidth(width)
@@ -1019,11 +1085,11 @@ function Products() {
             setCodeOfProduct(lastProductCode)
             if (checkOfProduct.length === 0)
                 categoryOfProduct?.label &&
-                    setCheckOfProduct(
-                        '47800' +
-                        categoryOfProduct.label.slice(0, 3) +
-                        lastProductCode
-                    )
+                setCheckOfProduct(
+                    '47800' +
+                    categoryOfProduct.label.slice(0, 3) +
+                    lastProductCode
+                )
         }
         //    eslint-disable-next-line react-hooks/exhaustive-deps
     }, [lastProductCode])
@@ -1042,19 +1108,21 @@ function Products() {
             animate='open'
             exit='collapsed'
             variants={{
-                open: { opacity: 1, height: 'auto' },
-                collapsed: { opacity: 0, height: 0 },
+                open: {opacity: 1, height: 'auto'},
+                collapsed: {opacity: 0, height: 0},
             }}
-            transition={{ duration: 0.8, ease: [0.04, 0.62, 0.23, 0.98] }}
+            transition={{duration: 0.8, ease: [0.04, 0.62, 0.23, 0.98]}}
         >
             {importLoading && (
-                <div className='fixed backdrop-blur-[2px] z-[50] top-0 left-0 right-0 bottom-0 bg-white-700 flex flex-col items-center justify-center w-full'>
-                    <SmallLoader />
+                <div
+                    className='fixed backdrop-blur-[2px] z-[50] top-0 left-0 right-0 bottom-0 bg-white-700 flex flex-col items-center justify-center w-full'>
+                    <SmallLoader/>
                 </div>
             )}
             {loadingExcel && (
-                <div className='fixed backdrop-blur-[2px] z-[100] left-0 top-0 right-0 bottom-0 bg-white-700 flex flex-col items-center justify-center w-full h-full'>
-                    <SmallLoader />
+                <div
+                    className='fixed backdrop-blur-[2px] z-[100] left-0 top-0 right-0 bottom-0 bg-white-700 flex flex-col items-center justify-center w-full h-full'>
+                    <SmallLoader/>
                 </div>
             )}
             {/* Modal */}
@@ -1100,11 +1168,16 @@ function Products() {
                     handleChangeProductWidth={handleChangeProductWidth}
                     nameOfProduct={nameOfProduct}
                     unitOfProduct={unitOfProduct}
+                    metrOfProduct={metrOfProduct}
+                    metrPriceOfProduct={metrPriceOfProduct}
+                    metrIncPriceOfProduct={metrIncPriceOfProduct}
+                    totalMetrOfProduct={totalMetrOfProduct}
                     categoryOfProduct={categoryOfProduct}
                     codeOfProduct={codeOfProduct}
                     checkOfProduct={checkOfProduct}
                     productHeight={productHeight}
                     handleChangeProductHeight={handleChangeProductHeight}
+                    handleMetrPriceOfProduct={handleMetrPriceOfProduct}
                     tradePriceProcient={tradePriceProcient}
                     handleChangeTradePriceProcient={
                         handleChangeTradePriceProcient
@@ -1130,6 +1203,7 @@ function Products() {
                     }
                     handleChangePriceOfProduct={handleChangePriceOfProduct}
                     handleChangeNumberOfProduct={handleChangeNumberOfProduct}
+                    handleMetrOfProduct={handleMetrOfProduct}
                     stickyForm={stickyForm}
                     clearForm={clearForm}
                     handleEdit={handleEdit}
@@ -1241,34 +1315,35 @@ function Products() {
                     }
                 >
                     <div className={'flex gap-[1rem] ms-[1rem]  mb-[15px] '}>
-                        <ExportBtn onClick={exportData} />
-                        <ImportBtn readExcel={readExcel} />
+                        <ExportBtn onClick={exportData}/>
+                        <ImportBtn readExcel={readExcel}/>
                         {isMobile ? (
                             <button
                                 onClick={() => setFilterModal(true)}
                                 className='hover:bg-blue-200  bg-blue-400 focus-visible:outline-none w-[90px] h-[33px]  createElement'
                             >
-                                <FaFilter /> {t('izlash')}
+                                <FaFilter/> {t('izlash')}
                             </button>
                         ) : null}
                     </div>
                 </div>
             ) : (
                 <div className={'flex px-4 py-2 gap-2'}>
-                    <ExportBtn onClick={exportData} />
-                    <ImportBtn readExcel={readExcel} />
+                    <ExportBtn onClick={exportData}/>
+                    <ImportBtn readExcel={readExcel}/>
                     {isMobile ? (
                         <button
                             onClick={() => setFilterModal(true)}
                             className='hover:bg-blue-200  bg-blue-400 focus-visible:outline-none w-[90px] h-[33px]  createElement'
                         >
-                            <FaFilter /> {t('izlash')}
+                            <FaFilter/> {t('izlash')}
                         </button>
                     ) : null}
                 </div>
             )}
             {filterModal ? (
-                <div className='absolute lg:p-[50px] w-[100vw]  h-[100vh]  flex justify-evenly flex-wrap items-center  top-0	left-0 z-50 bg-[white]	'>
+                <div
+                    className='absolute lg:p-[50px] w-[100vw]  h-[100vh]  flex justify-evenly flex-wrap items-center  top-0	left-0 z-50 bg-[white]	'>
                     <VscChromeClose
                         onClick={() => setFilterModal(false)}
                         className=' absolute right-[20px]  top-[20px]  text-4xl cursor-pointer'
@@ -1304,7 +1379,7 @@ function Products() {
                         }}
                         className='d-block  hover:bg-green-200  bg-green-400 mt-[-200px] lg:mt-[25px] focus-visible:outline-none w-[150px] h-[40px] createElement '
                     >
-                        <FaFilter /> {t('izlash')}
+                        <FaFilter/> {t('izlash')}
                     </button>
                 </div>
             ) : null}
@@ -1347,9 +1422,9 @@ function Products() {
 
             <div className='lg:p-[20px] p-0'>
                 {loading ? (
-                    <Spinner />
+                    <Spinner/>
                 ) : data.length === 0 && searchedData.length === 0 ? (
-                    <NotFind text={'Maxsulot mavjud emas'} />
+                    <NotFind text={'Maxsulot mavjud emas'}/>
                 ) : isMobile ? (
                     <TableMobile
                         currencyType={currencyType}
@@ -1392,7 +1467,7 @@ function Products() {
                     />
                 )}
             </div>
-            <BarcodeReader onError={handleError} onScan={handleScan} />
+            <BarcodeReader onError={handleError} onScan={handleScan}/>
         </motion.section>
     )
 }
