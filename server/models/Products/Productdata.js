@@ -1,21 +1,21 @@
-const { Schema, model, Types } = require("mongoose");
-const Joi = require("joi");
+const { Schema, model, Types } = require('mongoose');
+const Joi = require('joi');
 
 const productdata = new Schema(
   {
     name: { type: String, required: true },
-    unit: { type: Schema.Types.ObjectId, ref: "Unit" },
+    unit: { type: Schema.Types.ObjectId, ref: 'Unit', index: true },
     code: { type: String, required: true },
-    barcode: { type: String },  
-    products: [{ type: Schema.Types.ObjectId, ref: "Product" }],
-    product: { type: Schema.Types.ObjectId, ref: "Product" },
-    category: { type: Schema.Types.ObjectId, ref: "Category" },
-    market: { type: Schema.Types.ObjectId, ref: "Market", required: true },
+    barcode: { type: String },
+    products: [{ type: Schema.Types.ObjectId, ref: 'Product', index: true }],
+    product: { type: Schema.Types.ObjectId, ref: 'Product', index: true },
+    category: { type: Schema.Types.ObjectId, ref: 'Category', index: true },
+    market: { type: Schema.Types.ObjectId, ref: 'Market', required: true, index: true },
     isArchive: { type: Boolean, default: false },
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 function validateProductData(productdata) {
@@ -31,4 +31,4 @@ function validateProductData(productdata) {
 }
 
 module.exports.validateProductData = validateProductData;
-module.exports.ProductData = model("ProductData", productdata);
+module.exports.ProductData = model('ProductData', productdata);

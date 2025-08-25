@@ -1,13 +1,13 @@
-const { Packman, validatePackman } = require("../../models/Sales/Packman.js");
-const { Market } = require("../../models/MarketAndBranch/Market");
+const { Packman, validatePackman } = require('../../models/Sales/Packman.js');
+const { Market } = require('../../models/MarketAndBranch/Market');
 const {
   DailySaleConnector,
-} = require("../../models/Sales/DailySaleConnector.js");
-const { SaleConnector } = require("../../models/Sales/SaleConnector.js");
-const { AgentPayment } = require("../../models/Sales/AgentPayment.js");
-const { Payment } = require("../../models/Sales/Payment.js");
-const { Discount } = require("../../models/Sales/Discount.js");
-const { SaleProduct } = require("../../models/Sales/SaleProduct.js");
+} = require('../../models/Sales/DailySaleConnector.js');
+const { SaleConnector } = require('../../models/Sales/SaleConnector.js');
+const { AgentPayment } = require('../../models/Sales/AgentPayment.js');
+const { Payment } = require('../../models/Sales/Payment.js');
+const { Discount } = require('../../models/Sales/Discount.js');
+const { SaleProduct } = require('../../models/Sales/SaleProduct.js');
 module.exports.register = async (req, res) => {
   try {
     const { name, commission, market, currentPage, countPage, search } =
@@ -44,8 +44,8 @@ module.exports.register = async (req, res) => {
 
     await newPackman.save();
     const namepackman = new RegExp(
-      ".*" + search ? search.name : "" + ".*",
-      "i"
+      '.*' + search ? search.name : '' + '.*',
+      'i',
     );
 
     const packmansCount = await Packman.find({
@@ -55,22 +55,22 @@ module.exports.register = async (req, res) => {
 
     const packmans = await Packman.find({ market, name: namepackman })
       .sort({ _id: -1 })
-      .select("name market commission payments")
-      .populate("payments")
-      .populate("clients")
+      .select('name market commission payments')
+      .populate('payments')
+      .populate('clients')
       .lean()
       .skip(currentPage * countPage)
       .limit(countPage);
     const packmansWithAllProfitAndTotalSum = await getTotalSumPackmanClientsSum(
       market,
-      packmans
+      packmans,
     );
     res.status(201).json({
       packmans: packmansWithAllProfitAndTotalSum,
       count: packmansCount,
     });
   } catch (error) {
-    res.status(400).json({ error: "Serverda xatolik yuz berdi..." });
+    res.status(400).json({ error: 'Serverda xatolik yuz berdi...' });
   }
 };
 
@@ -80,19 +80,20 @@ module.exports.getAll = async (req, res) => {
     const marke = await Market.findById(market);
     if (!marke) {
       return res.status(400).json({
-        message: "Diqqat! Do'kon haqida malumotlari topilmadi!",
+        message: 'Diqqat! Do\'kon haqida malumotlari topilmadi!',
       });
     }
     const packmans = await Packman.find({ market })
       .sort({ _id: -1 })
-      .select("name market commission payments")
-      .populate("payments")
-      .populate("clients")
+      .select('name market commission payments')
+      .populate('payments')
+      .populate('clients')
       .lean();
+
     res.status(201).json(packmans);
   } catch (error) {
     console.log(error.message);
-    res.status(501).json({ error: "Serverda xatolik yuz berdi..." });
+    res.status(501).json({ error: 'Serverda xatolik yuz berdi...' });
   }
 };
 
@@ -104,7 +105,7 @@ module.exports.updatePackman = async (req, res) => {
     if (!marke) {
       return res
         .status(400)
-        .json({ message: "Diqqat! Do'kon haqida malumot topilmadi!" });
+        .json({ message: 'Diqqat! Do\'kon haqida malumot topilmadi!' });
     }
     const packman = await Packman.findById(_id);
     if (!packman) {
@@ -119,12 +120,12 @@ module.exports.updatePackman = async (req, res) => {
     });
 
     await Packman.findById(_id)
-      .select("name market commission payments")
-      .populate("payments");
+      .select('name market commission payments')
+      .populate('payments');
 
     const namepackman = new RegExp(
-      ".*" + search ? search.name : "" + ".*",
-      "i"
+      '.*' + search ? search.name : '' + '.*',
+      'i',
     );
 
     const packmansCount = await Packman.find({
@@ -133,22 +134,22 @@ module.exports.updatePackman = async (req, res) => {
     }).count();
     const packmans = await Packman.find({ market, name: namepackman })
       .sort({ _id: -1 })
-      .select("name market commission payments")
-      .populate("payments")
-      .populate("clients")
+      .select('name market commission payments')
+      .populate('payments')
+      .populate('clients')
       .lean()
       .skip(currentPage * countPage)
       .limit(countPage);
     const packmansWithAllProfitAndTotalSum = await getTotalSumPackmanClientsSum(
       market,
-      packmans
+      packmans,
     );
     res.status(201).json({
       packmans: packmansWithAllProfitAndTotalSum,
       count: packmansCount,
     });
   } catch (error) {
-    res.status(501).json({ error: "Serverda xatolik yuz berdi..." });
+    res.status(501).json({ error: 'Serverda xatolik yuz berdi...' });
   }
 };
 
@@ -159,7 +160,7 @@ module.exports.deletePackman = async (req, res) => {
     if (!marke) {
       return res
         .status(400)
-        .json({ message: "Diqqat! Do'kon haqida malumot topilmadi!" });
+        .json({ message: 'Diqqat! Do\'kon haqida malumot topilmadi!' });
     }
     const packman = await Packman.findById(_id);
     if (!packman) {
@@ -177,8 +178,8 @@ module.exports.deletePackman = async (req, res) => {
     await Packman.findByIdAndDelete(_id);
 
     const namepackman = new RegExp(
-      ".*" + search ? search.name : "" + ".*",
-      "i"
+      '.*' + search ? search.name : '' + '.*',
+      'i',
     );
 
     const packmansCount = await Packman.find({
@@ -187,22 +188,22 @@ module.exports.deletePackman = async (req, res) => {
     }).count();
     const packmans = await Packman.find({ market, name: namepackman })
       .sort({ _id: -1 })
-      .select("name market commission payments")
-      .populate("payments")
-      .populate("clients")
+      .select('name market commission payments')
+      .populate('payments')
+      .populate('clients')
       .lean()
       .skip(currentPage * countPage)
       .limit(countPage);
     const packmansWithAllProfitAndTotalSum = await getTotalSumPackmanClientsSum(
       market,
-      packmans
+      packmans,
     );
     res.status(201).json({
       packmans: packmansWithAllProfitAndTotalSum,
       count: packmansCount,
     });
   } catch (error) {
-    res.status(501).json({ error: "Serverda xatolik yuz berdi..." });
+    res.status(501).json({ error: 'Serverda xatolik yuz berdi...' });
   }
 };
 module.exports.payProfit = async (req, res) => {
@@ -226,7 +227,7 @@ module.exports.payProfit = async (req, res) => {
       comment: payment.comment,
       payment: 0,
       paymentuzs: convertToUzs(
-        payment.carduzs + payment.cashuzs + payment.transferuzs
+        payment.carduzs + payment.cashuzs + payment.transferuzs,
       ),
       card: convertToUsd(payment.card),
       cash: convertToUsd(payment.cash),
@@ -240,7 +241,7 @@ module.exports.payProfit = async (req, res) => {
       market,
       packman: payment.packman,
       packman_saleconnectors: payment.packman_saleconnectors.map(
-        (item) => item.saleconnector._id
+        (item) => item.saleconnector._id,
       ),
       user,
     });
@@ -250,7 +251,7 @@ module.exports.payProfit = async (req, res) => {
     res.status(201).json(newPayment);
   } catch (error) {
     console.log(error.message);
-    res.status(501).json({ error: "Serverda xatolik yuz berdi..." });
+    res.status(501).json({ error: 'Serverda xatolik yuz berdi...' });
   }
 };
 module.exports.getPackmans = async (req, res) => {
@@ -260,25 +261,25 @@ module.exports.getPackmans = async (req, res) => {
     if (!marke) {
       return res
         .status(401)
-        .json({ message: "Diqqat! Do'kon malumotlari topilmadi." });
+        .json({ message: 'Diqqat! Do\'kon malumotlari topilmadi.' });
     }
 
-    const name = new RegExp(".*" + (search ? search.name : "") + ".*", "i");
+    const name = new RegExp('.*' + (search ? search.name : '') + '.*', 'i');
 
     const packmansCount = await Packman.find({ market, name: name }).count();
 
     const packmans = await Packman.find({ market, name: name })
       .sort({ _id: -1 })
-      .select("name market commission payments")
-      .populate("payments")
-      .populate("clients")
+      .select('name market commission payments')
+      .populate('payments')
+      .populate('clients')
       .lean()
       .skip(currentPage * countPage)
       .limit(countPage);
 
     const packmansWithAllProfitAndTotalSum = await getTotalSumPackmanClientsSum(
       market,
-      packmans
+      packmans,
     );
     packmansWithAllProfitAndTotalSum.sort((a, b) => b.totalSum - a.totalSum);
     res.status(201).json({
@@ -288,7 +289,7 @@ module.exports.getPackmans = async (req, res) => {
 
   } catch (error) {
     console.warn(error.message);
-    res.status(501).json({ error: "Serverda xatolik yuz berdi..." });
+    res.status(501).json({ error: 'Serverda xatolik yuz berdi...' });
   }
 };
 const getTotalSumPackmanClientsSum = async (market, packmans) => {
@@ -296,7 +297,7 @@ const getTotalSumPackmanClientsSum = async (market, packmans) => {
     packmans.map(async (packman) => {
       const { allClients, totalSum } = await fetchClientTotalSaleSum(
         packman.clients,
-        market
+        market,
       );
       return {
         ...packman,
@@ -304,7 +305,7 @@ const getTotalSumPackmanClientsSum = async (market, packmans) => {
         totalSum: totalSum,
         commissionProfit: (totalSum * packman.commission) / 100 || 0,
       };
-    })
+    }),
   );
   return newPackmansWithProfits;
 };
@@ -321,47 +322,47 @@ const fetchClientTotalSaleSum = async (clients, market) => {
       market,
       client: client._id,
     })
-      .select("-isArchive -market -__v")
+      .select('-isArchive -market -__v')
       .sort({ createdAt: -1 })
       .populate({
-        path: "products",
-        select: "user",
+        path: 'products',
+        select: 'user',
         populate: {
-          path: "user",
-          select: "firstname lastname",
+          path: 'user',
+          select: 'firstname lastname',
         },
       })
       .populate({
-        path: "products",
-        select: "price",
+        path: 'products',
+        select: 'price',
         populate: {
-          path: "price",
-          select: "incomingprice incomingpriceuzs",
+          path: 'price',
+          select: 'incomingprice incomingpriceuzs',
         },
       })
       .populate({
-        path: "products",
+        path: 'products',
         select:
-          "totalprice unitprice totalpriceuzs unitpriceuzs pieces createdAt discount saleproducts product",
+          'totalprice unitprice totalpriceuzs unitpriceuzs pieces createdAt discount saleproducts product',
         options: { sort: { createdAt: -1 } },
         populate: {
-          path: "product",
-          select: "productdata",
-          populate: { path: "productdata", select: "name code" },
+          path: 'product',
+          select: 'productdata',
+          populate: { path: 'productdata', select: 'name code' },
         },
       })
       .populate(
-        "payments",
-        "payment paymentuzs comment totalprice totalpriceuzs createdAt"
+        'payments',
+        'payment paymentuzs comment totalprice totalpriceuzs createdAt',
       )
       .populate(
-        "discounts",
-        "discount discountuzs procient products totalprice totalpriceuzs"
+        'discounts',
+        'discount discountuzs procient products totalprice totalpriceuzs',
       )
-      .populate({ path: "client", select: "name phoneNumber" })
-      .populate("packman", "name")
-      .populate("user", "firstname lastname")
-      .populate("dailyconnectors", "comment")
+      .populate({ path: 'client', select: 'name phoneNumber' })
+      .populate('packman', 'name')
+      .populate('user', 'firstname lastname')
+      .populate('dailyconnectors', 'comment')
       .lean();
     for (const connector of saleconnectors) {
       const products = await SaleProduct.find({
@@ -369,22 +370,22 @@ const fetchClientTotalSaleSum = async (clients, market) => {
       }).lean();
       const productstotalusd = [...products].reduce(
         (prev, el) => prev + el.totalprice,
-        0
+        0,
       );
       const productstotaluzs = [...products].reduce(
         (prev, el) => prev + el.totalpriceuzs,
-        0
+        0,
       );
       const payments = await Payment.find({
         saleconnector: connector._id,
       }).lean();
       const paymentstotalusd = [...payments].reduce(
         (prev, el) => prev + el.payment,
-        0
+        0,
       );
       const paymentstotaluzs = [...payments].reduce(
         (prev, el) => prev + el.paymentuzs,
-        0
+        0,
       );
 
       const discounts = await Discount.find({
@@ -393,14 +394,14 @@ const fetchClientTotalSaleSum = async (clients, market) => {
 
       const discountstotalusd = [...discounts].reduce(
         (prev, el) => prev + el.discount,
-        0
+        0,
       );
       const discountstotaluzs = [...discounts].reduce(
         (prev, el) => prev + el.discountuzs,
-        0
+        0,
       );
       totaldebtusd = productstotalusd - paymentstotalusd - discountstotalusd;
-      totaldebtuzs = productstotaluzs - paymentstotaluzs - discountstotaluzs;  
+      totaldebtuzs = productstotaluzs - paymentstotaluzs - discountstotaluzs;
       let s = {
         _id: connector._id,
         dailyconnectors: connector.dailyconnectors,
@@ -410,13 +411,13 @@ const fetchClientTotalSaleSum = async (clients, market) => {
             : connector.debts,
         user: connector.user,
         createdAt: connector.createdAt,
-        totalsalesuzs:productstotaluzs,
+        totalsalesuzs: productstotaluzs,
         updatedAt: connector.updatedAt,
         client: connector.client,
         id: connector.id,
-        products:products,
+        products: products,
         payments: connector.payments,
-        saleconnector: {...connector},
+        saleconnector: { ...connector },
         totaldebtusd: totaldebtusd,
         totaldebtuzs: totaldebtuzs,
       };
@@ -494,7 +495,7 @@ const fetchClientTotalSaleSum = async (clients, market) => {
     totalSum:
       allClients.reduce(
         (prev, item) => prev + item.saleconnector?.totalsalesuzs || 0,
-        0
+        0,
       ) || 0,
     allClients,
   };

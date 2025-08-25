@@ -1,4 +1,4 @@
-const { Schema, model, Types } = require('mongoose');
+const { Schema, model } = require('mongoose');
 const Joi = require('joi');
 const { number } = require('joi');
 
@@ -11,17 +11,17 @@ const productprice = new Schema(
     tradeprice: { type: Number },
     tradepriceuzs: { type: Number },
     proceint: { type: Number },
-    product: { type: Schema.Types.ObjectId, ref: 'Product' },
+    product: { type: Schema.Types.ObjectId, ref: 'Product', index: true },
     incoming: {
       type: Schema.Types.ObjectId,
-      ref: 'Incoming',
+      ref: 'Incoming', index: true,
     },
-    market: { type: Schema.Types.ObjectId, ref: 'Market', required: true },
+    market: { type: Schema.Types.ObjectId, ref: 'Market', required: true, index: true },
     isArchive: { type: Boolean, default: false },
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 function validateProductPrice(productprice) {

@@ -1,26 +1,23 @@
-const { Schema, model, Types } = require("mongoose");
-const Joi = require("joi");
+const { Schema, model, Types } = require('mongoose');
+const Joi = require('joi');
 
 const debt = new Schema(
   {
     totalprice: { type: Number, required: true },
     totalpriceuzs: { type: Number, required: true },
-    products: [{ type: Schema.Types.ObjectId, ref: "Product", required: true }],
+    products: [{ type: Schema.Types.ObjectId, ref: 'Product', required: true, index: true }],
     debt: { type: Number },
     debtuzs: { type: Number },
     comment: { type: String, min: 5 },
-    pay_end_date:{type:Date,default:null},
-    saleconnector: {
-      type: Schema.Types.ObjectId,
-      ref: "SaleConnector",
-    },
-    user: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    market: { type: Schema.Types.ObjectId, ref: "Market", required: true },
+    pay_end_date: { type: Date, default: null },
+    saleconnector: { type: Schema.Types.ObjectId, ref: 'SaleConnector', index: true },
+    user: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
+    market: { type: Schema.Types.ObjectId, ref: 'Market', required: true, index: true },
     isArchive: { type: Boolean, default: false },
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 function validateDebt(debt) {
@@ -33,7 +30,7 @@ function validateDebt(debt) {
     saleconnector: Joi.string(),
     comment: Joi.string(),
     user: Joi.string().required(),
-    pay_end_date:Joi.date().required(),
+    pay_end_date: Joi.date().required(),
 
     market: Joi.string().required(),
   });
@@ -41,4 +38,4 @@ function validateDebt(debt) {
 }
 
 module.exports.validateDebt = validateDebt;
-module.exports.Debt = model("Debt", debt);
+module.exports.Debt = model('Debt', debt);
