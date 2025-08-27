@@ -23,7 +23,11 @@ import {
     updateProduct,
 } from './productSlice'
 import {getUnits} from '../../Units/unitsSlice'
-import {universalToast, warningCurrencyRate, warningEmptyInput,} from '../../../Components/ToastMessages/ToastMessages'
+import {
+    universalToast,
+    warningCurrencyRate,
+    warningEmptyInput,
+} from '../../../Components/ToastMessages/ToastMessages'
 import {regexForTypeNumber} from '../../../Components/RegularExpressions/RegularExpressions'
 import UniversalModal from '../../../Components/Modal/UniversalModal'
 import CreateProductForm from '../../../Components/CreateProductForm/CreateProductForm'
@@ -60,6 +64,7 @@ function Products() {
     const {
         products,
         total,
+        statistics,
         loading,
         lastProductCode,
         searchedProducts,
@@ -90,6 +95,7 @@ function Products() {
     const [showByTotal, setShowByTotal] = useState('10')
     const [currentPage, setCurrentPage] = useState(0)
     const [filteredDataTotal, setFilteredDataTotal] = useState(total)
+    const [statisticsData, setStatistics] = useState(statistics)
     const [stickyForm, setStickyForm] = useState(false)
     const [currentProduct, setCurrentProduct] = useState(null)
     const [modalVisible, setModalVisible] = useState(false)
@@ -115,8 +121,8 @@ function Products() {
     const [tableRowId, setTableRowId] = useState('')
     const [modalOpen, setModalOpen] = useState(false)
     const [filterModal, setFilterModal] = useState(false)
-    const [productWidth, setProductWidth] = useState('');
-    const [productHeight, setProductHeight] = useState('');
+    const [productWidth, setProductWidth] = useState('')
+    const [productHeight, setProductHeight] = useState('')
     // modal toggle
     const toggleModal = () => setModalVisible(!modalVisible)
 
@@ -197,6 +203,7 @@ function Products() {
         {name: 'Optom narxi UZS', value: 'tradepriceuzs'},
         {name: 'Minimum qiymat', value: 'minimumcount'},
     ]
+
     useEffect(() => {
         const handleResize = () => {
             setIsMobile(window.innerWidth <= 768)
@@ -208,6 +215,11 @@ function Products() {
             window.removeEventListener('resize', handleResize)
         }
     }, [])
+
+    useEffect(() => {
+        setStatistics(statistics)
+    }, [statistics])
+
     // handle change of inputs
     const handleChangeCheckOfProduct = (e) => {
         let val = e.target.value
@@ -215,15 +227,18 @@ function Products() {
             setCheckOfProduct(e.target.value)
         }
     }
+
     const handleChangeCodeOfProduct = (e) => {
         let val = e.target.value
         if (regexForTypeNumber.test(val)) {
             setCodeOfProduct(val)
         }
     }
+
     const handleChangeNameOfProduct = (e) => {
         setNameOfProduct(e.target.value)
     }
+
     const handleChangeNumberOfProduct = (e) => {
         let val = Number(e.target.value)
         if (regexForTypeNumber.test(val)) {
@@ -247,7 +262,6 @@ function Products() {
             }
         }
     }
-    console.log(metrIncPriceOfProduct);
 
     const handleMetrPriceOfProduct = (e) => {
         let val = e.target.value
@@ -259,10 +273,10 @@ function Products() {
     const setProcient = (datausd, datauzs, procient) => {
         if (procient && data) {
             setSellingPriceOfProduct(
-                roundUzs(datauzs + (datauzs * procient) / 100)
+                roundUzs(datauzs + (datauzs * procient) / 100),
             )
             setSellingPriceOfProductUsd(
-                roundUsd(datausd + (datausd * procient) / 100)
+                roundUsd(datausd + (datausd * procient) / 100),
             )
         } else {
             setSellingPriceOfProduct('')
@@ -287,10 +301,12 @@ function Products() {
                 setProcient(
                     UzsToUsd(val, currency),
                     Number(val),
-                    Number(sellingPriceOfProcient)
+                    Number(sellingPriceOfProcient),
                 )
                 if (metrOfProduct) {
-                    setMetrIncPriceOfProduct(roundUzs(Number(val) / metrOfProduct))
+                    setMetrIncPriceOfProduct(
+                        roundUzs(Number(val) / metrOfProduct),
+                    )
                 }
             } else {
                 setPriceOfProductsUsd(val)
@@ -298,7 +314,7 @@ function Products() {
                 setProcient(
                     Number(val),
                     UsdToUzs(val, currency),
-                    Number(sellingPriceOfProcient)
+                    Number(sellingPriceOfProcient),
                 )
             }
         }
@@ -321,7 +337,7 @@ function Products() {
         setProcient(
             Number(priceOfProductUsd),
             Number(priceOfProduct),
-            Number(val)
+            Number(val),
         )
     }
     const handleChangeUnitOfProduct = (option) => {
@@ -358,7 +374,7 @@ function Products() {
         setProcientTradePrice(
             Number(priceOfProductUsd),
             Number(priceOfProduct),
-            Number(val)
+            Number(val),
         )
     }
     // handle change of search inputs
@@ -367,7 +383,7 @@ function Products() {
         let valForSearch = val.replace(/\s+/g, ' ').trim()
         setSearchByCode(val)
         ;(searchedData.length > 0 || totalSearched > 0) &&
-        dispatch(clearSearchedProducts())
+            dispatch(clearSearchedProducts())
         if (valForSearch === '') {
             setData(products)
             setFilteredDataTotal(total)
@@ -385,7 +401,7 @@ function Products() {
         let valForSearch = val.replace(/\s+/g, ' ').trim()
         setBarCode(val)
         ;(searchedData.length > 0 || totalSearched > 0) &&
-        dispatch(clearSearchedProducts())
+            dispatch(clearSearchedProducts())
         if (valForSearch === '') {
             setData(products)
             setFilteredDataTotal(total)
@@ -403,7 +419,7 @@ function Products() {
         let valForSearch = val.replace(/\s+/g, ' ').trim()
         setSearchByCategory(val)
         ;(searchedData.length > 0 || totalSearched > 0) &&
-        dispatch(clearSearchedProducts())
+            dispatch(clearSearchedProducts())
         if (valForSearch === '') {
             setData(products)
             setFilteredDataTotal(total)
@@ -420,7 +436,7 @@ function Products() {
         let valForSearch = val.toLowerCase().replace(/\s+/g, ' ').trim()
         setSearchByName(val)
         ;(searchedData.length > 0 || totalSearched > 0) &&
-        dispatch(clearSearchedProducts())
+            dispatch(clearSearchedProducts())
         if (valForSearch === '') {
             setData(products)
             setFilteredDataTotal(total)
@@ -560,8 +576,8 @@ function Products() {
                         tradeprice: tradePrice,
                         tradepriceuzs: tradePriceUzs,
                         minimumcount: minimumCount,
-                        width: productWidth === "" ? 0 : productWidth,
-                        height: productHeight === "" ? 0 : productHeight,
+                        width: productWidth === '' ? 0 : productWidth,
+                        height: productHeight === '' ? 0 : productHeight,
                         metrOfProduct: metrOfProduct || 0,
                         totalMetrOfProduct: totalMetrOfProduct || 0,
                         metrPriceOfProduct: metrPriceOfProduct || 0,
@@ -678,12 +694,12 @@ function Products() {
                     tradeprice: tradePrice,
                     tradepriceuzs: tradePriceUzs,
                     minimumcount: minimumCount,
-                    width: productWidth === "" ? 0 : productWidth,
-                    height: productHeight === "" ? 0 : productHeight,
+                    width: productWidth === '' ? 0 : productWidth,
+                    height: productHeight === '' ? 0 : productHeight,
                     metrOfProduct: metrOfProduct || 0,
                     totalMetrOfProduct: totalMetrOfProduct || 0,
                     metrPriceOfProduct: metrPriceOfProduct || 0,
-                    metrIncPriceOfProduct: metrIncPriceOfProduct || 0
+                    metrIncPriceOfProduct: metrIncPriceOfProduct || 0,
                 },
                 currentPage,
                 countPage: showByTotal,
@@ -767,7 +783,6 @@ function Products() {
         setTableRowId(ident)
         setCurrentProduct(product)
         setStickyForm(true)
-
     }
     const handleDeleteProduct = (product) => {
         const body = {
@@ -822,8 +837,8 @@ function Products() {
         })
         newData.forEach((item) =>
             oldKeys.forEach(
-                (key) => item.hasOwnProperty(key) && delete item[key]
-            )
+                (key) => item.hasOwnProperty(key) && delete item[key],
+            ),
         )
         const body = {
             products: [...newData],
@@ -862,7 +877,7 @@ function Products() {
                         searchedData.length > 0 ? setSearchedData : setData,
                         filterKey,
                         1,
-                        searchedData.length > 0 ? searchedProducts : products
+                        searchedData.length > 0 ? searchedProducts : products,
                     )
                     break
                 case 2:
@@ -876,7 +891,7 @@ function Products() {
                         searchedData.length > 0 ? setSearchedData : setData,
                         filterKey,
                         '',
-                        searchedData.length > 0 ? searchedProducts : products
+                        searchedData.length > 0 ? searchedProducts : products,
                     )
                     break
                 default:
@@ -890,7 +905,7 @@ function Products() {
                         searchedData.length > 0 ? setSearchedData : setData,
                         filterKey,
                         -1,
-                        searchedData.length > 0 ? searchedProducts : products
+                        searchedData.length > 0 ? searchedProducts : products,
                     )
             }
         } else {
@@ -905,7 +920,7 @@ function Products() {
                 filterKey,
                 -1,
                 searchedData ? searchedProducts : products,
-                searchedData.length > 0
+                searchedData.length > 0,
             )
         }
     }
@@ -913,7 +928,7 @@ function Products() {
         setProductWidth(target.value)
     }
     const handleChangeProductHeight = ({target}) => {
-        console.log(target.value);
+        console.log(target.value)
         setProductHeight(target.value)
     }
     const handleError = () => {
@@ -1067,7 +1082,7 @@ function Products() {
             map(units, (unit) => ({
                 value: unit._id,
                 label: unit.name,
-            }))
+            })),
         )
     }, [units])
     useEffect(() => {
@@ -1077,7 +1092,7 @@ function Products() {
                 label:
                     category.code +
                     `${category.name ? ` - ${category.name}` : ''}`,
-            }))
+            })),
         )
     }, [allcategories])
     useEffect(() => {
@@ -1085,11 +1100,11 @@ function Products() {
             setCodeOfProduct(lastProductCode)
             if (checkOfProduct.length === 0)
                 categoryOfProduct?.label &&
-                setCheckOfProduct(
-                    '47800' +
-                    categoryOfProduct.label.slice(0, 3) +
-                    lastProductCode
-                )
+                    setCheckOfProduct(
+                        '47800' +
+                            categoryOfProduct.label.slice(0, 3) +
+                            lastProductCode,
+                    )
         }
         //    eslint-disable-next-line react-hooks/exhaustive-deps
     }, [lastProductCode])
@@ -1114,15 +1129,13 @@ function Products() {
             transition={{duration: 0.8, ease: [0.04, 0.62, 0.23, 0.98]}}
         >
             {importLoading && (
-                <div
-                    className='fixed backdrop-blur-[2px] z-[50] top-0 left-0 right-0 bottom-0 bg-white-700 flex flex-col items-center justify-center w-full'>
-                    <SmallLoader/>
+                <div className='fixed backdrop-blur-[2px] z-[50] top-0 left-0 right-0 bottom-0 bg-white-700 flex flex-col items-center justify-center w-full'>
+                    <SmallLoader />
                 </div>
             )}
             {loadingExcel && (
-                <div
-                    className='fixed backdrop-blur-[2px] z-[100] left-0 top-0 right-0 bottom-0 bg-white-700 flex flex-col items-center justify-center w-full h-full'>
-                    <SmallLoader/>
+                <div className='fixed backdrop-blur-[2px] z-[100] left-0 top-0 right-0 bottom-0 bg-white-700 flex flex-col items-center justify-center w-full h-full'>
+                    <SmallLoader />
                 </div>
             )}
             {/* Modal */}
@@ -1242,7 +1255,9 @@ function Products() {
                             checkOfProduct={checkOfProduct}
                             productWidth={productWidth}
                             productHeight={productHeight}
-                            handleChangeProductHeight={handleChangeProductHeight}
+                            handleChangeProductHeight={
+                                handleChangeProductHeight
+                            }
                             handleChangeProductWidth={handleChangeProductWidth}
                             tradePriceProcient={tradePriceProcient}
                             handleChangeTradePriceProcient={
@@ -1307,7 +1322,6 @@ function Products() {
                     </section>
                 )
             )}
-
             {isMobile ? (
                 <div
                     className={
@@ -1315,35 +1329,34 @@ function Products() {
                     }
                 >
                     <div className={'flex gap-[1rem] ms-[1rem]  mb-[15px] '}>
-                        <ExportBtn onClick={exportData}/>
-                        <ImportBtn readExcel={readExcel}/>
+                        <ExportBtn onClick={exportData} />
+                        <ImportBtn readExcel={readExcel} />
                         {isMobile ? (
                             <button
                                 onClick={() => setFilterModal(true)}
                                 className='hover:bg-blue-200  bg-blue-400 focus-visible:outline-none w-[90px] h-[33px]  createElement'
                             >
-                                <FaFilter/> {t('izlash')}
+                                <FaFilter /> {t('izlash')}
                             </button>
                         ) : null}
                     </div>
                 </div>
             ) : (
                 <div className={'flex px-4 py-2 gap-2'}>
-                    <ExportBtn onClick={exportData}/>
-                    <ImportBtn readExcel={readExcel}/>
+                    <ExportBtn onClick={exportData} />
+                    <ImportBtn readExcel={readExcel} />
                     {isMobile ? (
                         <button
                             onClick={() => setFilterModal(true)}
                             className='hover:bg-blue-200  bg-blue-400 focus-visible:outline-none w-[90px] h-[33px]  createElement'
                         >
-                            <FaFilter/> {t('izlash')}
+                            <FaFilter /> {t('izlash')}
                         </button>
                     ) : null}
                 </div>
             )}
             {filterModal ? (
-                <div
-                    className='absolute lg:p-[50px] w-[100vw]  h-[100vh]  flex justify-evenly flex-wrap items-center  top-0	left-0 z-50 bg-[white]	'>
+                <div className='absolute lg:p-[50px] w-[100vw]  h-[100vh]  flex justify-evenly flex-wrap items-center  top-0	left-0 z-50 bg-[white]	'>
                     <VscChromeClose
                         onClick={() => setFilterModal(false)}
                         className=' absolute right-[20px]  top-[20px]  text-4xl cursor-pointer'
@@ -1379,7 +1392,7 @@ function Products() {
                         }}
                         className='d-block  hover:bg-green-200  bg-green-400 mt-[-200px] lg:mt-[25px] focus-visible:outline-none w-[150px] h-[40px] createElement '
                     >
-                        <FaFilter/> {t('izlash')}
+                        <FaFilter /> {t('izlash')}
                     </button>
                 </div>
             ) : null}
@@ -1420,11 +1433,100 @@ function Products() {
                 ) : null}
             </span>
 
+            <div
+                className={
+                    'mb-4 mt-3 pl-[2.5rem] pr-[1.25rem] flex items-center  lg:justify-center gap-[1rem]'
+                }
+            >
+                <p className={'font-medium'}></p>
+                <ul
+                    className={
+                        'lg:flex lg:justify-center justify-start gap-[1rem] '
+                    }
+                >
+                    <li className={'text-sm flex items-center gap-[0.5rem]'}>
+                        <div
+                            className={
+                                'w-[0.5rem] h-[0.5rem] rounded-full bg-blue-600'
+                            }
+                        ></div>
+                        <span className={'font-medium'}>
+                            {t('Jami')}:{' '}
+                            {Number(
+                                statisticsData.categoriesTotalCount,
+                            ).toLocaleString('ru-RU')}{' '}
+                        </span>
+                    </li>{' '}
+                    <li className={'text-sm flex items-center gap-[0.5rem]'}>
+                        <div
+                            className={
+                                'w-[0.5rem] h-[0.5rem] rounded-full bg-error-600'
+                            }
+                        ></div>
+                        <span className={'font-medium'}>
+                            {t('Turi')}:{' '}
+                            {Number(
+                                statistics.productsTotalCount,
+                            ).toLocaleString('ru-RU')}{' '}
+                        </span>
+                    </li>
+                    <li className={'text-sm flex items-center gap-[0.5rem]'}>
+                        <div
+                            className={
+                                'w-[0.5rem] h-[0.5rem] rounded-full bg-warning-400'
+                            }
+                        ></div>
+                        <span className={'font-medium'}>
+                            {t('Soni')}:{' '}
+                            {Number(statistics.productsTotal).toLocaleString(
+                                'ru-RU',
+                            )}
+                        </span>
+                    </li>
+                    <li className={'text-sm flex items-center gap-[0.5rem]'}>
+                        <div
+                            className={
+                                'w-[0.5rem] h-[0.5rem] rounded-full bg-blue-400'
+                            }
+                        ></div>
+                        <span className={'font-medium'}>
+                            {t('Olish')}:{' '}
+                            {Number(
+                                statistics.productsIncomingTotalPriceUzs,
+                            ).toLocaleString('ru-RU')}{' '}
+                            UZS {' / '}{' '}
+                            {Number(
+                                statistics.productsIncomingTotalPriceUsd,
+                            ).toLocaleString('ru-RU')}{' '}
+                            USD
+                        </span>
+                    </li>
+                    <li className={'text-sm flex items-center gap-[0.5rem]'}>
+                        <div
+                            className={
+                                'w-[0.5rem] h-[0.5rem] rounded-full bg-success-400'
+                            }
+                        ></div>
+                        <span className={'font-medium'}>
+                            {t('Sotish')}:{' '}
+                            {Number(
+                                statistics.productsSellingTotalPriceUzs,
+                            ).toLocaleString('ru-RU')}{' '}
+                            UZS {' / '}{' '}
+                            {Number(
+                                statistics.productsSellingTotalPriceUsd,
+                            ).toLocaleString('ru-RU')}{' '}
+                            USD
+                        </span>
+                    </li>
+                </ul>
+            </div>
+
             <div className='lg:p-[20px] p-0'>
                 {loading ? (
-                    <Spinner/>
+                    <Spinner />
                 ) : data.length === 0 && searchedData.length === 0 ? (
-                    <NotFind text={'Maxsulot mavjud emas'}/>
+                    <NotFind text={'Maxsulot mavjud emas'} />
                 ) : isMobile ? (
                     <TableMobile
                         currencyType={currencyType}
@@ -1467,7 +1569,7 @@ function Products() {
                     />
                 )}
             </div>
-            <BarcodeReader onError={handleError} onScan={handleScan}/>
+            <BarcodeReader onError={handleError} onScan={handleScan} />
         </motion.section>
     )
 }

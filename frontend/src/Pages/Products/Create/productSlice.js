@@ -16,7 +16,7 @@ export const getProducts = createAsyncThunk(
         } catch (error) {
             return rejectWithValue(error)
         }
-    }
+    },
 )
 
 export const getIncomeProducts = createAsyncThunk(
@@ -28,7 +28,7 @@ export const getIncomeProducts = createAsyncThunk(
         } catch (error) {
             return rejectWithValue(error)
         }
-    }
+    },
 )
 
 export const getProductsAll = createAsyncThunk(
@@ -41,18 +41,18 @@ export const getProductsAll = createAsyncThunk(
                 category: '',
             },
         },
-        {rejectWithValue}
+        {rejectWithValue},
     ) => {
         try {
             const {data} = await Api.post(
                 '/products/product/getexceldata',
-                body
+                body,
             )
             return data
         } catch (error) {
             return rejectWithValue(error)
         }
-    }
+    },
 )
 
 export const getProductsByFilter = createAsyncThunk(
@@ -64,7 +64,7 @@ export const getProductsByFilter = createAsyncThunk(
         } catch (error) {
             return rejectWithValue(error)
         }
-    }
+    },
 )
 
 export const addProduct = createAsyncThunk(
@@ -76,7 +76,7 @@ export const addProduct = createAsyncThunk(
         } catch (error) {
             return rejectWithValue(error)
         }
-    }
+    },
 )
 
 export const updateProduct = createAsyncThunk(
@@ -88,7 +88,7 @@ export const updateProduct = createAsyncThunk(
         } catch (error) {
             return rejectWithValue(error)
         }
-    }
+    },
 )
 
 export const deleteProduct = createAsyncThunk(
@@ -102,7 +102,7 @@ export const deleteProduct = createAsyncThunk(
         } catch (error) {
             return rejectWithValue(error)
         }
-    }
+    },
 )
 
 export const addProductsFromExcel = createAsyncThunk(
@@ -114,7 +114,7 @@ export const addProductsFromExcel = createAsyncThunk(
         } catch (error) {
             return rejectWithValue(error)
         }
-    }
+    },
 )
 
 export const getCodeOfCategory = createAsyncThunk(
@@ -126,13 +126,14 @@ export const getCodeOfCategory = createAsyncThunk(
         } catch (error) {
             return rejectWithValue(error)
         }
-    }
+    },
 )
 
 const productSlice = createSlice({
     name: 'products',
     initialState: {
         products: [],
+        statistics: {},
         lastProductCode: null,
         allProducts: [],
         searchedProducts: [],
@@ -155,7 +156,10 @@ const productSlice = createSlice({
         [getProducts.pending]: (state) => {
             state.loading = true
         },
-        [getProducts.fulfilled]: (state, {payload: {products, count}}) => {
+        [getProducts.fulfilled]: (
+            state,
+            {payload: {products, count, statistics}},
+        ) => {
             state.loading = false
             if (state.totalSearched > 0) {
                 state.searchedProducts = products
@@ -163,6 +167,7 @@ const productSlice = createSlice({
             } else {
                 state.products = products
                 state.total = count
+                state.statistics = statistics
             }
         },
         [getProducts.rejected]: (state, {payload}) => {
@@ -173,7 +178,10 @@ const productSlice = createSlice({
         [getIncomeProducts.pending]: (state) => {
             state.loading = true
         },
-        [getIncomeProducts.fulfilled]: (state, {payload: {products, count}}) => {
+        [getIncomeProducts.fulfilled]: (
+            state,
+            {payload: {products, count, statistics}},
+        ) => {
             state.loading = false
             if (state.totalSearched > 0) {
                 state.searchedProducts = products
@@ -181,6 +189,7 @@ const productSlice = createSlice({
             } else {
                 state.products = products
                 state.total = count
+                state.statistics = statistics
             }
         },
         [getIncomeProducts.rejected]: (state, {payload}) => {
@@ -193,7 +202,7 @@ const productSlice = createSlice({
         },
         [getProductsByFilter.fulfilled]: (
             state,
-            {payload: {products, count}}
+            {payload: {products, count}},
         ) => {
             state.loading = false
             state.searchedProducts = products
@@ -266,7 +275,7 @@ const productSlice = createSlice({
         },
         [addProductsFromExcel.fulfilled]: (
             state,
-            {payload: {products, count}}
+            {payload: {products, count}},
         ) => {
             state.loading = false
             state.products = products

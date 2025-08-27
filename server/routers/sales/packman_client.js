@@ -156,6 +156,6 @@ router.post('/sellers/get_day_total_report', auth, (req, res) => {
 
 router.post('/comment/update', auth, (req, res) => {
   require('./saleproduct').chnageComment(req, res);
-})
+});
 
 module.exports = router;
