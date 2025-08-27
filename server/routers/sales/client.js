@@ -128,7 +128,7 @@ module.exports.getAll = async (req, res) => {
         .select("name phoneNumber")
         .populate("packman", "name")
         .lean(),
-      Client.countDocuments({ market }),
+      // Client.countDocuments({ market }),
     ]);
 
     if (clients.length > 0) {
@@ -147,14 +147,7 @@ module.exports.getAll = async (req, res) => {
       }
     }
 
-    res.status(201).send({
-      clients,
-      pagination: {
-        current_page: page,
-        total_pages: Math.ceil(totalCount / limit),
-        total_count: totalCount,
-      },
-    });
+    res.status(201).send(clients);
   } catch (error) {
     console.log(error);
     res.status(501).json({ error: "Serverda xatolik yuz berdi..." });
