@@ -983,14 +983,7 @@ module.exports.getProducts = async (req, res) => {
           { $project: { _id: 0, totalInt: { $toInt: '$total' } } },
         ]),
       ]);
-    // .then((products) =>
-    //   filter(products, (product) => product.productdata !== null && product.category !== null),
-    // );
 
-    // const count = products.length;
-    // const filtered = products.splice(currentPage * countPage, countPage);
-    console.log(productsTotalPrices);
-    console.log(productsTotal);
     res.status(201).json({
       products,
       count,
@@ -1005,6 +998,7 @@ module.exports.getProducts = async (req, res) => {
       },
     });
   } catch (error) {
+      console.log(error);
     res.status(401).send(error);
   }
 };
