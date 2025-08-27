@@ -979,8 +979,7 @@ module.exports.getProducts = async (req, res) => {
               market: ObjectId(id),
             },
           },
-          { $group: { _id: null, total: { $sum: '$total' } } },
-          { $project: { _id: 0, totalInt: { $toInt: '$total' } } },
+          { $group: { _id: null, total: { $sum: { $toLong: { $ifNull: ['$total', 0] } } } } },
         ]),
       ]);
 
@@ -990,7 +989,7 @@ module.exports.getProducts = async (req, res) => {
       statistics: {
         categoriesTotalCount,
         productsTotalCount: count,
-        productsTotal: productsTotal[0].totalInt,
+        productsTotal: productsTotal[0].total,
         productsIncomingTotalPriceUzs: productsTotalPrices[0].incomingpriceuzs,
         productsIncomingTotalPriceUsd: productsTotalPrices[0].incomingprice,
         productsSellingTotalPriceUzs: productsTotalPrices[0].sellingpriceuzs,
