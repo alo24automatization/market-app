@@ -50,9 +50,9 @@ import {getUnits} from '../../Units/unitsSlice.js'
 
 const RegisterIncoming = () => {
     const [modalIsOpen, setIsOpen] = useState(false)
-    // function openModal() {
-    //     setIsOpen(true)
-    // }
+    function openModal() {
+        setIsOpen(true)
+    }
 
     function closeModal() {
         setIsOpen(false)
@@ -87,16 +87,16 @@ const RegisterIncoming = () => {
     const {units} = useSelector((state) => state.units)
     const {allcategories} = useSelector((state) => state.category)
     // const {currency, currencyType} = useSelector((state) => state.currency)
-    // const {
-    //     // products,
-    //     total,
-    //     statistics,
-    //     // loading,
-    //     lastProductCode,
-    //     // searchedProducts,
-    //     totalSearched,
-    //     loadingExcel,
-    // } = useSelector((state) => state.products)
+    const {
+        // products,
+        total,
+        statistics,
+        // loading,
+        lastProductCode,
+        // searchedProducts,
+        totalSearched,
+        loadingExcel,
+    } = useSelector((state) => state.products)
     const {barcode} = useSelector((state) => state.barcode)
     const [data, setData] = useState(products)
     // const [searchedData, setSearchedData] = useState(searchedProducts)
@@ -195,6 +195,28 @@ const RegisterIncoming = () => {
             })),
         )
     }, [units])
+
+    useEffect(() => {
+        if (lastProductCode) {
+            setCodeOfProduct(lastProductCode)
+            if (checkOfProduct.length === 0)
+                categoryOfProduct?.label &&
+                    setCheckOfProduct(
+                        '47800' +
+                            categoryOfProduct.label.slice(0, 3) +
+                            lastProductCode,
+                    )
+        }
+        //    eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [lastProductCode])
+    // useEffect(() => {
+    //     setSearchedData(searchedProducts)
+    // }, [searchedProducts])
+    useEffect(() => {
+        if (barcode) {
+            setNameOfProduct(barcode.name)
+        }
+    }, [barcode])
 
     /////////
     // handle change of inputs
