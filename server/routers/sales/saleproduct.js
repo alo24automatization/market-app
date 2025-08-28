@@ -111,6 +111,7 @@ module.exports.register = async (req, res) => {
         forWhat,
         size,
         piece,
+        isMetr,
         columns,
         priceFromLengthAmout,
         lengthAmout,
@@ -123,6 +124,7 @@ module.exports.register = async (req, res) => {
         unitpriceuzs,
         forWhat,
         pieces,
+        isMetr,
         product: product._id,
         more_parameters1: {
           length: length === '' ? 0 : length,
@@ -167,6 +169,7 @@ module.exports.register = async (req, res) => {
         forWhat,
         user,
         fromFilial,
+        isMetr,
         previous: produc.total,
         next: produc.total - Number(pieces),
         more_parameters1: {
@@ -222,6 +225,7 @@ module.exports.register = async (req, res) => {
           updateproduct.totalMetrOfProduct -= saleproduct.pieces;
           updateproduct.total = updateproduct.totalMetrOfProduct / updateproduct.metrOfProduct;
         } else {
+          updateproduct.totalMetrOfProduct -= saleproduct.pieces;
           updateproduct.total -= saleproduct.pieces;
         }
       }
