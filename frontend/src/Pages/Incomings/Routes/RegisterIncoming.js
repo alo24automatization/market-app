@@ -1,6 +1,8 @@
 import React, {useEffect, useState} from 'react'
 import {useDispatch, useSelector} from 'react-redux'
 import SelectInput from '../../../Components/SelectInput/SelectInput'
+import {getBarcode} from '../../Barcode/barcodeSlice'
+
 import Table from '../../../Components/Table/Table'
 import {
     addIncoming,
@@ -12,32 +14,130 @@ import {
     getAllSuppliers,
     getProducts
 } from '../incomingSlice'
+import {addProduct, getCodeOfCategory, updateProduct} from '../../Products/Create/productSlice.js'
+
 import {ConfirmBtn, SaveBtn} from '../../../Components/Buttons/SaveConfirmBtn'
 import UniversalModal from '../../../Components/Modal/UniversalModal'
-import {currentExchangerate, reduceSumm, roundUsd, roundUzs, UsdToUzs, UzsToUsd} from '../../../App/globalFunctions'
+import {
+    checkEmptyString,
+    currentExchangerate,
+    reduceSumm,
+    roundUsd,
+    roundUzs,
+    UsdToUzs,
+    UzsToUsd
+} from '../../../App/globalFunctions'
 import {useNavigate} from 'react-router-dom'
 import {useTranslation} from 'react-i18next'
 import {filter, map} from 'lodash'
+import Modal from 'react-modal'
+
 import {
     universalToast,
     warningCurrencyRate,
+    warningEmptyInput,
     warningMorePayment,
     warningSaleProductsEmpty
 } from '../../../Components/ToastMessages/ToastMessages'
+import CreateProductForm from '../../../Components/CreateProductForm/CreateProductForm'
+
 import CustomerPayment from '../../../Components/Payment/CustomerPayment.js'
 import Loader from '../../../Components/Loader/Loader'
+import {IoClose} from 'react-icons/io5'
+import {regexForTypeNumber} from '../../../Components/RegularExpressions/RegularExpressions.js'
+import {getAllCategories} from '../../Category/categorySlice.js'
+import {getUnits} from '../../Units/unitsSlice.js'
 
 const RegisterIncoming = () => {
-    const { t } = useTranslation(['common'])
+    const [modalIsOpen, setIsOpen] = useState(false)
+    function openModal() {
+        setIsOpen(true)
+    }
+
+    function closeModal() {
+        setIsOpen(false)
+    }
+    const [currentPage, setCurrentPage] = useState(0)
+    const [showByTotal, setShowByTotal] = useState('10')
+    const [searchByCode, setSearchByCode] = useState('')
+    const [searchByName, setSearchByName] = useState('')
+    const [searchByCategory, setSearchByCategory] = useState('')
+    const [tableRowId, setTableRowId] = useState('')
+
+    const {t} = useTranslation(['common'])
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const {
-        market: { _id },
+        market: {_id},
         user,
     } = useSelector((state) => state.login)
-    const { currency, currencyType } = useSelector((state) => state.currency)
-    const { suppliers, products, successAdd, successTemporary, temporary, loading } =
-        useSelector((state) => state.incoming)
+    const {currency, currencyType} = useSelector((state) => state.currency)
+    const {
+        suppliers,
+        products,
+        successAdd,
+        successTemporary,
+        temporary,
+        loading,
+    } = useSelector((state) => state.incoming)
+
+    // const {
+    //         market: {_id},
+    //     } = useSelector((state) => state.login)
+    const {units} = useSelector((state) => state.units)
+    const {allcategories} = useSelector((state) => state.category)
+    // const {currency, currencyType} = useSelector((state) => state.currency)
+    const {
+        // products,
+        total,
+        statistics,
+        // loading,
+        lastProductCode,
+        // searchedProducts,
+        totalSearched,
+        loadingExcel,
+    } = useSelector((state) => state.products)
+    const {barcode} = useSelector((state) => state.barcode)
+    const [data, setData] = useState(products)
+    // const [searchedData, setSearchedData] = useState(searchedProducts)
+    const [checkOfProduct, setCheckOfProduct] = useState('')
+    const [codeOfProduct, setCodeOfProduct] = useState('')
+    const [nameOfProduct, setNameOfProduct] = useState('')
+    const [metrOfProduct, setMetrOfProduct] = useState('')
+    const [totalMetrOfProduct, setTotalMetrOfProduct] = useState('')
+    const [metrPriceOfProduct, setMetrPriceOfProduct] = useState('')
+    const [metrIncPriceOfProduct, setMetrIncPriceOfProduct] = useState('')
+    const [numberOfProduct, setNumberOfProduct] = useState('')
+    const [unitOfProduct, setUnitOfProduct] = useState('')
+    const [priceOfProduct, setPriceOfProduct] = useState('')
+    const [sellingPriceOfProduct, setSellingPriceOfProduct] = useState('')
+    const [sellingPriceOfProcient, setSellingPriceOfProcient] = useState('')
+    const [priceOfProductUsd, setPriceOfProductsUsd] = useState('')
+    const [sellingPriceOfProductUsd, setSellingPriceOfProductUsd] = useState('')
+    const [categoryOfProduct, setCategoryOfProduct] = useState('')
+    const [currentProduct, setCurrentProduct] = useState(null)
+
+    const [stickyForm, setStickyForm] = useState(false)
+
+    const [unitOptions, setUnitOptions] = useState([])
+    const [categoryOptions, setCategoryOptions] = useState([])
+    // const [excelData, setExcelData] = useState([])
+    // const [createdData, setCreatedData] = useState([])
+    // const [barCode, setBarCode] = useState('')
+    // const [sorItem, setSorItem] = useState({
+    //     filter: '',
+    //     sort: '',
+    //     count: 0,
+    // })
+    // const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
+    // const [importLoading, setImportLoading] = useState(false)
+    const [minimumCount, setMinimumCount] = useState('')
+    const [tradePrice, setTradePrice] = useState('')
+    const [tradePriceUzs, setTradePriceUzs] = useState('')
+    const [tradePriceProcient, setTradePriceProcient] = useState('')
+
+    const [productWidth, setProductWidth] = useState('')
+    const [productHeight, setProductHeight] = useState('')
 
     // states
     const [suppliersData, setSuppliersData] = useState([])
@@ -70,6 +170,469 @@ const RegisterIncoming = () => {
     const [saleComment, setSaleComment] = useState('')
     let delay = null
 
+    useEffect(() => {
+        dispatch(getUnits())
+        dispatch(getAllCategories())
+        // dispatch(getCurrency())
+    }, [dispatch])
+
+    useEffect(() => {
+        setCategoryOptions(
+            map(allcategories, (category) => ({
+                value: category._id,
+                label:
+                    category.code +
+                    `${category.name ? ` - ${category.name}` : ''}`,
+            })),
+        )
+    }, [allcategories])
+
+    useEffect(() => {
+        setUnitOptions(
+            map(units, (unit) => ({
+                value: unit._id,
+                label: unit.name,
+            })),
+        )
+    }, [units])
+
+    useEffect(() => {
+        if (lastProductCode) {
+            setCodeOfProduct(lastProductCode)
+            if (checkOfProduct.length === 0)
+                categoryOfProduct?.label &&
+                    setCheckOfProduct(
+                        '47800' +
+                            categoryOfProduct.label.slice(0, 3) +
+                            lastProductCode,
+                    )
+        }
+        //    eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [lastProductCode])
+    // useEffect(() => {
+    //     setSearchedData(searchedProducts)
+    // }, [searchedProducts])
+    useEffect(() => {
+        if (barcode) {
+            setNameOfProduct(barcode.name)
+        }
+    }, [barcode])
+
+    /////////
+    // handle change of inputs
+
+    const addNewProduct = (e) => {
+        e.preventDefault()
+        if (currency) {
+            const {failed, message} = checkEmptyString([
+                {
+                    value: checkOfProduct,
+                    message: t('Maxsulot shtrix kodi'),
+                },
+                {
+                    value: codeOfProduct,
+                    message: t('Maxsulot kodi'),
+                },
+                {
+                    value: nameOfProduct,
+                    message: t('Maxsulot nomi'),
+                },
+                {
+                    value: unitOfProduct,
+                    message: t("Maxsulot o'lchov birligi"),
+                },
+                {
+                    value: categoryOfProduct,
+                    message: t('Maxsulot kategoriyasi'),
+                },
+                {
+                    value: priceOfProduct,
+                    message: t('Maxsulot kelish narxi'),
+                },
+                {
+                    value: sellingPriceOfProduct,
+                    message: t('Maxsulot sotish narxi'),
+                },
+                {
+                    value: tradePrice,
+                    message: t('Maxsulot optom narxi'),
+                },
+                {
+                    value: minimumCount,
+                    message: t('Maxsulot minimal miqdori'),
+                },
+            ])
+            if (failed) {
+                warningEmptyInput(message)
+            } else {
+                const body = {
+                    currentPage,
+                    countPage: showByTotal,
+                    category: categoryOfProduct.value,
+                    search: {
+                        name: searchByName.replace(/\s+/g, ' ').trim(),
+                        code: searchByCode.replace(/\s+/g, ' ').trim(),
+                        category: searchByCategory.replace(/\s+/g, ' ').trim(),
+                    },
+                    product: {
+                        code: codeOfProduct,
+                        name: nameOfProduct.replace(/\s+/g, ' ').trim(),
+                        total: numberOfProduct,
+                        unit: unitOfProduct.value,
+                        category: categoryOfProduct.value,
+                        market: _id,
+                        incomingprice: priceOfProductUsd,
+                        sellingprice: sellingPriceOfProductUsd,
+                        incomingpriceuzs: priceOfProduct,
+                        sellingpriceuzs: sellingPriceOfProduct,
+                        barcode: checkOfProduct,
+                        tradeprice: tradePrice,
+                        tradepriceuzs: tradePriceUzs,
+                        minimumcount: minimumCount,
+                        width: productWidth === '' ? 0 : productWidth,
+                        height: productHeight === '' ? 0 : productHeight,
+                        metrOfProduct: metrOfProduct || 0,
+                        totalMetrOfProduct: totalMetrOfProduct || 0,
+                        metrPriceOfProduct: metrPriceOfProduct || 0,
+                        metrIncPriceOfProduct: metrIncPriceOfProduct || 0,
+                    },
+                }
+                dispatch(addProduct(body)).then(({error}) => {
+                    if (!error) {
+                        const body = {
+                            currentPage,
+                            countPage: showByTotal,
+                            search: {
+                                name: searchByName.replace(/\s+/g, ' ').trim(),
+                                code: searchByCode.replace(/\s+/g, ' ').trim(),
+                                category: searchByCategory
+                                    .replace(/\s+/g, ' ')
+                                    .trim(),
+                            },
+                        }
+                        dispatch(getProducts(body))
+                        clearForm()
+                        setIsOpen(false)
+                        handleClickCancelToImport()
+                    }
+                })
+            }
+        } else {
+            warningCurrencyRate()
+        }
+    }
+
+    const handleClickCancelToImport = () => {
+        setModalVisible(false)
+        setTimeout(() => {
+            setModalBody(null)
+        }, 500)
+    }
+
+    // handle submit of inputs
+    const searchBarcode = (e) => {
+        if (e.key === 'Enter') {
+            const body = {
+                code: e.target.value,
+            }
+            dispatch(getBarcode(body))
+        }
+    }
+
+    const setProcientTradePrice = (datausd, datauzs, procient) => {
+        if (procient && data) {
+            setTradePriceUzs(roundUzs(datauzs + (datauzs * procient) / 100))
+            setTradePrice(roundUsd(datausd + (datausd * procient) / 100))
+        } else {
+            setTradePriceUzs('')
+            setTradePrice('')
+        }
+    }
+    const handleChangeCheckOfProduct = (e) => {
+        let val = e.target.value
+        if (regexForTypeNumber.test(val)) {
+            setCheckOfProduct(e.target.value)
+        }
+    }
+
+    const handleChangeCodeOfProduct = (e) => {
+        let val = e.target.value
+        if (regexForTypeNumber.test(val)) {
+            setCodeOfProduct(val)
+        }
+    }
+
+    const handleChangeNameOfProduct = (e) => {
+        setNameOfProduct(e.target.value)
+    }
+
+    const handleChangeNumberOfProduct = (e) => {
+        let val = Number(e.target.value)
+        if (regexForTypeNumber.test(val)) {
+            setNumberOfProduct(val)
+            if (metrOfProduct) {
+                setTotalMetrOfProduct(val * metrOfProduct)
+            }
+        }
+    }
+
+    const handleMetrOfProduct = (e) => {
+        let val = Number(e.target.value)
+        if (regexForTypeNumber.test(val)) {
+            setMetrOfProduct(val)
+            setTotalMetrOfProduct(val * numberOfProduct)
+            // if (val === 0) {
+            //     setMetrIncPriceOfProduct(0)
+            // }
+            if (priceOfProduct) {
+                setMetrIncPriceOfProduct(roundUzs(priceOfProduct / val))
+            }
+        }
+    }
+
+    const handleMetrPriceOfProduct = (e) => {
+        let val = e.target.value
+        if (regexForTypeNumber.test(val)) {
+            setMetrPriceOfProduct(val)
+        }
+    }
+
+    const handleChangePriceOfProduct = (e) => {
+        let val = e.target.value
+        if (regexForTypeNumber.test(val)) {
+            if (currencyType === 'UZS') {
+                setPriceOfProduct(val)
+                setPriceOfProductsUsd(UzsToUsd(val, currency))
+                setProcient(
+                    UzsToUsd(val, currency),
+                    Number(val),
+                    Number(sellingPriceOfProcient),
+                )
+                if (metrOfProduct) {
+                    setMetrIncPriceOfProduct(
+                        roundUzs(Number(val) / metrOfProduct),
+                    )
+                }
+            } else {
+                setPriceOfProductsUsd(val)
+                setPriceOfProduct(UsdToUzs(val, currency))
+                setProcient(
+                    Number(val),
+                    UsdToUzs(val, currency),
+                    Number(sellingPriceOfProcient),
+                )
+            }
+        }
+    }
+    const handleChangeSellingPriceOfProduct = (e) => {
+        let val = e.target.value
+        if (regexForTypeNumber.test(val)) {
+            if (currencyType === 'UZS') {
+                setSellingPriceOfProduct(val)
+                setSellingPriceOfProductUsd(UzsToUsd(val, currency))
+            } else {
+                setSellingPriceOfProductUsd(val)
+                setSellingPriceOfProduct(UsdToUzs(val, currency))
+            }
+        }
+    }
+    const handleChangeSellingPriceOfProcient = (e) => {
+        let val = e.target.value
+        setSellingPriceOfProcient(val)
+        setProcient(
+            Number(priceOfProductUsd),
+            Number(priceOfProduct),
+            Number(val),
+        )
+    }
+    const handleChangeUnitOfProduct = (option) => {
+        setUnitOfProduct(option)
+    }
+    const handleChangeCategoryOfProduct = (option) => {
+        setCategoryOfProduct(option)
+        const body = {
+            categoryId: option.value,
+        }
+        dispatch(getCodeOfCategory(body))
+    }
+    const handleChangeMinimumCount = (e) => {
+        let val = e.target.value
+        if (regexForTypeNumber.test(val)) {
+            setMinimumCount(val)
+        }
+    }
+    const handleChangeTradePrice = (e) => {
+        let val = e.target.value
+        if (regexForTypeNumber.test(val)) {
+            if (currencyType === 'UZS') {
+                setTradePriceUzs(val)
+                setTradePrice(UzsToUsd(val, currency))
+            } else {
+                setTradePrice(val)
+                setTradePriceUzs(UsdToUzs(val, currency))
+            }
+        }
+    }
+    const handleChangeTradePriceProcient = (e) => {
+        let val = e.target.value
+        setTradePriceProcient(val)
+        setProcientTradePrice(
+            Number(priceOfProductUsd),
+            Number(priceOfProduct),
+            Number(val),
+        )
+    }
+
+    const setProcient = (datausd, datauzs, procient) => {
+        if (procient && data) {
+            setSellingPriceOfProduct(
+                roundUzs(datauzs + (datauzs * procient) / 100),
+            )
+            setSellingPriceOfProductUsd(
+                roundUsd(datausd + (datausd * procient) / 100),
+            )
+        } else {
+            setSellingPriceOfProduct('')
+            setSellingPriceOfProductUsd('')
+        }
+    }
+
+    const handleChangeProductWidth = ({target}) => {
+        setProductWidth(target.value)
+    }
+    const handleChangeProductHeight = ({target}) => {
+        console.log(target.value)
+        setProductHeight(target.value)
+    }
+
+    const clearForm = (e) => {
+        e && e.preventDefault()
+        setCodeOfProduct('')
+        setNameOfProduct('')
+        setCheckOfProduct('')
+        setNumberOfProduct('')
+        setPriceOfProduct('')
+        setSellingPriceOfProduct('')
+        setPriceOfProductsUsd('')
+        setSellingPriceOfProductUsd('')
+        setUnitOfProduct('')
+        setCategoryOfProduct('')
+        setTradePrice('')
+        setTradePriceUzs('')
+        setMinimumCount('')
+        setCurrentProduct(null)
+        setStickyForm(false)
+        setSellingPriceOfProcient('')
+        setTradePriceProcient('')
+        setProductWidth('')
+        setProductHeight('')
+        setMetrOfProduct('')
+        setMetrPriceOfProduct('')
+        setTotalMetrOfProduct('')
+        setMetrIncPriceOfProduct('')
+    }
+    const handleEdit = (e) => {
+        e.preventDefault()
+        const {failed, message} = checkEmptyString([
+            {
+                value: checkOfProduct,
+                message: t('Maxsulot shtrix kodi'),
+            },
+            {
+                value: codeOfProduct,
+                message: t('Maxsulot kodi'),
+            },
+            {
+                value: nameOfProduct,
+                message: t('Maxsulot nomi'),
+            },
+            {
+                value: unitOfProduct,
+                message: t("Maxsulot o'lchov birligi"),
+            },
+            {
+                value: categoryOfProduct,
+                message: t('Maxsulot kategoriyasi'),
+            },
+            {
+                value: priceOfProduct,
+                message: t('Maxsulot kelish narxi'),
+            },
+            {
+                value: sellingPriceOfProduct,
+                message: t('Maxsulot sotish narxi'),
+            },
+            {
+                value: tradePrice,
+                message: t('Maxsulot optom narxi'),
+            },
+            {
+                value: minimumCount,
+                message: t('Maxsulot minimal miqdori'),
+            },
+        ])
+        if (failed) {
+            warningEmptyInput(message)
+        } else {
+            const body = {
+                product: {
+                    ...currentProduct,
+                    name: nameOfProduct.replace(/\s+/g, ' ').trim(),
+                    code: codeOfProduct,
+                    category: categoryOfProduct.value,
+                    unit: unitOfProduct.value,
+                    priceid: currentProduct.price._id,
+                    productdata: currentProduct.productdata._id,
+                    incomingprice: priceOfProductUsd,
+                    sellingprice: sellingPriceOfProductUsd,
+                    incomingpriceuzs: priceOfProduct,
+                    sellingpriceuzs: sellingPriceOfProduct,
+                    total: numberOfProduct,
+                    barcode: checkOfProduct,
+                    tradeprice: tradePrice,
+                    tradepriceuzs: tradePriceUzs,
+                    minimumcount: minimumCount,
+                    width: productWidth === '' ? 0 : productWidth,
+                    height: productHeight === '' ? 0 : productHeight,
+                    metrOfProduct: metrOfProduct || 0,
+                    totalMetrOfProduct: totalMetrOfProduct || 0,
+                    metrPriceOfProduct: metrPriceOfProduct || 0,
+                    metrIncPriceOfProduct: metrIncPriceOfProduct || 0,
+                },
+                currentPage,
+                countPage: showByTotal,
+                search: {
+                    name: searchByName.replace(/\s+/g, ' ').trim(),
+                    code: searchByCode.replace(/\s+/g, ' ').trim(),
+                    category: searchByCategory.replace(/\s+/g, ' ').trim(),
+                },
+            }
+            dispatch(updateProduct(body)).then(({error}) => {
+                if (!error) {
+                    clearForm()
+                    setStickyForm(false)
+                    const body = {
+                        currentPage,
+                        countPage: showByTotal,
+                        search: {
+                            name: searchByName.replace(/\s+/g, ' ').trim(),
+                            code: searchByCode.replace(/\s+/g, ' ').trim(),
+                            category: searchByCategory
+                                .replace(/\s+/g, ' ')
+                                .trim(),
+                        },
+                    }
+                    dispatch(getProducts(body)).then(() => {
+                        document
+                            .querySelector(`#${tableRowId}`)
+                            .scrollIntoView({block: 'center'})
+                    })
+                }
+            })
+        }
+    }
+    /////////
+
     // functions for onchange of select
     const selectSupplier = (e) => {
         setSelectSupplierValue({
@@ -77,7 +640,7 @@ const RegisterIncoming = () => {
             value: e.value,
         })
         setSupplier(
-            ...filter([...suppliers], (supplier) => supplier._id === e.value)
+            ...filter([...suppliers], (supplier) => supplier._id === e.value),
         )
         if (incomings.length > 0) {
             setIncomings([
@@ -103,7 +666,7 @@ const RegisterIncoming = () => {
             !incomings.some(
                 (incoming) =>
                     incoming._id === e.value &&
-                    incoming.supplier._id === supplier._id
+                    incoming.supplier._id === supplier._id,
             )
         ) {
             addIncomingToModal(e.value)
@@ -121,7 +684,7 @@ const RegisterIncoming = () => {
             _id: product._id,
             oldprice: product.price.incomingprice,
             oldpriceuzs: product.price.incomingpriceuzs,
-            product: { ...product.productdata, _id: product._id },
+            product: {...product.productdata, _id: product._id},
             pieces: '',
             unitprice: '',
             unitpriceuzs: '',
@@ -134,7 +697,7 @@ const RegisterIncoming = () => {
             tradeprice: product.price.tradeprice,
             tradepriceuzs: product.price.tradepriceuzs,
             procient: '',
-            supplier: { ...supplier },
+            supplier: {...supplier},
         })
         setModalBody('registerincomingbody')
         setModalVisible(true)
@@ -154,7 +717,7 @@ const RegisterIncoming = () => {
         const check = (property) => key === property
         const product = (!id && {
             ...incomingModal,
-        }) || { ...filter([...incomings], (incoming) => incoming._id === id)[0] }
+        }) || {...filter([...incomings], (incoming) => incoming._id === id)[0]}
 
         const countUsd =
             currencyType === 'USD' ? target : UzsToUsd(target, currency)
@@ -243,7 +806,7 @@ const RegisterIncoming = () => {
         setIncomings(f)
         const temps = filter(
             temporaryIncomings,
-            (temp) => temp._id !== product._id
+            (temp) => temp._id !== product._id,
         )
         setTemporaryIncomings(temps)
         if (temps.length === 0) {
@@ -259,13 +822,13 @@ const RegisterIncoming = () => {
             if (product.unitprice < 0.01) {
                 return universalToast(
                     t('Mahsulot qabul narxini kiriting!'),
-                    'warning'
+                    'warning',
                 )
             }
             if (product.sellingprice < product.unitprice) {
                 return universalToast(
                     t("Sotish narxi olish narxidan kam bo'lmasin"),
-                    'warning'
+                    'warning',
                 )
             }
         }
@@ -279,13 +842,13 @@ const RegisterIncoming = () => {
         if (Number(product.unitprice) < 0.01) {
             return universalToast(
                 t('Mahsulot qabul narxini kiriting!'),
-                'warning'
+                'warning',
             )
         }
         if (Number(product.sellingprice) < Number(product.unitprice)) {
             return universalToast(
                 t("Sotish narxi olish narxidan kam bo'lmasin"),
-                'warning'
+                'warning',
             )
         }
         return false
@@ -294,7 +857,7 @@ const RegisterIncoming = () => {
     // request functions
     const createIncoming = () => {
         const postincoming = map(incomings, (incoming) => {
-            let obj = { ...incoming }
+            let obj = {...incoming}
             delete obj._id
             delete obj.procient
             return obj
@@ -327,7 +890,7 @@ const RegisterIncoming = () => {
             dispatch(
                 deleteTemporary({
                     _id: temporary._id,
-                })
+                }),
             )
             dispatch(clearTemporary())
         }
@@ -342,8 +905,8 @@ const RegisterIncoming = () => {
                     supplier,
                     incomings,
                 },
-            })
-        ).then(({ error }) => {
+            }),
+        ).then(({error}) => {
             if (!error) {
                 setSelectSupplierValue({
                     label: t('Yetkazib beruvchi'),
@@ -617,7 +1180,7 @@ const RegisterIncoming = () => {
     const handleApprovePay = () => {
         if (!loading) {
             const postincoming = map(incomings, (incoming) => {
-                let obj = { ...incoming }
+                let obj = {...incoming}
                 delete obj._id
                 delete obj.procient
                 return obj
@@ -637,8 +1200,8 @@ const RegisterIncoming = () => {
                         transfer: Number(paymentTransfer),
                         transferuzs: Number(paymentTransferUzs),
                     },
-                })
-            ).then(({ error }) => {
+                }),
+            ).then(({error}) => {
                 removeTemporary()
                 dispatch(getProducts())
                 !error && navigate('/maxsulotlar/qabul/qabullar')
@@ -655,7 +1218,7 @@ const RegisterIncoming = () => {
     }, [dispatch, _id, suppliers])
 
     useEffect(() => {
-        products.length < 1 && dispatch(getProducts({ market: _id }))
+        products.length < 1 && dispatch(getProducts({market: _id}))
         products.length > 0 && changeProductsData(products)
     }, [dispatch, _id, products])
 
@@ -696,9 +1259,11 @@ const RegisterIncoming = () => {
 
     return (
         <>
-            {loading && <div className='absolute top-0 left-0 z-30'>
-                <Loader />
-            </div>}
+            {loading && (
+                <div className='absolute top-0 left-0 z-30'>
+                    <Loader />
+                </div>
+            )}
             <div className={'relative grow overflow-auto'}>
                 <CustomerPayment
                     returned={true}
@@ -708,7 +1273,9 @@ const RegisterIncoming = () => {
                     changePaymentType={handleChangePaymentType}
                     onChange={handleChangePaymentInput}
                     client={''}
-                    allPayment={currencyType === 'USD' ? allPayment : allPaymentUzs}
+                    allPayment={
+                        currencyType === 'USD' ? allPayment : allPaymentUzs
+                    }
                     card={currencyType === 'USD' ? paymentCard : paymentCardUzs}
                     cash={currencyType === 'USD' ? paymentCash : paymentCashUzs}
                     debt={currencyType === 'USD' ? paymentDebt : paymentDebtUzs}
@@ -742,13 +1309,124 @@ const RegisterIncoming = () => {
                             placeholder={t('Maxsulotlar')}
                         />
                     </div>
+                    <button
+                        onClick={() => setIsOpen(true)}
+                        className='hover:bg-green-200 flex-none lg:ms-[20px] lg:mt-[10px] mt-[60px] bg-green-300 focus-visible:outline-none w-[90%]  m-auto lg:w-[200px] lg:h-[33px] h=[40px] createElement'
+                    >
+                        {t("Yangi maxsulot qo'shish")}
+                    </button>
+                    <Modal
+                        isOpen={modalIsOpen}
+                        // onAfterOpen={afterOpenModal}
+                        onRequestClose={closeModal}
+                        style={{
+                            content: {
+                                height: '80vh',
+                                top: '50%',
+                                left: '50%',
+                                right: 'auto',
+                                bottom: 'auto',
+                                marginRight: '-50%',
+                                transform: 'translate(-50%, -50%)',
+                            },
+                        }}
+                        contentLabel='Example Modal'
+                    >
+                        <button
+                            className='absolute top-3 right-4 text-[21px] bg-black-200 rounded-full p-2'
+                            onClick={closeModal}
+                        >
+                            <IoClose />
+                        </button>
+                        <CreateProductForm
+                            productWidth={productWidth}
+                            handleChangeProductWidth={handleChangeProductWidth}
+                            nameOfProduct={nameOfProduct}
+                            unitOfProduct={unitOfProduct}
+                            metrOfProduct={metrOfProduct}
+                            metrPriceOfProduct={metrPriceOfProduct}
+                            metrIncPriceOfProduct={metrIncPriceOfProduct}
+                            totalMetrOfProduct={totalMetrOfProduct}
+                            categoryOfProduct={categoryOfProduct}
+                            codeOfProduct={codeOfProduct}
+                            checkOfProduct={checkOfProduct}
+                            productHeight={productHeight}
+                            handleChangeProductHeight={
+                                handleChangeProductHeight
+                            }
+                            handleMetrPriceOfProduct={handleMetrPriceOfProduct}
+                            tradePriceProcient={tradePriceProcient}
+                            handleChangeTradePriceProcient={
+                                handleChangeTradePriceProcient
+                            }
+                            handleChangeCheckOfProduct={
+                                handleChangeCheckOfProduct
+                            }
+                            priceOfProduct={
+                                currencyType === 'UZS'
+                                    ? priceOfProduct
+                                    : priceOfProductUsd
+                            }
+                            sellingPriceOfProduct={
+                                currencyType === 'UZS'
+                                    ? sellingPriceOfProduct
+                                    : sellingPriceOfProductUsd
+                            }
+                            sellingPriceOfProcient={sellingPriceOfProcient}
+                            numberOfProduct={numberOfProduct}
+                            handleChangeSellingPriceOfProduct={
+                                handleChangeSellingPriceOfProduct
+                            }
+                            handleChangeSellingPriceOfProcient={
+                                handleChangeSellingPriceOfProcient
+                            }
+                            handleChangePriceOfProduct={
+                                handleChangePriceOfProduct
+                            }
+                            handleChangeNumberOfProduct={
+                                handleChangeNumberOfProduct
+                            }
+                            handleMetrOfProduct={handleMetrOfProduct}
+                            stickyForm={stickyForm}
+                            clearForm={clearForm}
+                            handleEdit={handleEdit}
+                            addNewProduct={addNewProduct}
+                            handleChangeCodeOfProduct={
+                                handleChangeCodeOfProduct
+                            }
+                            handleChangeNameOfProduct={
+                                handleChangeNameOfProduct
+                            }
+                            handleChangeUnitOfProduct={
+                                handleChangeUnitOfProduct
+                            }
+                            handleChangeCategoryOfProduct={
+                                handleChangeCategoryOfProduct
+                            }
+                            pageName={'products'}
+                            unitOptions={unitOptions}
+                            categoryOptions={categoryOptions}
+                            searchBarcode={searchBarcode}
+                            minimumCount={minimumCount}
+                            handleChangeMinimumCount={handleChangeMinimumCount}
+                            tradePrice={
+                                currencyType === 'USD'
+                                    ? tradePrice
+                                    : tradePriceUzs
+                            }
+                            handleChangeTradePrice={handleChangeTradePrice}
+                        />
+                    </Modal>
                 </div>
                 <p className='text-[1.25rem] text-blue-900 mainPadding'>
                     {t('Yetkazib beruvchi')}: {supplier.name}
                 </p>
                 <div
-                    className={`${incomings.length > 0 ? 'tableContainerPadding' : 'hidden'
-                        }`}
+                    className={`${
+                        incomings.length > 0
+                            ? 'tableContainerPadding'
+                            : 'hidden'
+                    }`}
                 >
                     <Table
                         page={'registerincoming'}
@@ -759,7 +1437,10 @@ const RegisterIncoming = () => {
                         Delete={deleteIncoming}
                     />
                     <div className='flex items-center justify-end gap-[0.625rem] pt-[1.25rem]'>
-                        <SaveBtn text={t('Saqlash')} onClick={createTemporary} />
+                        <SaveBtn
+                            text={t('Saqlash')}
+                            onClick={createTemporary}
+                        />
                         <ConfirmBtn
                             text={t('Tasdiqlash')}
                             onClick={createIncoming}
@@ -769,9 +1450,11 @@ const RegisterIncoming = () => {
                 <UniversalModal
                     isOpen={modalVisible}
                     body={modalBody}
-                    headerText={t("To'lovni amalga oshirishni tasdiqlaysizmi ?")}
+                    headerText={t(
+                        "To'lovni amalga oshirishni tasdiqlaysizmi ?",
+                    )}
                     title={t(
-                        "To'lovni amalga oshirgach bu ma`lumotlarni o`zgaritirb bo`lmaydi !"
+                        "To'lovni amalga oshirgach bu ma`lumotlarni o`zgaritirb bo`lmaydi !",
                     )}
                     product={incomingModal}
                     toggleModal={toggleModal}
