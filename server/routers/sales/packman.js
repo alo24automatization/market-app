@@ -172,6 +172,7 @@ module.exports.deletePackman = async (req, res) => {
     res.status(501).json({ error: 'Serverda xatolik yuz berdi...' });
   }
 };
+
 module.exports.payProfit = async (req, res) => {
   try {
     const convertToUsd = (value) => Math.round(value * 1000) / 1000;
@@ -226,6 +227,7 @@ module.exports.getPackmans = async (req, res) => {
     }
 
     const name = new RegExp('.*' + (search ? search.name : '') + '.*', 'i');
+    console.time('getPackmans');
     const [packmans, packmansCount] = await Promise.all([
       Packman.find({ market, name: name })
         .sort({ _id: -1 })
@@ -274,9 +276,12 @@ module.exports.getPackmans = async (req, res) => {
         .lean(),
       Packman.countDocuments({ market, name: name }),
     ]);
-
+    
+    console.timeEnd('getPackmans');
+    console.time('getTotalSumPackmanClientsSum');
     const packmansWithAllProfitAndTotalSum = await getTotalSumPackmanClientsSum(market, packmans);
     packmansWithAllProfitAndTotalSum.sort((a, b) => b.totalSum - a.totalSum);
+    console.timeEnd('getTotalSumPackmanClientsSum');
 
     res.status(201).json({
       packmans: packmansWithAllProfitAndTotalSum,
