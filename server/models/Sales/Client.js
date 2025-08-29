@@ -1,4 +1,4 @@
-const { Schema, model, Types } = require('mongoose');
+const { Schema, model } = require('mongoose');
 const Joi = require('joi');
 
 const client = new Schema(
@@ -13,6 +13,16 @@ const client = new Schema(
     timestamps: true,
   },
 );
+
+// client.schema.js
+client.virtual('saleconnectors', {
+  ref: 'SaleConnector',
+  localField: '_id',
+  foreignField: 'client',
+});
+
+client.set('toObject', { virtuals: true });
+client.set('toJSON', { virtuals: true });
 
 function validateClient(client) {
   const schema = Joi.object({

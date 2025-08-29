@@ -99,7 +99,7 @@ function Packman() {
     const [deletedPackman, setDeletedPackman] = useState(null)
     const [modalVisible, setModalVisible] = useState(false)
     const [stickyForm, setStickyForm] = useState(false)
-    const [showByTotal, setShowByTotal] = useState('10')
+    const [showByTotal, setShowByTotal] = useState('100')
     const [currentPage, setCurrentPage] = useState(0)
     const [filteredDataTotal, setFilteredDataTotal] = useState(total)
     const [searchByName, setSearchByName] = useState('')
@@ -266,13 +266,14 @@ function Packman() {
         if (valForSearch === '') {
             setData(packmans)
             setFilteredDataTotal(total)
-        } else {
-            const filteredPackmans = filter(packmans, (packman) => {
-                return packman.name.toLowerCase().includes(valForSearch)
-            })
-            setData(filteredPackmans)
-            setFilteredDataTotal(filteredPackmans.length)
-        }
+        } 
+        // else {
+        //     const filteredPackmans = filter(packmans, (packman) => {
+        //         return packman.name.toLowerCase().includes(valForSearch)
+        //     })
+        //     setData(filteredPackmans)
+        //     setFilteredDataTotal(filteredPackmans.length)
+        // }
     }
 
     const filterByNameWhenPressEnter = (e) => {
@@ -536,7 +537,7 @@ function Packman() {
                     'totalpriceuzs'
                 )
             )
-            .reduce((prev, item) => prev + item, 0)||0
+            .reduce((prev, item) => prev + item, 0) || 0
     const calcTotalCommission = () =>
         (clickedPackman?.clients
             ?.map((client) =>

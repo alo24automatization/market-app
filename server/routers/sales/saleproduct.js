@@ -50,8 +50,7 @@ const transferWarhouseProducts = async (products) => {
 
 module.exports.register = async (req, res) => {
   try {
-    let { saleproducts, client, packman, discount, payment, debt, market, user, comment } =
-      req.body;
+    let { saleproducts, client, packman, discount, payment, debt, market, user, comment } = req.body;
     const marke = await Market.findById(market);
 
     if (!marke) {
@@ -138,14 +137,22 @@ module.exports.register = async (req, res) => {
       });
 
       const produc = await Product.findById(product._id)
-        .select('total')
+        .select('total totalMetrOfProduct')
         .populate('productdata', 'name')
         .populate('price');
 
-      if (fromFilial <= 0 && produc.total < pieces) {
-        return res.status(400).json({
-          error: `Diqqat! ${produc.productdata.name} mahsuloti omborda yetarlicha mavjud emas. Qolgan mahsulot soni ${produc.total} ta`,
-        });
+      if (isMetr) {
+        if (fromFilial <= 0 && produc.totalMetrOfProduct < pieces) {
+          return res.status(400).json({
+            error: `Diqqat! ${produc.productdata.name} mahsuloti omborda yetarlicha mavjud emas. Qolgan mahsulot ${produc.totalMetrOfProduct} m`,
+          });
+        }
+      } else {
+        if (fromFilial <= 0 && produc.total < pieces) {
+          return res.status(400).json({
+            error: `Diqqat! ${produc.productdata.name} mahsuloti omborda yetarlicha mavjud emas. Qolgan mahsulot soni ${produc.total} ta`,
+          });
+        }
       }
 
       if (error) {
@@ -282,13 +289,7 @@ module.exports.register = async (req, res) => {
       if (!findedMarket) {
         return res.status(400).json({ message: 'Market not found!' });
       }
-      await sendMessageToClientAboutHisDebt(
-        client,
-        debt.debtuzs,
-        debt.pay_end_date,
-        use.phone,
-        findedMarket,
-      );
+      await sendMessageToClientAboutHisDebt(client, debt.debtuzs, debt.pay_end_date, use.phone, findedMarket);
     }
 
     if (payment.totalprice > 0) {
@@ -571,18 +572,8 @@ module.exports.deleteSale = async (req, res) => {
 
 module.exports.addproducts = async (req, res) => {
   try {
-    const {
-      saleconnectorid,
-      saleproducts,
-      client,
-      packman,
-      discount,
-      payment,
-      debt,
-      market,
-      user,
-      comment,
-    } = req.body;
+    const { saleconnectorid, saleproducts, client, packman, discount, payment, debt, market, user, comment } =
+      req.body;
 
     const marke = await Market.findById(market);
     if (!marke) {
@@ -657,9 +648,7 @@ module.exports.addproducts = async (req, res) => {
         more_parameters2: columns,
       });
 
-      const produc = await Product.findById(product._id)
-        .populate('productdata', 'name')
-        .populate('price');
+      const produc = await Product.findById(product._id).populate('productdata', 'name').populate('price');
 
       if (produc.total < pieces) {
         return res.status(400).json({
@@ -769,13 +758,7 @@ module.exports.addproducts = async (req, res) => {
       if (!findedMarket) {
         res.status(400).json({ message: 'Market not found!' });
       }
-      await sendMessageToClientAboutHisDebt(
-        client,
-        debt.debtuzs,
-        debt.pay_end_date,
-        use.phone,
-        findedMarket,
-      );
+      await sendMessageToClientAboutHisDebt(client, debt.debtuzs, debt.pay_end_date, use.phone, findedMarket);
     }
 
     if (payment.totalprice > 0) {
@@ -976,8 +959,7 @@ module.exports.getsaleconnectors = async (req, res) => {
           options: { sort: { createdAt: -1 } },
           populate: {
             path: 'product',
-            select:
-              'productdata metrIncPriceOfProduct metrOfProduct totalMetrOfProduct metrPriceOfProduct',
+            select: 'productdata metrIncPriceOfProduct metrOfProduct totalMetrOfProduct metrPriceOfProduct',
             populate: {
               path: 'productdata',
               select: 'name code', // match: {name: product}
@@ -998,10 +980,7 @@ module.exports.getsaleconnectors = async (req, res) => {
           'payments',
           'payment paymentuzs comment totalprice totalpriceuzs createdAt cash cashuzs card carduzs transfer transferuzs',
         )
-        .populate(
-          'discounts',
-          'discount discountuzs createdAt procient products totalprice totalpriceuzs',
-        )
+        .populate('discounts', 'discount discountuzs createdAt procient products totalprice totalpriceuzs')
         .populate({
           path: 'client',
           match: { name: name },
@@ -1082,10 +1061,7 @@ module.exports.getsaleconnectors = async (req, res) => {
           'payments',
           'payment paymentuzs comment totalprice totalpriceuzs createdAt cash cashuzs card carduzs transfer transferuzs',
         )
-        .populate(
-          'discounts',
-          'discount discountuzs createdAt procient products totalprice totalpriceuzs',
-        )
+        .populate('discounts', 'discount discountuzs createdAt procient products totalprice totalpriceuzs')
         .populate({
           path: 'client',
           match: { name: name },
@@ -1128,14 +1104,12 @@ module.exports.getsaleconnectors = async (req, res) => {
     for (const connector of saleconnectors) {
       const filterProducts = connector.products.filter((product) => {
         return (
-          new Date(product.createdAt) > new Date(startDate) &&
-          new Date(product.createdAt) < new Date(endDate)
+          new Date(product.createdAt) > new Date(startDate) && new Date(product.createdAt) < new Date(endDate)
         );
       });
       const filterPayment = connector.payments.filter((payment) => {
         return (
-          new Date(payment.createdAt) > new Date(startDate) &&
-          new Date(payment.createdAt) < new Date(endDate)
+          new Date(payment.createdAt) > new Date(startDate) && new Date(payment.createdAt) < new Date(endDate)
         );
       });
       const filterDiscount = connector.discounts.filter((discount) => {
@@ -1169,10 +1143,7 @@ module.exports.getsaleconnectors = async (req, res) => {
         _id: connector._id,
         dailyconnectors: connector.dailyconnectors,
         discounts: filterDiscount,
-        debts:
-          connector.debts.length > 0
-            ? [connector.debts[connector.debts.length - 1]]
-            : connector.debts,
+        debts: connector.debts.length > 0 ? [connector.debts[connector.debts.length - 1]] : connector.debts,
         user: connector.user,
         createdAt: connector.createdAt,
         updatedAt: connector.updatedAt,
@@ -1273,10 +1244,7 @@ module.exports.getsaleconnectorsexcel = async (req, res) => {
       .populate('packman', 'name');
 
     const filter = saleconnectors.filter((item) => {
-      return (
-        (search.client.length > 0 && item.client !== null && item.client) ||
-        search.client.length === 0
-      );
+      return (search.client.length > 0 && item.client !== null && item.client) || search.client.length === 0;
     });
 
     res.status(200).json({ saleconnectors: filter });
