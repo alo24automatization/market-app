@@ -314,23 +314,10 @@ function ProductReport() {
                     <SmallLoader />
                 </div>
             )}
-            <div className={'mainPadding'}>
-                <p className='product_name text-center'>{t('')}</p>
-            </div>
-            <div className='flex lg:justify-start gap-3 justify-between mainPadding '>
-                <ExportBtn
-                    onClick={exportData}
-                />
-                <button class=" hover:bg-blue-200  bg-blue-400 focus-visible:outline-none w-[100px] lg:h-[33px] h-[33px] createElement " onClick={()=>setOpenModal(true)}><FaFilter /> {t('izlash')}</button>
-                
-                
-                
-            </div>
-            {
-               openModal?
-                    <div className='fixed top-0 start-0 bg-[white] w-[100%] h-[100vh] z-50 lg:pt-[100px] pt-[55px]'>
-                        <VscClose onClick={()=>setOpenModal(false)} className='absolute text-3xl end-[25px] top-[25px] cursor-pointer'/>
-                        <SearchForm
+            
+            <div className='flex flex-wrap gap-3 justify-start mainPadding '>
+              
+                                        <SearchForm
                         filterBy={['total', 'code', 'name', 'clientName', 'sellerName']}
                         filterByTotal={filterByTotal}
                         searchByCode={searchByCode}
@@ -347,7 +334,6 @@ function ProductReport() {
                     />
                     
                     
-            <div className='flex justify-evenly'>
                     <Dates
                         label={t('dan')}
                         value={new Date(beginDay)}
@@ -360,12 +346,12 @@ function ProductReport() {
                         onChange={(value) => changeDate(value, 'endDay')}
                         maxWidth={'max-w-[9.6875rem]'}
                     />
-                </div>
-                <div className='flex justify-center mt-[50px]'>
-                <button onClick={()=>setOpenModal(false)} class=" hover:bg-green-200  bg-green-400 focus-visible:outline-none w-[160px]  h-[40px] createElement "><FaFilter /> {t('izlash')}</button>
-                </div>
-                    </div>:null
-            }
+                <ExportBtn
+                    onClick={exportData}
+                />
+                
+            </div>
+            
             <div className={' ps-[20px] tableContainerPadding'}>
                 {loading ? (
                     <Spinner />
