@@ -23,6 +23,7 @@ import {exportExcel} from '../../App/globalFunctions.js'
 import {universalToast} from '../../Components/ToastMessages/ToastMessages.js'
 import {FaFilter} from 'react-icons/fa'
 import TableMobile from '../../Components/Table/TableMobile.js'
+import SelectForm from '../../Components/Select/SelectForm.js'
 
 
 function ProductReport() {
@@ -87,7 +88,7 @@ function ProductReport() {
     const [data, setData] = useState(products)
     const [searchedData, setSearchedData] = useState(searchedProducts)
     const [filteredDataTotal, setFilteredDataTotal] = useState(total)
-    const [showByTotal, setShowByTotal] = useState('10')
+    const [showByTotal, setShowByTotal] = useState('100')
     const [currentPage, setCurrentPage] = useState(0)
     const [searchByCode, setSearchByCode] = useState('')
     const [searchByName, setSearchByName] = useState('')
@@ -185,7 +186,7 @@ function ProductReport() {
             const body = {
                 startDate: beginDay,
                 endDate: endDay,
-                currentPage: currentPage,
+                currentPage: 0,
                 countPage: showByTotal,
                 search: {
                     codeofproduct: searchByCode.replace(/\s+/g, ' ').trim(),
@@ -200,10 +201,11 @@ function ProductReport() {
     const changeDate = (value, name) => {
         name === 'beginDay' && setBeginDay(new Date(value).toISOString())
         name === 'endDay' && setEndDay(new Date(value).toISOString())
+        setCurrentPage(0) // Reset current page when date changes
         const body = {
             startDate: name === 'beginDay' ? new Date(value).toISOString() : beginDay,
             endDate: name === 'endDay' ? new Date(value).toISOString() : endDay,
-            currentPage: currentPage,
+            currentPage: 0,
             countPage: showByTotal,
             search: {
                 codeofproduct: searchByCode.replace(/\s+/g, ' ').trim(),
@@ -270,23 +272,19 @@ function ProductReport() {
     }
     useEffect(() => {
         const body = {
-            startDate: new Date(
-                new Date().getFullYear(),
-                new Date().getMonth(),
-                new Date().getDate()
-            ).toISOString(),
-            endDate: new Date(new Date().setHours(23, 59, 59, 0)).toISOString(),
+            startDate: beginDay,
+            endDate: endDay,
             currentPage: currentPage,
             countPage: showByTotal,
             search: {
-                codeofproduct: '',
-                nameofproduct: '',
-                nameofclient: '',
-                nameofseller: ''
+                codeofproduct: searchByCode.replace(/\s+/g, ' ').trim(),
+                nameofproduct: searchByName.replace(/\s+/g, ' ').trim(),
+                nameofclient: searchByClient.replace(/\s+/g, ' ').trim(),
+                nameofseller: searchBySeller.replace(/\s+/g, ' ').trim()
             }
         }
         dispatch(getProductReports(body))
-    }, [currentPage, showByTotal, dispatch])
+    }, [currentPage, showByTotal, dispatch, beginDay, endDay, searchByCode, searchByName, searchByClient, searchBySeller])
     useEffect(() => {
         setData(products)
     }, [products])
@@ -315,11 +313,9 @@ function ProductReport() {
                 </div>
             )}
             
-            <div className='flex flex-wrap gap-3 justify-start mainPadding '>
-              
+            <div className='flex flex-wrap gap-3 justify-start mainPadding'>
                                         <SearchForm
-                        filterBy={['total', 'code', 'name', 'clientName', 'sellerName']}
-                        filterByTotal={filterByTotal}
+                        filterBy={['code', 'name', 'clientName', 'sellerName']}
                         searchByCode={searchByCode}
                         searchByName={searchByName}
                         searchByClientName={searchByClient}
@@ -346,13 +342,17 @@ function ProductReport() {
                         onChange={(value) => changeDate(value, 'endDay')}
                         maxWidth={'max-w-[9.6875rem]'}
                     />
-                <ExportBtn
+                {/* <ExportBtn
                     onClick={exportData}
+                /> */}
+                <SelectForm 
+                    key={'total_1'} 
+                    onSelect={filterByTotal}
                 />
                 
             </div>
             
-            <div className={' ps-[20px] tableContainerPadding'}>
+            <div className={'ps-[20px] tableContainerPadding'}>
                 {loading ? (
                     <Spinner />
                 ) : data.length === 0 && searchedData.length === 0 ? (

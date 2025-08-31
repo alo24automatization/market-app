@@ -12,22 +12,22 @@ import './i18n'
 
 const root = ReactDOM.createRoot(document.getElementById('root'))
 root.render(
-    <>
-        <Router>
-            <Provider store={Store}>
-                <App />
-            </Provider>
-        </Router>
-        <ToastContainer
-            position='top-right'
-            theme={'colored'}
-            autoClose={2000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            pauseOnHover
-        />
-    </>
+  <>
+    <Router>
+      <Provider store={Store}>
+        <App />
+      </Provider>
+    </Router>
+    <ToastContainer
+      position='top-right'
+      theme={'colored'}
+      autoClose={2000}
+      hideProgressBar={false}
+      newestOnTop={false}
+      closeOnClick
+      rtl={false}
+      pauseOnFocusLoss
+      pauseOnHover
+    />
+  </>
 )

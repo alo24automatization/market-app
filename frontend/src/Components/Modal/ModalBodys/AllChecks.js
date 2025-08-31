@@ -222,7 +222,7 @@ function AllCheck({product, allDetails}) {
                     userInfo={userInfo}
                 />
             </div>
-            <div className='flex justify-center md:justify-between items-center mt-6 '>
+            <div className='flex justify-center items-center mt-6 md:justify-between'>
                 <div className={'hidden md:inline'}>
                     <button
                         className={`group print-btn-style ml-auto min-w-max ${
@@ -237,7 +237,7 @@ function AllCheck({product, allDetails}) {
                         <span className='print-icon-style'>
                             <IoPrint
                                 size={'1.125rem'}
-                                className='text-primary-800 text-lg transition-all ease-in-out duration-200 group-hover:text-primary-900'
+                                className='text-lg transition-all duration-200 ease-in-out text-primary-800 group-hover:text-primary-900'
                             />
                         </span>
                     </button>

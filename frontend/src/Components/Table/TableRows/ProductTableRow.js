@@ -21,39 +21,39 @@ export const ProductTableRow = ({
                     className='tr'
                     id={'producttablerow' + index}
                 >
-                    <td className='td text-center '>
+                    <td className='text-center td'>
                         {productminimumpage
                             ? index + 1
                             : currentPage * countPage + 1 + index}
                     </td>
-                    <td className='td text-center'>
+                    <td className='text-center td'>
                         {product.productdata?.barcode}
                     </td>
-                    <td className='td text-center'>
+                    <td className='text-center td'>
                         {product?.category?.code}{' '}
                         {product?.category?.name && `- ${product?.category?.name}`}
                     </td>
-                    <td className='td text-center'>
-                        {product.productdata.code}
+                    <td className='text-center td'>
+                        {product?.productdata?.code}
                     </td>
-                    <td className='td text-left'>{product.productdata.name}</td>
-                    <td className='td text-right'>
+                    <td className='text-left td'>{product?.productdata?.name}</td>
+                    <td className='text-right td'>
                         {product.total.toLocaleString('ru-RU')}{' '}
                         {product.unit && product.unit.name}
                     </td>
-                    <td className='td text-right'>
+                    <td className='text-right td'>
                         {product?.metrOfProduct}{' '}
                     </td>
-                    <td className='td text-right'>
+                    <td className='text-right td'>
                         {product?.totalMetrOfProduct}{' '}
                     </td>
-                    <td className='td text-right'>
+                    <td className='text-right td'>
                         {product?.metrPriceOfProduct}{' '}{currencyType}
                     </td>
-                    <td className='td text-right'>
+                    <td className='text-right td'>
                         {product?.metrIncPriceOfProduct}{' '}{currencyType}
                     </td>
-                    <td className='td text-right'>
+                    <td className='text-right td'>
                         {product.price &&
                             (currency === 'UZS'
                                 ? product?.price?.incomingpriceuzs && product?.price?.incomingpriceuzs.toLocaleString(
@@ -64,7 +64,7 @@ export const ProductTableRow = ({
                             ))}{' '}
                         {currencyType}
                     </td>
-                    <td className='td text-right'>
+                    <td className='text-right td'>
                         {product.price &&
                             (currency === 'UZS'
                                 ? product?.price?.sellingpriceuzs && product?.price?.sellingpriceuzs.toLocaleString(
@@ -75,7 +75,7 @@ export const ProductTableRow = ({
                             ))}{' '}
                         {currencyType}
                     </td>
-                    <td className='td text-right'>
+                    <td className='text-right td'>
                         {product.price?.tradepriceuzs ? (
                             <>
                                 {currency === 'UZS'
@@ -101,7 +101,7 @@ export const ProductTableRow = ({
                     </td>
                     {!productminimumpage && (
                         <td className='td py-[0.375rem] border-r-0'>
-                            <div className='flex items-center justify-center'>
+                            <div className='flex justify-center items-center'>
                                 <TableBtn
                                     type={'edit'}
                                     bgcolor='bg-warning-500'
