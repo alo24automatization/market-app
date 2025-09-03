@@ -471,10 +471,7 @@ module.exports.register = async (req, res) => {
       })
       .populate('unit', 'name');
 
-    let filtered = filter(
-      products,
-      (product) => product.productdata !== null && product.category !== null,
-    );
+    let filtered = filter(products, (product) => product.productdata !== null && product.category !== null);
 
     const count = filtered.length;
     filtered = filtered.splice(currentPage * countPage, countPage);
@@ -567,9 +564,7 @@ module.exports.update = async (req, res) => {
       });
     }
 
-    const exchangerate = await Exchangerate.findOne({ market })
-      .select('exchangerate')
-      .sort({ _id: -1 });
+    const exchangerate = await Exchangerate.findOne({ market }).select('exchangerate').sort({ _id: -1 });
 
     await ProductPrice.findByIdAndUpdate(priceid, {
       incomingprice: Math.round(incomingprice * 1000) / 1000,
@@ -733,10 +728,7 @@ module.exports.update = async (req, res) => {
       })
       .populate('unit', 'name');
 
-    let filtered = filter(
-      products,
-      (product) => product.productdata !== null && product.category !== null,
-    );
+    let filtered = filter(products, (product) => product.productdata !== null && product.category !== null);
 
     const count = filtered.length;
     filtered = filtered.splice(currentPage * countPage, countPage);
@@ -926,62 +918,60 @@ module.exports.getProducts = async (req, res) => {
       category: { $ne: null },
     };
 
-    const [products, count, productsTotalPrices, categoriesTotalCount, productsTotal] =
-      await Promise.all([
-        Product.find(filter)
-          .sort({ code: 1 })
-          .limit(countPage)
-          .skip(currentPage * countPage + 1)
-          .select(
-            'total market category minimumcount connections width height metrIncPriceOfProduct metrOfProduct totalMetrOfProduct metrPriceOfProduct',
-          )
-          .populate(
-            'price',
-            'incomingprice sellingprice incomingpriceuzs sellingpriceuzs tradeprice tradepriceuzs',
-          )
-          .populate({
-            path: 'productdata',
-            select: 'name code barcode',
-            match: { name: name, code: code },
-          })
-          .populate({
-            path: 'category',
-            select: 'name code',
-            match: { code: category },
-          })
-          .populate('unit', 'name')
-          .lean(),
-        Product.countDocuments(filter),
-        ProductPrice.aggregate([
-          {
-            $match: {
-              market: ObjectId(id),
-              isArchive: false,
-            },
+    const [products, count, categoriesTotalCount, productsTotal] = await Promise.all([
+      Product.find(filter)
+        .sort({ code: 1 })
+        .limit(countPage)
+        .skip(currentPage * countPage + 1)
+        .select(
+          'total market category minimumcount connections width height metrIncPriceOfProduct metrOfProduct totalMetrOfProduct metrPriceOfProduct',
+        )
+        .populate(
+          'price',
+          'incomingprice sellingprice incomingpriceuzs sellingpriceuzs tradeprice tradepriceuzs',
+        )
+        .populate({
+          path: 'productdata',
+          select: 'name code barcode',
+          match: { name: name, code: code },
+        })
+        .populate({
+          path: 'category',
+          select: 'name code',
+          match: { code: category },
+        })
+        .populate('unit', 'name')
+        .lean(),
+      Product.countDocuments(filter),
+      Category.countDocuments({
+        market: id,
+        isArchive: false,
+      }),
+      Product.aggregate([
+        {
+          $match: {
+            market: ObjectId(id),
           },
-          {
-            $group: {
-              _id: null,
-              incomingprice: { $sum: '$incomingprice' },
-              sellingprice: { $sum: '$sellingprice' },
-              incomingpriceuzs: { $sum: '$incomingpriceuzs' },
-              sellingpriceuzs: { $sum: '$sellingpriceuzs' },
-            },
-          },
-        ]),
-        Category.countDocuments({
-          market: id,
-          isArchive: false,
-        }),
-        Product.aggregate([
-          {
-            $match: {
-              market: ObjectId(id),
-            },
-          },
-          { $group: { _id: null, total: { $sum: { $toLong: { $ifNull: ['$total', 0] } } } } },
-        ]),
-      ]);
+        },
+        { $group: { _id: null, total: { $sum: { $toLong: { $ifNull: ['$total', 0] } } } } },
+      ]),
+    ]);
+
+    const data = products.reduce(
+      (acc, product) => {
+        acc.productsIncomingTotalPriceUzs += product.price.incomingpriceuzs * product.total;
+        acc.productsIncomingTotalPriceUsd += product.price.incomingprice * product.total;
+        acc.productsSellingTotalPriceUzs += product.price.sellingpriceuzs * product.total;
+        acc.productsSellingTotalPriceUsd += product.price.sellingprice * product.total;
+        return acc;
+      },
+      {
+        productsIncomingTotalPriceUzs: 0,
+        productsIncomingTotalPriceUsd: 0,
+        productsSellingTotalPriceUzs: 0,
+        productsSellingTotalPriceUsd: 0,
+      },
+    );
 
     res.status(201).json({
       products,
@@ -990,14 +980,14 @@ module.exports.getProducts = async (req, res) => {
         categoriesTotalCount,
         productsTotalCount: count,
         productsTotal: productsTotal[0].total,
-        productsIncomingTotalPriceUzs: productsTotalPrices[0].incomingpriceuzs,
-        productsIncomingTotalPriceUsd: productsTotalPrices[0].incomingprice,
-        productsSellingTotalPriceUzs: productsTotalPrices[0].sellingpriceuzs,
-        productsSellingTotalPriceUsd: productsTotalPrices[0].sellingprice,
+        productsIncomingTotalPriceUzs: data.productsIncomingTotalPriceUzs,
+        productsIncomingTotalPriceUsd: data.productsIncomingTotalPriceUsd,
+        productsSellingTotalPriceUzs: data.productsSellingTotalPriceUzs,
+        productsSellingTotalPriceUsd: data.productsSellingTotalPriceUsd,
       },
     });
   } catch (error) {
-      console.log(error);
+    console.log(error);
     res.status(401).send(error);
   }
 };
@@ -1279,9 +1269,7 @@ module.exports.getAllCategory = async (req, res) => {
       product.totalsalesuzs = saleproducts.reduce((prev, el) => prev + el.totalpriceuzs, 0);
     }
 
-    const response = [...products].sort((a, b) =>
-      a.totalsaleproducts > b.totalsaleproducts ? -1 : 1,
-    );
+    const response = [...products].sort((a, b) => (a.totalsaleproducts > b.totalsaleproducts ? -1 : 1));
 
     res.status(201).send(response);
   } catch (error) {

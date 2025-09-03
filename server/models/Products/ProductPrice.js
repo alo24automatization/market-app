@@ -1,6 +1,5 @@
 const { Schema, model } = require('mongoose');
 const Joi = require('joi');
-const { number } = require('joi');
 
 const productprice = new Schema(
   {
@@ -14,7 +13,8 @@ const productprice = new Schema(
     product: { type: Schema.Types.ObjectId, ref: 'Product', index: true },
     incoming: {
       type: Schema.Types.ObjectId,
-      ref: 'Incoming', index: true,
+      ref: 'Incoming',
+      index: true,
     },
     market: { type: Schema.Types.ObjectId, ref: 'Market', required: true, index: true },
     isArchive: { type: Boolean, default: false },
