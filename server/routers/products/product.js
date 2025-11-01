@@ -979,7 +979,7 @@ module.exports.getProducts = async (req, res) => {
       statistics: {
         categoriesTotalCount,
         productsTotalCount: count,
-        productsTotal: productsTotal[0].total,
+        productsTotal: productsTotal[0]?.total,
         productsIncomingTotalPriceUzs: data.productsIncomingTotalPriceUzs,
         productsIncomingTotalPriceUsd: data.productsIncomingTotalPriceUsd,
         productsSellingTotalPriceUzs: data.productsSellingTotalPriceUzs,
