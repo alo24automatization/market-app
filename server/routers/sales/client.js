@@ -641,9 +641,16 @@ module.exports.getClientsSales = async (req, res) => {
         .json({ message: `Diqqat! Do'kon haqida malumotlar topilmadi!` });
     }
 
+    const client = await Client.findOne({ name: clientId })
+    if(!client){
+       return res
+        .status(401)
+        .json({ message: `Diqqat! Mijoz haqida malumotlar topilmadi!` });
+    }
+
     const allpayments = await DailySaleConnector.find({
       market,
-      client: clientId,
+      client: client._id,
     })
       .select("-isArchive -updatedAt -market -__v")
       .populate({

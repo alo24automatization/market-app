@@ -875,8 +875,7 @@ const sendMessageToClientAboutHisDebt = async (client, debtUzs, debtDate, userPh
     console.log(response.data);
     console.log('Messaging has ended!');
   } catch (error) {
-    console.log(error);
-    throw new Error(error);
+    console.log("SMS provider error:\n", error);
   }
 };
 
