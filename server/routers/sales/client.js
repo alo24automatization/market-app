@@ -14,6 +14,7 @@ require("../../models/Users");
 const { regExpression } = require("../globalFunctions.js");
 const { DailySaleConnector } = require("../../models/Sales/DailySaleConnector");
 const { Debt } = require("../../models/Sales/Debt");
+const { isValidObjectId } = require("mongoose")
 
 const reduce = (arr, el) =>
   arr.reduce((prev, item) => prev + (item[el] || 0), 0);
@@ -641,16 +642,20 @@ module.exports.getClientsSales = async (req, res) => {
         .json({ message: `Diqqat! Do'kon haqida malumotlar topilmadi!` });
     }
 
-    const client = await Client.findOne({ name: clientId })
-    if(!client){
-       return res
+    let id = clientId;
+    if (id && !isValidObjectId(clientId)){
+      const client = await Client.findOne({ name: clientId })
+      if (!client) {
+        return res
         .status(401)
         .json({ message: `Diqqat! Mijoz haqida malumotlar topilmadi!` });
+      }
+      id = client._id
     }
 
     const allpayments = await DailySaleConnector.find({
       market,
-      client: client._id,
+      client: id,
     })
       .select("-isArchive -updatedAt -market -__v")
       .populate({
